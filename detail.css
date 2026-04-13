@@ -1,0 +1,566 @@
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Segoe UI', sans-serif;
+}
+
+body{
+  background:
+    radial-gradient(circle at top left, rgba(80,150,255,0.25), transparent 35%),
+    linear-gradient(135deg, #021b3a, #012a63);
+  color:#fff;
+  min-height:100vh;
+  padding-top: 0;
+}
+
+/* ===== PAGE ===== */
+.detail-page{ padding:90px 20px; }
+.detail-wrapper{ max-width:1200px; margin:auto; }
+
+/* ===== GRID LAYOUT (Gallery - Content - Booking) ===== */
+.top-layout{
+  display:grid;
+  grid-template-columns: 2.4fr 1.4fr 1fr; /* gallery paling besar */
+  gap:22px;
+  align-items:start;
+}
+
+/* ===================================================================== */
+/* =================== GALLERY Airbnb-style (3 foto) ==================== */
+/* ===================================================================== */
+
+/* container gallery */
+.gallery-main{
+  position:relative;
+  height:520px;                   /* besar seperti contoh */
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 14px 45px rgba(0,0,0,.22);
+  background:rgba(255,255,255,.06);
+}
+
+/* GRID 3 foto: 1 besar kiri + 2 kecil kanan */
+#slides{
+  height:100%;
+  width:100%;
+  display:grid;
+  grid-template-columns: 1.65fr 1fr; /* kiri besar */
+  grid-template-rows: 1fr 1fr;
+  gap:10px;
+  padding:10px;                    /* ada jarak tipis seperti contoh */
+}
+
+/* tiap kotak foto harus penuh */
+.slide{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  border-radius:14px;
+}
+
+/* foto selalu cover (nggak nyempil) */
+.slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* posisi */
+.slide:nth-child(1){
+  grid-column:1;
+  grid-row:1 / span 2;
+}
+.slide:nth-child(2){
+  grid-column:2;
+  grid-row:1;
+}
+.slide:nth-child(3){
+  grid-column:2;
+  grid-row:2;
+}
+
+/* panah slider tidak dipakai untuk grid */
+.nav-arrow{
+  display:none;
+}
+
+/* ===================================================================== */
+/* ========================= CONTENT CARD ============================== */
+/* ===================================================================== */
+.detail-content{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:22px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 45px rgba(0,0,0,.18);
+}
+
+.meta-kecil{
+  font-size:12px;
+  opacity:.75;
+  margin-bottom:8px;
+}
+
+#namaPaket{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+/* deskripsi tetap, tapi tidak bikin panjang berlebihan */
+.detail-desc{
+  font-size:13px;
+  line-height:1.6;
+  opacity:.9;
+  margin-bottom:16px;
+
+  display:-webkit-box;
+  -webkit-line-clamp:4;
+  line-clamp:4;                 /* tambah ini (versi standar) */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* highlights */
+.mini-list{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:16px;
+}
+.mini-title{
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:8px;
+  opacity:.95;
+}
+#highlightsList{
+  list-style:none;
+  display:grid;
+  gap:6px;
+}
+#highlightsList li{
+  font-size:12px;
+  opacity:.85;
+  display:flex;
+  gap:8px;
+}
+#highlightsList li::before{
+  content:"•";
+  font-weight:900;
+  opacity:.9;
+}
+
+/* include */
+.extra{
+  margin-top:6px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+
+.extra h3{
+  font-size:13px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+#inclusionsList{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+
+.inc-group{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.inc-group h4{
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.inc-group ul{
+  margin:0;
+  padding-left:18px;
+  display:grid;
+  gap:4px;
+}
+.inc-group li{
+  font-size:12px;
+  opacity:.85;
+}
+
+/* ===================================================================== */
+/* =========================== BOOKING CARD ============================ */
+/* ===================================================================== */
+.booking-box{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:22px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 45px rgba(0,0,0,.18);
+  position:sticky;
+  top:20px;
+}
+
+.price-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:14px;
+}
+
+.mulai-dari{
+  font-size:11px;
+  opacity:.7;
+  margin-bottom:2px;
+}
+
+#hargaPaket{
+  font-size:22px;
+  font-weight:900;
+}
+
+.unit{
+  font-size:12px;
+  opacity:.75;
+  padding-bottom:3px;
+}
+
+.booking-box label{
+  font-size:11px;
+  opacity:.75;
+  margin-bottom:4px;
+  display:block;
+}
+
+.booking-box input{
+  width:100%;
+  height:40px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05);
+  color:white;
+  padding:0 12px;
+  margin-bottom:12px;
+}
+.booking-box input:focus{
+  outline:none;
+  border-color:#fff;
+}
+
+.total{
+  font-size:12px;
+  opacity:.85;
+  margin-bottom:12px;
+}
+
+.book-btn{
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.22);
+
+  background: rgba(255,255,255,0.05);
+  color: #ffffff;
+
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.25s ease,
+    box-shadow 0.35s ease;
+}
+
+.book-btn::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.45),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+}
+
+.book-btn:hover{
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.book-btn:hover::before{
+  left: 140%;
+}
+
+.book-btn:active{
+  transform: translateY(0) scale(0.98);
+}
+
+.note{
+  margin-top:10px;
+  font-size:11px;
+  opacity:.75;
+  line-height:1.4;
+}
+
+/* ===================================================================== */
+/* ============================ RESPONSIVE ============================= */
+/* ===================================================================== */
+@media(max-width:1100px){
+  .top-layout{
+    grid-template-columns:1fr;
+  }
+  .gallery-main{ height:300px; }
+  .booking-box{ position:relative; top:auto; }
+  #inclusionsList{ grid-template-columns:1fr; }
+}
+
+@media(max-width:900px){
+  .gallery-main{ height:260px; }
+}
+
+#slides{
+  width: 100%;
+  height: 100%;
+}
+
+.detail-gallery-grid{
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+
+  width: 100%;
+  height: 560px; /* atur tinggi sesuai kebutuhan */
+}
+
+.gallery-main{
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.gallery-side.top{
+  grid-column: 2;
+  grid-row: 1;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.gallery-side.bottom{
+  grid-column: 2;
+  grid-row: 2;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.detail-gallery-grid img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* mobile */
+@media (max-width: 900px){
+  .detail-gallery-grid{
+    grid-template-columns: 1fr;
+    grid-template-rows: 300px 180px 180px;
+    height: auto;
+  }
+
+  .gallery-main{
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .gallery-side.top{
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .gallery-side.bottom{
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+/* ===== HEADER DETAIL: SAMAKAN PERSIS DENGAN HOME ===== */
+.topbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 22px 40px;
+
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.brand{
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.96);
+  text-shadow: none;
+}
+
+.nav-pill{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+
+  height: 62px;
+  padding: 0 28px;
+  border-radius: 999px;
+
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.18);
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.nav-pill a{
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  border-radius: 999px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.90);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.nav-pill a:hover{
+  background: transparent;
+  color: #ffffff;
+}
+
+.nav-pill a.active{
+  background: transparent !important;
+  color: rgba(255,255,255,0.90) !important;
+  box-shadow: none !important;
+}
+
+.contact-btn{
+  position: relative;
+  overflow: hidden;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+
+  text-decoration: none;
+  color: #ffffff;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.22);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  box-shadow: none;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.25s ease,
+    box-shadow 0.35s ease;
+}
+
+.contact-btn::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.45),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+}
+
+.contact-btn:hover{
+  background: #ffffff;
+  color: #0b2342;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.contact-btn:hover::before{
+  left: 140%;
+}
+
+.contact-btn:active{
+  transform: translateY(0) scale(0.98);
+}
+
+.contact-btn .arrow{
+  transition: transform 0.3s ease;
+}
+
+.contact-btn:hover .arrow{
+  transform: translate(2px, -2px);
+}

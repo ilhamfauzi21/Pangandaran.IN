@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detail Paket</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="detail.css" />
+  </head>
+<body>
+
+<header class="topbar">
+  <div class="brand">PANGANDARAN.IN</div>
+
+  <nav class="nav-pill">
+    <a href="index.html">Home</a>
+    <a href="index.html#destinasi-scroll">Destinasi</a>
+    <a href="index.html#paket-scroll">Paket</a>
+    <a href="index.html#gallery">Galeri</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <a class="contact-btn" href="booking.html">
+    Booking Now
+    <span class="arrow">↗</span>
+  </a>
+</header>
+
+<div class="detail-page">
+  <div class="detail-wrapper">
+
+    <div class="top-layout">
+      <!-- GALLERY (3 FOTO) -->
+      <div class="detail-gallery">
+        <div class="gallery-main" id="galleryMain">
+          <button class="nav-arrow left" id="prevBtn" aria-label="Sebelumnya">‹</button>
+
+          <div class="slides" id="slides">
+            <!-- diisi JS -->
+          </div>
+
+          <button class="nav-arrow right" id="nextBtn" aria-label="Berikutnya">›</button>
+        </div>
+      </div>
+
+      <!-- KONTEN -->
+      <div class="detail-content">
+        <div class="meta-kecil" id="subtitlePaket">River Adventure • 1 Day</div>
+        <h1 id="namaPaket">Nama Paket</h1>
+
+        <p class="detail-desc" id="descPaket">
+          Deskripsi paket...
+        </p>
+
+        <!-- Highlights (ringkas) -->
+        <div class="mini-list">
+          <div class="mini-title">Highlight</div>
+          <ul id="highlightsList"></ul>
+        </div>
+
+        <!-- Include -->
+        <div class="extra">
+          <div>
+            <h3>Include</h3>
+            <div id="inclusionsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKING -->
+      <div class="detail-right">
+        <div class="booking-box">
+          <div class="price-row">
+            <div>
+              <div class="mulai-dari">Mulai dari</div>
+              <h2 id="hargaPaket">Rp 0</h2>
+            </div>
+            <div class="unit" id="unitPaket">/ orang</div>
+          </div>
+
+          <label>Nama</label>
+          <input id="nama" type="text" placeholder="Masukan Nama" />
+
+          <label>Tanggal</label>
+          <input id="tanggal" type="date" />
+
+          <label>Jumlah Peserta</label>
+          <input id="peserta" type="number" min="1" value="1" />
+
+          <div class="total">
+            Total: Rp <span id="totalHarga">0</span>
+          </div>
+
+          <button id="bookWA" class="book-btn">Booking Sekarang</button>
+
+          <div class="note">
+            Admin akan membalas untuk konfirmasi jadwal dan detail pembayaran via WhatsApp.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- ======================= DATA PAKET (EDIT MANUAL) ====================== -->
+<!-- ====================================================================== -->
+
+
+
+
+<!-- ================= RIVER ADVENTURE ================= -->
+<template id="paket-gc">
+  <data
+    title="Green Canyon Body Rafting"
+    subtitle="River Adventure • Durasi 3,5 jam"
+    desc="Nikmati pengalaman seru body rafting di Green Canyon dengan panorama tebing megah & air jernih yang ikonik."
+    price="250000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/greencanyon1.jpg" alt="">
+    <img src="assets/greencanyon2.jpeg" alt="">
+    <img src="assets/greencanyoon.5.jpeg" alt="">
+  </images>
+
+  <highlights>
+    <li>Air jernih & tebing ikonik</li>
+    <li>Body rafting + cliff jump (opsional)</li>
+    <li>Cocok untuk pemula (dipandu)</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Helm</li>
+      <li>Life jacket</li>
+      <li>Pelindung kaki</li>
+    </group>
+    <group label="Guide">
+      <li>River guide profesional</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Dry bag</li>
+      <li>Dokumentasi foto/video</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-ciwayang">
+  <data
+    title="Ciwayang Body Rafting"
+    subtitle="River Adventure • Durasi 2 jam"
+    desc="Body rafting dengan arus lebih menantang, cocok untuk kamu yang suka adventure."
+    price="150000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/ciwayang1.jpg" alt="">
+    <img src="assets/ciwayang.png" alt="">
+    <img src="assets/ciwayang3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Arus lebih menantang</li>
+    <li>Spot lompatan air (opsional)</li>
+    <li>Pemandangan masih asri</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Helm</li>
+      <li>Life jacket</li>
+      <li>Pelindung kaki</li>
+    </group>
+    <group label="Guide">
+      <li>River guide profesional</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Dry bag</li>
+      <li>Dokumentasi foto/video</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-citumang">
+  <data
+    title="Citumang Body Rafting"
+    subtitle="River Adventure • Durasi 2 jam"
+    desc="Body rafting santai dengan air sebening kristal & nuansa alam yang menenangkan."
+    price="150000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/Citumang2.png" alt="">
+    <img src="assets/citumang1.jpg" alt="">
+    <img src="assets/Citumang3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Air bening seperti kristal</li>
+    <li>Lebih santai & family-friendly</li>
+    <li>Cocok pemula</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Helm</li>
+      <li>Life jacket</li>
+    </group>
+    <group label="Guide">
+      <li>River guide profesional</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Dry bag</li>
+      <li>Dokumentasi foto/video</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-santirah">
+  <data
+    title="Santirah River Tubing"
+    subtitle="River Adventure • Durasi 2 jam"
+    desc="Pengalaman unik menyusuri sungai bawah tanah yang eksotis dan spektakuler."
+    price="150000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="">
+    <img src="assets/santirah.png" alt="">
+    <img src="assets/Santirah3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Sungai + gua (vibes bawah tanah)</li>
+    <li>Tubing lebih fun</li>
+    <li>Spot foto dramatis</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Helm</li>
+      <li>Life jacket</li>
+      <li>Ban tubing</li>
+    </group>
+    <group label="Guide">
+      <li>Guide lokal</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Dry bag</li>
+      <li>Dokumentasi foto/video</li>
+    </group>
+  </inclusions>
+</template>
+
+<!-- ================= MULTI DAY TRIP ================= -->
+<template id="paket-oneday">
+  <data
+    title="One Day Tour Package"
+    subtitle="Multi Day Trip • Durasi 1 Hari"
+    desc="Paket wisata praktis untuk menikmati Pangandaran dalam satu hari penuh."
+    price="260000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/chilltime1.jpeg" alt="">
+    <img src="assets/greencanyon2.jpeg" alt="">
+    <img src="assets/watersport3.jpeg" alt="">
+  </images>
+
+  <highlights>
+    <li>Itinerary 1 hari</li>
+    <li>Koordinasi spot</li>
+    <li>Dokumentasi (opsional tergantung paket)</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Program">
+      <li>Itinerary 1 hari</li>
+      <li>Tour leader (jika tersedia)</li>
+    </group>
+    <group label="Support">
+      <li>Koordinasi spot</li>
+      <li>Dokumentasi (opsional tergantung paket)</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-2d1n">
+  <data
+    title="2 Day 1 Night Package"
+    subtitle="Multi Day Trip • Durasi 2 Hari 1 Malam"
+    desc="Liburan lebih santai dengan pengalaman menginap & eksplorasi destinasi terbaik."
+    price="700000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/chilltime3.jpeg" alt="">
+    <img src="assets/outbond.jpg" alt="">
+    <img src="assets/customtrip1.jpg" alt="">
+  </images>
+
+  <highlights>
+    <li>Menginap 1 malam</li>
+    <li>Lebih santai</li>
+    <li>Bisa custom destinasi</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Akomodasi">
+      <li>Hotel/penginapan 1 malam (sesuai paket)</li>
+    </group>
+    <group label="Trip">
+      <li>Itinerary 2 hari</li>
+      <li>Koordinator trip</li>
+    </group>
+    <group label="Support">
+      <li>Dokumentasi (opsional tergantung paket)</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-3d2n">
+  <data
+    title="3 Day 2 Night Package"
+    subtitle="Multi Day Trip • Durasi 3 Hari 1 Malam"
+    desc="Eksplorasi Pangandaran lebih lengkap dengan itinerary wisata yang maksimal."
+    price="700000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="">
+    <img src="assets/greencanyon1.jpg" alt="">
+    <img src="assets/fungame3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Lebih lengkap</li>
+    <li>Banyak destinasi</li>
+    <li>Lebih fleksibel</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Akomodasi">
+      <li>Hotel/penginapan 2 malam (sesuai paket)</li>
+    </group>
+    <group label="Trip">
+      <li>Itinerary 3 hari</li>
+      <li>Koordinator trip</li>
+    </group>
+    <group label="Support">
+      <li>Dokumentasi (opsional tergantung paket)</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-custom">
+  <data
+    title="Custom Trip"
+    subtitle="Multi Day Trip • Opsional"
+    desc="Bebas tentukan konsep perjalanan sesuai kebutuhan & gaya liburan Anda."
+    price="0"
+    unit="/ nego"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/watersport-2.jpeg" alt="">
+    <img src="assets/fungame.png" alt="">
+    <img src="assets/citumang1.jpg" alt="">
+  </images>
+
+  <highlights>
+    <li>Bisa pilih destinasi</li>
+    <li>Bisa pilih hotel</li>
+    <li>Cocok corporate/komunitas</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Fleksibel">
+      <li>Rute, jadwal, dan budget menyesuaikan</li>
+      <li>Konsultasi itinerary</li>
+    </group>
+    <group label="Support">
+      <li>Koordinator trip</li>
+      <li>Diskusi kebutuhan trip</li>
+    </group>
+  </inclusions>
+</template>
+
+<!-- ================= SEA ADVENTURE ================= -->
+<template id="paket-jetski">
+  <data
+    title="Jetski"
+    subtitle="Sea Adventure • Durasi 15 Menit"
+    desc="Rasakan sensasi kecepatan di atas ombak Pangandaran dengan pengalaman seru & aman."
+    price="350000"
+    unit="/ ride"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="">
+    <img src="assets/jetski-2.jpeg" alt="">
+    <img src="assets/jetski3.jpg" alt="">
+  </images>
+
+  <highlights>
+    <li>Aman untuk pemula</li>
+    <li>Briefing keselamatan</li>
+    <li>Crew/Instruktur</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Life jacket</li>
+    </group>
+    <group label="Support">
+      <li>Instruktur/crew</li>
+      <li>Briefing keselamatan</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-jetski_areal">
+  <data
+    title="Drone Areal + Jetski"
+    subtitle="Sea Adventure • Durasi 15 Menit"
+    desc="Jetski + dokumentasi drone areal yang cinematic di Pantai Pangandaran."
+    price="650000"
+    unit="/ paket"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/jetski-2.jpeg" alt="">
+    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="">
+    <img src="assets/jetski3.jpg" alt="">
+  </images>
+
+  <highlights>
+    <li>Drone areal cinematic</li>
+    <li>Fun ride</li>
+    <li>Crew profesional</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Ride">
+      <li>Jetski sesuai paket</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Dokumentasi">
+      <li>Video drone areal</li>
+      <li>File digital</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-jetski_fvp">
+  <data
+    title="FPV Drone + Jetski"
+    subtitle="Sea Adventure • Durasi 15 Menit"
+    desc="Paket jetski dengan video FPV drone untuk hasil yang lebih profesional dan spektakuler."
+    price="1200000"
+    unit="/ paket"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/jetski3.jpg" alt="">
+    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="">
+    <img src="assets/jetski-2.jpeg" alt="">
+  </images>
+
+  <highlights>
+    <li>Video FPV cinematic</li>
+    <li>Premium ride</li>
+    <li>Crew profesional</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Ride">
+      <li>Jetski sesuai paket</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Dokumentasi">
+      <li>Video FPV drone</li>
+      <li>File digital</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-watersport">
+  <data
+    title="Water Sport"
+    subtitle="Sea Adventure • Durasi 1 Jam"
+    desc="Beragam aktivitas laut seru yang memacu adrenalin & penuh keseruan."
+    price="150000"
+    unit="/ paket"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/watersport3.jpeg" alt="">
+    <img src="assets/watersport-2.jpeg" alt="">
+    <img src="assets/waterpsort3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Pilihan permainan beragam</li>
+    <li>Cocok rame-rame</li>
+    <li>Briefing keselamatan</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Safety Gear">
+      <li>Life jacket</li>
+      <li>Peralatan sesuai permainan</li>
+    </group>
+    <group label="Support">
+      <li>Instruktur/crew</li>
+      <li>Briefing keselamatan</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-standuppaddle">
+  <data
+    title="Stand Up Paddle"
+    subtitle="Sea Adventure • Durasi 2 Jam"
+    desc="Aktivitas santai menikmati air/ombak dengan pengalaman relaxing & menyenangkan."
+    price="350000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/paddle.png" alt="">
+    <img src="assets/standuppaddle-1-DIYrHU0i.jpeg" alt="">
+    <img src="assets/standuppaddle3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Board + Paddle</li>
+    <li>Life jacket</li>
+    <li>Cocok pemula</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Gear">
+      <li>Board SUP</li>
+      <li>Paddle</li>
+    </group>
+    <group label="Safety">
+      <li>Life jacket</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Pendamping/crew </li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-snorkeling">
+  <data
+    title="Snorkeling"
+    subtitle="Sea Adventure • Durasi 2 jam"
+    desc="Jelajahi keindahan bawah laut Pangandaran yang kaya warna & kehidupan."
+    price="150000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/snorekling3.png" alt="">
+    <img src="assets/snorkeling2.png" alt="">
+    <img src="assets/snorekling2.png" alt="">
+    
+  </images>
+
+  <highlights>
+    <li>Masker + snorkel</li>
+    <li>Briefing keselamatan</li>
+    <li>Guide/crew</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Gear">
+      <li>Masker</li>
+      <li>Snorkel</li>
+      <li>Fin (jika tersedia)</li>
+    </group>
+    <group label="Safety">
+      <li>Life jacket</li>
+      <li>Briefing keselamatan</li>
+    </group>
+    <group label="Support">
+      <li>Guide/crew</li>
+      <li>Perahu (jika include trip)</li>
+    </group>
+  </inclusions>
+</template>
+
+<!-- ================= OUTBOUND ================= -->
+<template id="paket-photosession">
+  <data
+    title="Photo Session"
+    subtitle="Outbound • Durasi 2 jam"
+    desc="Abadikan momen perjalanan dengan hasil foto profesional yang estetik & berkelas."
+    price="200000"
+    unit="/ sesi"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/photosession-1-CWeHPraX.jpeg" alt="">
+    <img src="assets/photoseason2.jpeg" alt="">
+    <img src="assets/photoseason3.jpeg" alt="">
+  </images>
+
+  <highlights>
+    <li>Arahan pose</li>
+    <li>Editing basic</li>
+    <li>Foto digital</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Output">
+      <li>Foto digital</li>
+      <li>Seleksi & editing basic</li>
+    </group>
+    <group label="Support">
+      <li>Arahan pose</li>
+      <li>Lokasi sesuai kesepakatan</li>
+    </group>
+  </inclusions>
+</template>
+
+<template id="paket-fungame">
+  <data
+    title="Fun Game"
+    subtitle="Outbound • Durasi 3 jam"
+    desc="Aktivitas interaktif seru untuk menciptakan kebersamaan & energi positif."
+    price="150000"
+    unit="/ orang"
+    wa="6287793827592"
+  ></data>
+
+  <images>
+    <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="">
+    <img src="assets/fungame.png" alt="">
+    <img src="assets/fungame3.png" alt="">
+  </images>
+
+  <highlights>
+    <li>Ice breaking seru</li>
+    <li>Dipandu fasilitator</li>
+    <li>Team activity</li>
+  </highlights>
+
+  <inclusions>
+    <group label="Program">
+      <li>Rundown fun game</li>
+      <li>Fasilitator</li>
+    </group>
+    <group label="Peralatan">
+      <li>Alat permainan</li>
+      <li>Sound system (jika tersedia)</li>
+    </group>
+    <group label="Dokumentasi">
+      <li>Foto (opsional tergantung paket)</li>
+    </group>
+  </inclusions>
+</template>
+
+<!-- ====================================================================== -->
+<!-- =============================== SCRIPT =============================== -->
+<!-- ====================================================================== -->
+<script>
+  // Ambil key dari URL: detail.html?paket=gc
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get("paket") || "gc";
+
+  // Ambil template
+  const tpl = document.getElementById("paket-" + key) || document.getElementById("paket-gc");
+  const frag = tpl.content.cloneNode(true);
+
+  const data = frag.querySelector("data");
+  const images = [...frag.querySelectorAll("images img")].slice(0, 3);
+  const highlights = [...frag.querySelectorAll("highlights li")];
+  const groups = [...frag.querySelectorAll("inclusions group")];
+
+  // Helper
+  const formatRupiah = (n) => "Rp " + (Number(n) || 0).toLocaleString("id-ID");
+
+  const title = data?.getAttribute("title") || "Paket";
+  const subtitle = data?.getAttribute("subtitle") || "";
+  const desc = data?.getAttribute("desc") || "";
+  const price = Number(data?.getAttribute("price") || 0);
+  const unit = data?.getAttribute("unit") || "/ orang";
+  const wa = data?.getAttribute("wa") || "6280000000000";
+
+  // Set konten utama
+  document.getElementById("namaPaket").innerText = title;
+  document.getElementById("subtitlePaket").innerText = subtitle;
+  document.getElementById("descPaket").innerText = desc;
+
+  document.getElementById("hargaPaket").innerText = formatRupiah(price);
+  document.getElementById("unitPaket").innerText = unit;
+
+  // Highlights list
+  const hlEl = document.getElementById("highlightsList");
+  hlEl.innerHTML = "";
+  highlights.forEach(li => {
+    const item = document.createElement("li");
+    item.textContent = li.textContent.trim();
+    hlEl.appendChild(item);
+  });
+
+  // Inclusions groups
+  const incEl = document.getElementById("inclusionsList");
+  incEl.innerHTML = "";
+  groups.forEach(g => {
+    const label = g.getAttribute("label") || "Include";
+    const items = [...g.querySelectorAll("li")].map(x => x.textContent.trim()).filter(Boolean);
+
+    const box = document.createElement("div");
+    box.className = "inc-group";
+    box.innerHTML = `
+      <h4>${label}</h4>
+      <ul>${items.map(t => `<li>${t}</li>`).join("")}</ul>
+    `;
+    incEl.appendChild(box);
+  });
+
+  // Gallery (3 foto) - GRID
+const slidesEl = document.getElementById("slides");
+slidesEl.innerHTML = "";
+
+const gallery = images.length ? images : [];
+
+gallery.forEach((img, idx) => {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.innerHTML = `<img src="${img.getAttribute("src")}" alt="foto ${idx+1}">`;
+  slidesEl.appendChild(slide);
+});
+
+// tombol panah tetap ada tapi tidak melakukan apa-apa
+document.getElementById("prevBtn").addEventListener("click", () => {});
+document.getElementById("nextBtn").addEventListener("click", () => {});
+  // Total harga
+  const pesertaInput = document.getElementById("peserta");
+  const totalHargaEl = document.getElementById("totalHarga");
+
+  function hitungTotal() {
+    const peserta = Math.max(1, parseInt(pesertaInput.value) || 1);
+    pesertaInput.value = peserta;
+    totalHargaEl.innerText = (peserta * price).toLocaleString("id-ID");
+  }
+  pesertaInput.addEventListener("input", hitungTotal);
+  hitungTotal();
+
+  // WhatsApp
+  document.getElementById("bookWA").addEventListener("click", () => {
+    const nama = document.getElementById("nama").value.trim();
+    const tanggal = document.getElementById("tanggal").value;
+    const peserta = parseInt(document.getElementById("peserta").value) || 1;
+    const total = totalHargaEl.innerText;
+
+    if (!nama || !tanggal || peserta <= 0) {
+      alert("Lengkapi data anda");
+      return;
+    }
+
+    const pesan =
+`Halo kak, saya tertarik dengan paket trip barengpangandaran.in
+
+Detail Pemesanan: ${title}
+Nama    : ${nama}
+Tanggal : ${tanggal}
+Peserta : ${peserta} orang
+Total   : Rp ${total}
+
+Mohon info ketersediaan jadwal ya kak.
+Terima kasih`;
+
+// simpan ke database dulu
+fetch("save_booking.php", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body:
+    "nama=" + encodeURIComponent(nama) +
+    "&paket=" + encodeURIComponent(title) +
+    "&tanggal=" + encodeURIComponent(tanggal) +
+    "&peserta=" + encodeURIComponent(peserta)
+})
+.then(() => {
+
+  // setelah tersimpan baru buka WhatsApp
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(pesan)}`, "_blank");
+  });
+
+});
+</script>
+
+</body>
+</html>

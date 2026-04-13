@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pangandaran.IN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="home-page">
+<main class="main-content">
+
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">PANGANDARAN.IN</div>
+
+    <nav class="nav-pill">
+      <a href="index.html" class="active">Home</a>
+      <a href="#destinasi-scroll">Destinasi</a>
+      <a href="#paket-scroll">Paket</a>
+      <a href="#gallery">Galeri</a>
+      <a href="about.html">About</a>
+    </nav>
+
+    <a class="contact-btn" href="booking.html">
+      Booking Now
+      <span class="arrow">↗</span>
+    </a>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero2">
+    <img src="assets/CONTOH.jpg" alt="bg" class="hero2-bg">
+    <div class="hero2-dim"></div>
+
+    <div class="hero2-center">
+      <h1>Extraordinary natural and<br>cultural charm</h1>
+      <p>Exploring Indonesia is an unforgettable adventure.</p>
+
+      <!-- SEARCHBAR (gambar ke-3: sesuaikan kebutuhan kamu) -->
+      <div class="searchbar">
+        <div class="sb-item">
+          <div class="sb-ic">
+            <i data-lucide="calendar"></i>
+          </div>
+          <div class="sb-text">
+            <div class="sb-t">Date</div>
+            <div class="sb-v">Select date</div>
+          </div>
+          <div class="sb-drop">▾</div>
+        </div>
+
+        <div class="sb-line"></div>
+
+        <div class="sb-item">
+          <div class="sb-ic">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="sb-text">
+            <div class="sb-t">Budget</div>
+            <div class="sb-v">&lt; 200K</div>
+          </div>
+          <div class="sb-drop">▾</div>
+        </div>
+
+        <div class="sb-line"></div>
+
+        <div class="sb-item">
+          <div class="sb-ic">
+          <i data-lucide="wallet"></i>
+          </div>
+          <div class="sb-text">
+            <div class="sb-t">Guest</div>
+            <div class="sb-v">8 Guest</div>
+          </div>
+          <div class="sb-drop">▾</div>
+        </div>
+
+        <button class="sb-btn">Search</button>
+    </div>
+  </div>
+</section>
+        
+
+<!-- ================= MOST POPULAR DESTINATION ================= -->
+<section id="destinasi-scroll" class="popular-v2">
+  <div class="container">
+    <div class="popular-v2-head">
+      <span class="popular-v2-kicker">DESTINASI</span>
+      <h2 class="popular-v2-title">MOST POPULAR DESTINATION</h2>
+    </div>
+
+    <div class="popular-v2-grid">
+
+      <a class="dest-card dest-a" href="#paket-scroll" data-filter="multi">
+        <div class="dest-slider">
+          <img src="assets/fungame3.png" alt="Multi Day Trip 1">
+          <img src="assets/waterpsort3.png" alt="Multi Day Trip 2">
+          <img src="assets/citumang1.jpg" alt="Multi Day Trip 3">
+          <img src="assets/greencanyon2.jpeg" alt="Multi Day Trip 4">
+        </div>
+        <div class="dest-overlay">
+          <div class="dest-text">
+            <h3>Multi Day Trip</h3>
+            <p>Paket liburan praktis untuk pengalaman maksimal</p>
+          </div>
+          <div class="dest-cta" aria-label="View">
+            <i data-lucide="arrow-up-right"></i>
+          </div>
+        </div>
+      </a>
+
+      <a class="dest-card dest-b" href="#paket-scroll" data-filter="river">
+        <div class="dest-slider">
+          <img src="assets/ciwayang4.png" alt="River Adventure 1">
+          <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="River Adventure 2">
+          <img src="assets/citumang.jpg" alt="River Adventure 3">
+          <img src="assets/greencanyon2.jpeg" alt="River Adventure 4">
+        </div>
+        <div class="dest-overlay">
+          <div class="dest-text">
+            <h3>River Adventure</h3>
+            <p>Rasakan serunya petualangan sungai di tengah alam yang memukau</p>
+          </div>
+          <div class="dest-cta" aria-label="View">
+            <i data-lucide="arrow-up-right"></i>
+          </div>
+        </div>
+      </a>
+
+      <a class="dest-card dest-c" href="#paket-scroll" data-filter="sea">
+        <div class="dest-slider">
+          <img src="assets/jetski3.jpg" alt="Sea Adventure 1">
+          <img src="assets/watersport-2.jpeg" alt="Sea Adventure 2">
+          <img src="assets/snorkeling2.png" alt="Sea Adventure 3">
+          <img src="assets/standuppaddle2.jpeg" alt="Sea Adventure 4">
+        </div>
+        <div class="dest-overlay">
+          <div class="dest-text">
+            <h3>Sea Adventure</h3>
+            <p>Saatnya menikmati wisata laut paling seru untuk liburan yang lebih berkesan</p>
+          </div>
+          <div class="dest-cta" aria-label="View">
+            <i data-lucide="arrow-up-right"></i>
+          </div>
+        </div>
+      </a>
+
+      <a class="dest-card dest-d" href="#paket-scroll" data-filter="outbound">
+        <div class="dest-slider">
+          <img src="assets/fungame3.png" alt="Outbound 1">
+          <img src="assets/photosession-1-CWeHPraX.jpeg" alt="Outbound 2">
+          <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Outbound 3">
+          <img src="assets/outbond.jpg" alt="Outbound 4">
+        </div>
+        <div class="dest-overlay">
+          <div class="dest-text">
+            <h3>Outbound</h3>
+            <p>Ciptakan momen kebersamaan lewat aktivitas seru yang penuh kesan</p>
+          </div>
+          <div class="dest-cta" aria-label="View">
+            <i data-lucide="arrow-up-right"></i>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+<!-- ================= PAKET WISATA ================= -->
+
+
+<section class="experience exp2">
+  <div class="exp2-left">
+    <h2 class="exp2-title">Rasakan Petualangan Baru Bersama Pangandaran.IN</h2>
+
+    <p class="exp2-desc">
+      Nikmati pengalaman perjalanan yang nyaman dan menyenangkan bersama
+      Pangandaran.IN. Kami menghadirkan layanan terbaik dengan perencanaan matang,
+      harga terjangkau, dan pengalaman yang tak terlupakan.
+    </p>
+
+    <div class="exp2-features">
+      <div class="exp2-item">
+        <img class="exp2-ic" src="assets/safe.png" alt="Safe">
+        <div>
+          <h4>Safe Traveling</h4>
+          <p>Perjalanan Anda kami rancang dengan standar keamanan tinggi dan didampingi tour guide profesional agar tetap aman dan nyaman.</p>
+        </div>
+      </div>
+
+      <div class="exp2-item">
+        <img class="exp2-ic" src="assets/dokumentasi.png" alt="Dokumentasi">
+        <div>
+          <h4>Dokumentasi</h4>
+          <p>Perjalanan didokumentasikan secara profesional untuk mengabadikan setiap momen berharga.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KARTU MEDIA KANAN (MODEL GAMBAR KE-2) -->
+  <div class="exp2-media">
+    <video id="mainVideo" class="exp2-main" autoplay muted loop playsinline>
+      <source src="assets/TRIP1.mp4" type="video/mp4">
+    </video>
+
+    <div class="exp2-thumbs">
+      <button class="exp2-thumb active" data-video="assets/TRIP2.mp4" aria-label="Play 1">
+        <video muted loop playsinline preload="metadata">
+          <source src="assets/TRIP2.mp4" type="video/mp4">
+        </video>
+        <span class="exp2-play"></span>
+      </button>
+
+      <button class="exp2-thumb" data-video="assets/TRIP3.mp4" aria-label="Play 2">
+        <video muted loop playsinline preload="metadata">
+          <source src="assets/TRIP3.mp4" type="video/mp4">
+        </video>
+        <span class="exp2-play"></span>
+      </button>
+    </div>
+  </div>
+
+</section>
+
+<!-- DESTINATION -->
+<section id="paket-scroll" class="destination">
+    <div class="section-header">
+      <span>PAKET</span>
+      <h2>KUNJUNGI DESTINASI PAKET FAVORIT ANDA</h2>
+    </div>
+
+  <!-- FILTER ATAS (SATU-SATUNYA YANG AKTIF) -->
+  <div class="filter filter-tabs-main">
+    <button class="tab active" data-filter="all">Semua</button>
+    <button class="tab" data-filter="sea">Sea Adventure</button>
+    <button class="tab" data-filter="multi">Multi Day Trip</button>
+    <button class="tab" data-filter="river">River Adventure</button>
+    <button class="tab" data-filter="outbound">Outbound</button>
+  </div>
+
+<div class="grid">
+
+<!-- ================= RIVER ADVENTURE ================= -->
+
+<div class="card river">
+  <img src="assets/greencanyon1.jpg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Green Canyon Body Rafting</h3>
+      <span class="price-tag">Rp 250K</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>River Adventure</span>
+      <span>Durasi 3,5 jam </span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('gc')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card river">
+  <img src="assets/ciwayang1.jpg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Ciwayang Body Rafting</h3>
+      <span class="price-tag">Rp 150K</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      
+      <span>River Adventure</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('ciwayang')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card river">
+  <img src="assets/citumang1.jpg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Citumang Body Rafting</h3>
+      <span class="price-tag">Rp 150K</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      
+      <span>River Adventure</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('citumang')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card river">
+  <img src="assets/santirah.png">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Santirah River Tubing</h3>
+      <span class="price-tag">Rp 150K</span>
+    </div>
+
+
+    <div class="card-meta">
+      <span>River Adventure</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('santirah')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+<!-- ================= MULTI DAY TRIP ================= -->
+
+<div class="card multi">
+
+  <div class="multi-slider">
+    <div class="multi-track">
+      <img src="assets/citumang1.jpg">
+      <img src="assets/greencanyon2.jpeg">
+      <img src="assets/watersport3.jpeg">
+      <img src="assets/chilltime1.jpeg">
+      <img src="assets/fungames-1-B6WDKIz9.jpeg">
+
+      <!-- DUPLIKAT FOTO PERTAMA -->
+      <img src="assets/watersport-2.jpeg">
+    </div>
+  </div>
+
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>One Day Tour Package</h3>
+      <span class="price-tag">Rp 260.000</span>
+    </div>
+
+    <div class="card-meta">
+      <span>Multi Day Trip</span>
+      <span>Durasi 1 Hari</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('oneday')">
+      Lihat Detail
+    </button>
+  </div>
+
+</div>
+
+<div class="card multi">
+
+  <div class="multi-slider">
+    <div class="multi-track">
+      <img src="assets/chilltime3.jpeg">
+      <img src="assets/outbond.jpg">
+      <img src="assets/greencanyon2.jpeg">
+      <img src="assets/ciwayang1.jpg">
+      <img src="assets/customtrip1.jpg">
+
+      <!-- DUPLIKAT FOTO PERTAMA -->
+      <img src="assets/waterpsort3.png">
+    </div>
+  </div>
+
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>2 Day 1 Night Package</h3>
+      <span class="price-tag">Rp 700.000</span>
+    </div>
+
+    <div class="card-meta">
+      <span>Multi Day Trip</span>
+      <span>Durasi 2 Hari 1 Malam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('2d1n')">
+      Lihat Detail
+    </button>
+  </div>
+
+</div>
+
+<div class="card multi">
+
+  <div class="multi-slider">
+    <div class="multi-track">
+      <img src="assets/santirah-1-DEyrdUd5.jpeg">
+      <img src="assets/ciwayang3.png">
+      <img src="assets/greencanyon1.jpg">
+      <img src="assets/fungame3.png">
+      <img src="assets/citumang.jpg">
+
+      <!-- DUPLIKAT FOTO PERTAMA -->
+      <img src="assets/waterpsort3.png">
+    </div>
+  </div>
+
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>3 Day 2 Night Package</h3>
+      <span class="price-tag">Rp 700.000</span>
+    </div>
+
+    <div class="card-meta">
+      <span>Multi Day Trip</span>
+      <span>Durasi 3 Hari 1 Malam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('3d2n')">
+      Lihat Detail
+    </button>
+  </div>
+
+</div>
+
+
+<div class="card multi">
+
+  <!-- SLIDER -->
+  <div class="multi-slider">
+    <div class="multi-track">
+      <img src="assets/watersport-2.jpeg">
+      <img src="assets/greencanyon1.jpg">
+      <img src="assets/fungame.png">
+      <img src="assets/citumang1.jpg">
+      <img src="assets/ciwayang1.jpg">
+
+      <!-- DUPLIKAT FOTO PERTAMA (WAJIB) -->
+      <img src="assets/gc.png">
+    </div>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Custom Trip</h3>
+      <span class="price-tag">Flexible</span>
+    </div>
+
+    <div class="card-meta">
+      <span>Multi Day Trip</span>
+      <span>Opsional</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('custom')">
+      Lihat Detail
+    </button>
+  </div>
+
+</div>
+
+
+
+
+<!-- ================= SEA ADVENTURE ================= -->
+
+<div class="card sea">
+  <img src="assets/jetski-1-Y9ZJopoJ.jpeg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Jetski</h3>
+      <span class="price-tag">Rp 350.000</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 15 Menit</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('jetski')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+<div class="card sea">
+  <img src="assets/jetski-2.jpeg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Drone Areal + Jetski</h3>
+      <span class="price-tag">Rp 650.000</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 15 Menit</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('jetski_areal')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+<div class="card sea">
+  <img src="assets/jetski3.jpg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>FVP Drone + Jetski</h3>
+      <span class="price-tag">Rp 1.200.000</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 15 Menit</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('jetski_fvp')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+<div class="card sea">
+  <img src="assets/watersport3.jpeg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Water Sport</h3>
+      <span class="price-tag">Rp 150.000</span>
+    </div>
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 1 Jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('watersport')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card sea">
+  <img src="assets/paddle.png">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Stand Up Paddle</h3>
+      <span class="price-tag">Rp 350.000</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('standuppaddle')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card sea">
+  <img src="assets/snorkeling2.png">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Snorkeling</h3>
+      <span class="price-tag">Rp 150.000</span>
+    </div>
+
+
+    <div class="card-meta">
+      <span>Sea Adventure</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('snorkeling')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<!-- ================= OUTBOUND ================= -->
+
+<div class="card outbound">
+  <img src="assets/photosession-1-CWeHPraX.jpeg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Photo Session</h3>
+      <span class="price-tag">Rp 200K</span>
+    </div>
+
+
+
+    <div class="card-meta">
+      <span>Outbound</span>
+      <span>Durasi 2 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('photosession')">
+      Lihat Detail
+    </button>
+  </div>
+</div>
+
+
+<div class="card outbound">
+  <img src="assets/fungames-1-B6WDKIz9.jpeg">
+  <div class="card-overlay">
+    <div class="card-header">
+      <h3>Fun Game</h3>
+      <span class="price-tag">Rp 150K</span>
+    </div>
+
+
+    <div class="card-meta">
+      <span>Outbound</span>
+      <span>Durasi 3 jam</span>
+    </div>
+
+    <button class="card-btn"
+      onclick="goDetail('fungame')">
+      Lihat Detail
+          </button>
+  </div>
+</div>
+
+</div>
+</section>
+
+<section id="gallery" class="editorial-gallery">
+  <div class="gallery-header">
+    <span>GALERI</span>
+    <h2>MOMEN PERJALANAN ANDA</h2>
+  </div>
+
+  <div class="editorial-grid">
+    <div class="item large">
+      <img src="assets/ciwayang.png" alt="Ciwayang">
+    </div>
+
+    <div class="item wide">
+      <img src="assets/greencanyon2.jpeg" alt="Green Canyon">
+    </div>
+
+    <div class="item">
+      <img src="assets/paddle.png" alt="Paddle">
+    </div>
+
+    <div class="item">
+      <img src="assets/fungame.png" alt="Fun Game">
+    </div>
+
+    <div class="item">
+      <img src="assets/citumang1.jpg" alt="Citumang">
+    </div>
+
+    <div class="item wide">
+      <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Fun Games">
+    </div>
+
+    <div class="item">
+      <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="Jetski">
+    </div>
+
+    <div class="item">
+      <img src="assets/waterpsort3.png" alt="Water Sport">
+    </div>
+
+    <div class="item">
+      <img src="assets/chilltime1.jpeg" alt="Chill Time">
+    </div>
+  </div>
+</section>
+
+<section class="our-clients">
+  <div class="clients-container">
+
+    <div class="clients-head">
+      <span class="clients-kicker">PARTNERSHIP</span>
+      <h2 class="clients-title">OUR CLIENTS</h2>
+    </div>
+
+    <div class="clients-grid">
+      <div class="client-card"><img src="assets/ahm-Cw0Q8E6L.png" alt="AHM"></div>
+      <div class="client-card"><img src="assets/biensi.jpeg" alt="Biensi"></div>
+
+      <div class="client-card"><img src="assets/bni-B3utHgBQ.png" alt="BNI"></div>
+      <div class="client-card"><img src="assets/indomarco-BMI6emVe.png" alt="Indomarco"></div>
+      <div class="client-card"><img src="assets/kai-S8EPM5yB.png" alt="KAI"></div>
+
+      <div class="client-card"><img src="assets/mandiri-BUSvWBm7.png" alt="Mandiri"></div>
+      <div class="client-card"><img src="assets/peruri-cEIHI3nT.png" alt="Peruri"></div>
+      <div class="client-card"><img src="assets/prudential-URrx6J0M.png" alt="Prudential"></div>
+
+      <div class="client-card"><img src="assets/rsud-profmano-C8YVFoov (1).webp" alt="Unsil"></div>
+      <div class="client-card"><img src="assets/telkom-DUXquX-C.png" alt="Telkom"></div>
+    </div>
+
+    <p class="clients-note">
+      Dan masih banyak lagi yang telah menjadi<br>
+      bagian dari perjalanan kami
+    </p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-container">
+
+    <div class="footer-left">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="Pangandaran.in Logo">
+        <div>
+          <h3>Pangandaran.in</h3>
+          <p>Easy Way to Explore</p>
+        </div>
+      </div>
+
+      <div class="footer-address">
+        <h4>Operational Address</h4>
+        <p>Dsn. Parapat RT. 3 RW. 9, Desa Pangandaran</p>
+        <p>Kecamatan Pangandaran</p>
+        <p>Kab. Pangandaran, Jawa Barat</p>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <h4>Social Media</h4>
+      <a href="https://www.tiktok.com/@pangandaran.in">Tiktok</a>
+      <a href="https://www.instagram.com/pangandaran.in/">Instagram</a>
+      <a href="#">WhatsApp</a>
+    </div>
+
+    <div class="footer-links">
+      <h4>Pages</h4>
+      <a href="index.html">Home</a>
+      <a href="index.html#destinasi-scroll">Destinasi</a>
+      <a href="index.html#paket-scroll">Paket</a>
+      <a href="index.html#gallery">Galeri</a>
+      <a href="about.html">About</a>
+    </div>
+
+  </div>
+</footer>
+
+
+<script src="style.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

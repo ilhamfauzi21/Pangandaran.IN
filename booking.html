@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Cepat</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="booking.css">
+</head>
+<body class="booking-body">
+
+  <header class="topbar">
+  <div class="brand">PANGANDARAN.IN</div>
+
+  <nav class="nav-pill">
+    <a href="index.html">Home</a>
+    <a href="index.html#destinasi-scroll">Destinasi</a>
+    <a href="index.html#paket-scroll">Paket</a>
+    <a href="index.html#gallery">Galeri</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <a class="contact-btn active-btn" href="booking.html">
+    Booking Now
+    <span class="arrow">↗</span>
+  </a>
+</header>
+  <main class="booking-wrap">
+
+  <!-- HERO MEDIA (Video / Image) -->
+  <section class="booking-hero" aria-label="Media booking">
+    <div class="booking-hero-media">
+
+      <video class="booking-hero-video" autoplay muted loop playsinline>
+        <source src="assets/booking-hero.mp4" type="video/mp4" />
+      </video>
+
+      <img class="booking-hero-img" src="assets/booking-hero.jpg" alt="Pangandaran travel" />
+
+      <div class="booking-hero-overlay"></div>
+
+      <div class="booking-hero-content">
+        <h2>Mulai Booking Dalam 1 Menit</h2>
+        <p>Pilih paket, tentukan tanggal, isi jumlah peserta, lalu kirim otomatis ke WhatsApp.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="booking-card">
+
+      <div class="booking-head">
+        <div class="booking-kicker">Quick Booking</div>
+        <h1 class="booking-title" id="selectedTitle">Booking Cepat</h1>
+        <p class="booking-sub">
+          Pilih paket, isi data singkat, lalu lanjutkan pemesanan melalui WhatsApp.
+        </p>
+      </div>
+
+      <div class="booking-grid">
+        <!-- Form -->
+        <form class="booking-form" action="save_booking.php" method="POST">
+          <div class="field">
+            <label for="nama">Nama</label>
+            <input id="nama" name="nama" type="text" placeholder="Masukkan nama" autocomplete="name" required />
+            <small class="hint">Gunakan nama asli agar admin mudah mengkonfirmasi.</small>
+          </div>
+
+          <div class="field">
+            <label for="paket">Pilih Paket</label>
+            <select id="paket" name="paket" required>
+            <option value="" selected disabled>Pilih paket wisata</option>
+
+            <optgroup label="River Adventure">
+                <option value="Green Canyon Body Rafting" data-harga="180000">Green Canyon Body Rafting</option>
+                <option value="Ciwayang Body Rafting" data-harga="200000">Ciwayang Body Rafting</option>
+                <option value="Citumang Body Rafting" data-harga="180000">Citumang Body Rafting</option>
+                <option value="Santirah River Tubing" data-harga="180000">Santirah River Tubing</option>
+            </optgroup>
+
+            <optgroup label="Multi Day Trip">
+                <option value="One Day Tour Package" data-harga="260000">One Day Tour Package</option>
+                <option value="2 Day 1 Night Package" data-harga="700000">2 Day 1 Night Package</option>
+                <option value="3 Day 2 Night Package" data-harga="700000">3 Day 2 Night Package</option>
+                <option value="Custom Trip" data-harga="">Custom Trip</option>
+            </optgroup>
+
+            <optgroup label="Sea Adventure">
+                <option value="Jetski" data-harga="250000">Jetski</option>
+                <option value="Water Sport" data-harga="300000">Water Sport</option>
+                <option value="Stand Up Paddle" data-harga="120000">Stand Up Paddle</option>
+                <option value="Snorkeling" data-harga="150000">Snorkeling</option>
+            </optgroup>
+
+            <optgroup label="Outbound">
+                <option value="Photo Session" data-harga="100000">Photo Session</option>
+                <option value="Fun Game" data-harga="150000">Fun Game</option>
+                <option value="Team Building" data-harga="200000">Team Building</option>
+            </optgroup>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="tanggal">Tanggal</label>
+              <input id="tanggal" name="tanggal" type="date" required />
+            </div>
+
+            <div class="field">
+              <label for="peserta">Jumlah Peserta</label>
+              <input id="peserta" name="peserta" type="number" min="1" placeholder="1" required />
+            </div>
+          </div>
+
+          <button id="btnBook" class="btn-primary" type="submit">
+            Booking Sekarang
+            <span class="btn-arrow">↗</span>
+          </button>
+
+          <p class="booking-note">
+            Konfirmasi jadwal dan detail pembayaran akan dibantu admin melalui WhatsApp.
+          </p>
+          </form>
+          
+        <!-- Summary -->
+        <aside class="booking-summary" aria-label="Ringkasan booking">
+            <div class="sum-title">Ringkasan</div>
+
+            <div class="sum-row">
+            <span>Nama</span>
+            <strong id="sumNama">-</strong>
+            </div>
+
+            <div class="sum-row">
+            <span>Paket</span>
+            <strong id="sumPaket">-</strong>
+            </div>
+
+            <div class="sum-row">
+            <span>Harga</span>
+            <strong id="sumHarga">-</strong>
+            </div>
+
+            <div class="sum-row">
+            <span>Tanggal</span>
+            <strong id="sumTanggal">-</strong>
+            </div>
+
+            <div class="sum-row">
+            <span>Peserta</span>
+            <strong id="sumPeserta">-</strong>
+            </div>
+            
+
+          <div class="divider"></div>
+
+          <div class="sum-badge">
+            Proses cepat, tanpa ribet. Admin akan membalas untuk konfirmasi.
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const elNama = document.getElementById("nama");
+    const elPaket = document.getElementById("paket");
+    const elTanggal = document.getElementById("tanggal");
+    const elPeserta = document.getElementById("peserta");
+    const btn = document.getElementById("btnBook");
+
+    const selectedTitle = document.getElementById("selectedTitle");
+    const sumPaket = document.getElementById("sumPaket");
+    const sumNama = document.getElementById("sumNama");
+    const sumTanggal = document.getElementById("sumTanggal");
+    const sumPeserta = document.getElementById("sumPeserta");
+    const sumHarga = document.getElementById("sumHarga");
+
+            function formatRupiah(num) {
+        const n = Number(num);
+        if (!Number.isFinite(n) || n <= 0) return "-";
+        return "Rp " + n.toLocaleString("id-ID");
+        }
+
+        function applyFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const paketParam = params.get("paket");
+        const hargaParam = params.get("harga");
+
+        // auto pilih paket
+        if (paketParam) {
+            for (const opt of elPaket.options) {
+            if (opt.value === paketParam) {
+                elPaket.value = paketParam;
+                break;
+            }
+            }
+            selectedTitle.textContent = paketParam;
+        }
+
+        // set harga
+        if (hargaParam) {
+            sumHarga.textContent = formatRupiah(hargaParam);
+            sumHarga.dataset.harga = hargaParam;
+        } else {
+            sumHarga.textContent = "-";
+            delete sumHarga.dataset.harga;
+        }
+        }
+
+            function updateSummary() {
+        const nama = (elNama.value || "").trim();
+        const paket = elPaket.value || "";
+        const tanggal = elTanggal.value || "";
+        const peserta = elPeserta.value || "";
+
+        sumNama.textContent = nama || "-";
+        sumPaket.textContent = paket || "-";
+        sumTanggal.textContent = tanggal || "-";
+        sumPeserta.textContent = peserta ? `${peserta} orang` : "-";
+
+        selectedTitle.textContent = paket || "Booking Cepat";
+
+        // ✅ ambil harga dari option yang dipilih
+        const opt = elPaket.options[elPaket.selectedIndex];
+        const hargaOpt = opt ? opt.getAttribute("data-harga") : "";
+
+        if (hargaOpt) {
+            sumHarga.textContent = formatRupiah(hargaOpt);
+            sumHarga.dataset.harga = hargaOpt;
+        } else {
+            sumHarga.textContent = "-";
+            delete sumHarga.dataset.harga;
+        }
+        }
+
+            elNama.addEventListener("input", updateSummary);
+            elPaket.addEventListener("change", updateSummary);
+            elTanggal.addEventListener("change", updateSummary);
+            elPeserta.addEventListener("input", updateSummary);
+            applyFromUrl();
+            updateSummary();
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const nama = (elNama.value || "").trim();
+      const paket = elPaket.value;
+      const tanggal = elTanggal.value;
+      const peserta = elPeserta.value;
+
+      if (!nama) { alert("Silakan isi nama."); elNama.focus(); return; }
+      if (!paket) { alert("Silakan pilih paket."); elPaket.focus(); return; }
+      if (!tanggal) { alert("Silakan pilih tanggal."); elTanggal.focus(); return; }
+      if (!peserta || parseInt(peserta) <= 0) { alert("Jumlah peserta minimal 1."); elPeserta.focus(); return; }
+
+      const pesan =
+`Halo kak, saya tertarik dengan paket trip barengpangandaran.in
+
+Detail Pemesanan
+Paket   : ${paket}
+Nama    : ${nama}
+Tanggal : ${tanggal}
+Peserta : ${peserta} orang`;
+
+      const nomor = "6287793827592";
+
+      document.querySelector(".booking-form").submit();
+
+      window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
+    });
+  </script>
+
+  <script>
+  const heroVideo = document.querySelector(".booking-hero-video");
+  const heroImg = document.querySelector(".booking-hero-img");
+
+  if (heroVideo) {
+    const showImageFallback = () => {
+      if (heroImg) heroImg.style.opacity = "1";
+      heroVideo.style.display = "none";
+    };
+
+    heroVideo.addEventListener("error", showImageFallback);
+    heroVideo.addEventListener("stalled", showImageFallback);
+
+    const src = heroVideo.querySelector("source")?.getAttribute("src");
+    if (!src) showImageFallback();
+  } else {
+    if (heroImg) heroImg.style.opacity = "1";
+  }
+    </script>
+
+
+<script src="style.js"></script>
+
+</body>
+</html>
