@@ -29,60 +29,113 @@
     </a>
   </header>
 
-  <!-- HERO -->
-  <section class="hero2">
-    <img src="assets/CONTOH.jpg" alt="bg" class="hero2-bg">
-    <div class="hero2-dim"></div>
+  <!-- HERO BARU -->
+<section class="hero-bm" id="heroBm">
+  <img src="assets/greencanyon1.jpg" alt="Hero Pangandaran" class="hero-bm-bg" id="heroBmBg">
+  <div class="hero-bm-overlay"></div>
+  <div class="hero-bm-bottom"></div>
 
-    <div class="hero2-center">
-      <h1>Extraordinary natural and<br>cultural charm</h1>
-      <p>Exploring Indonesia is an unforgettable adventure.</p>
+  <div class="hero-bm-inner">
+    <div class="hero-bm-left">
+      <div class="hero-bm-loc">
+        <span class="hero-bm-line"></span>
+        <span id="heroBmCat">River Adventure</span>
+      </div>
 
-      <!-- SEARCHBAR (gambar ke-3: sesuaikan kebutuhan kamu) -->
-      <div class="searchbar">
-        <div class="sb-item">
-          <div class="sb-ic">
-            <i data-lucide="calendar"></i>
-          </div>
-          <div class="sb-text">
-            <div class="sb-t">Date</div>
-            <div class="sb-v">Select date</div>
-          </div>
-          <div class="sb-drop">▾</div>
-        </div>
+      <h1 class="hero-bm-title" id="heroBmTitle">
+        Green Canyon
+        <span>Body Rafting</span>
+      </h1>
 
-        <div class="sb-line"></div>
+      <p class="hero-bm-desc" id="heroBmDesc">
+        Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.
+      </p>
 
-        <div class="sb-item">
-          <div class="sb-ic">
-            <i data-lucide="users"></i>
-          </div>
-          <div class="sb-text">
-            <div class="sb-t">Budget</div>
-            <div class="sb-v">&lt; 200K</div>
-          </div>
-          <div class="sb-drop">▾</div>
-        </div>
-
-        <div class="sb-line"></div>
-
-        <div class="sb-item">
-          <div class="sb-ic">
-          <i data-lucide="wallet"></i>
-          </div>
-          <div class="sb-text">
-            <div class="sb-t">Guest</div>
-            <div class="sb-v">8 Guest</div>
-          </div>
-          <div class="sb-drop">▾</div>
-        </div>
-
-        <button class="sb-btn">Search</button>
+      <a href="#paket-scroll" class="hero-bm-btn">Lihat Paket</a>
     </div>
+
+    <div class="hero-bm-cards">
+      <button class="hero-mini-card is-far" data-idx="3" type="button">
+        <img src="assets/fungame3.png" alt="Fun Game">
+        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-info">
+          <small>Outbound</small>
+          <strong>Fun Game</strong>
+        </div>
+      </button>
+
+      <button class="hero-mini-card is-prev" data-idx="2" type="button">
+        <img src="assets/jetski3.jpg" alt="Jetski">
+        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-info">
+          <small>Sea Adventure</small>
+          <strong>Jetski</strong>
+        </div>
+      </button>
+
+      <button class="hero-mini-card is-active" data-idx="0" type="button">
+        <img src="assets/greencanyon1.jpg" alt="Green Canyon">
+        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-info">
+          <small>River Adventure</small>
+          <strong>Green Canyon</strong>
+        </div>
+      </button>
+
+      <button class="hero-mini-card is-next" data-idx="1" type="button">
+        <img src="assets/citumang1.jpg" alt="Citumang">
+        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-info">
+          <small>River Adventure</small>
+          <strong>Citumang</strong>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="hero-bm-bottombar">
+    <div class="hero-bm-arrows">
+      <button type="button" class="hero-bm-arrow" id="heroPrev">‹</button>
+      <button type="button" class="hero-bm-arrow" id="heroNext">›</button>
+    </div>
+
+    <div class="hero-bm-progress">
+      <span class="hero-bm-progress-fill" id="heroBmProgress"></span>
+    </div>
+
+    <div class="hero-bm-count" id="heroBmCount">01 / 04</div>
+  </div>
+
+  <div class="hero-bm-bgnum" id="heroBmBigNum">01</div>
+</section>
+
+<!-- ===== TRUST INDICATOR / STATS ===== -->
+<section class="stats-section">
+  <div class="stats">
+
+    <div class="s-card">
+      <div class="s-num">500+</div>
+      <div class="s-cap">Wisatawan Dilayani</div>
+    </div>
+
+    <div class="s-card">
+      <div class="s-num">15+</div>
+      <div class="s-cap">Destinasi Wisata</div>
+    </div>
+
+    <div class="s-card">
+      <div class="s-num">⭐ 4.9</div>
+      <div class="s-cap">Rating Pelanggan</div>
+    </div>
+
+    <div class="s-card">
+      <div class="s-num">3+</div>
+      <div class="s-cap">Tahun Pengalaman</div>
+    </div>
+
   </div>
 </section>
         
-
 <!-- ================= MOST POPULAR DESTINATION ================= -->
 <section id="destinasi-scroll" class="popular-v2">
   <div class="container">
@@ -250,7 +303,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Green Canyon Body Rafting</h3>
-      <span class="price-tag">Rp 250K</span>
+      <span class="price-tag">Rp 250.000</span>
     </div>
 
 
@@ -273,7 +326,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Ciwayang Body Rafting</h3>
-      <span class="price-tag">Rp 150K</span>
+      <span class="price-tag">Rp 150.000</span>
     </div>
 
 
@@ -297,7 +350,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Citumang Body Rafting</h3>
-      <span class="price-tag">Rp 150K</span>
+      <span class="price-tag">Rp 150.000</span>
     </div>
 
 
@@ -321,7 +374,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Santirah River Tubing</h3>
-      <span class="price-tag">Rp 150K</span>
+      <span class="price-tag">Rp 150.000</span>
     </div>
 
 
@@ -560,7 +613,7 @@
 
     <div class="card-meta">
       <span>Sea Adventure</span>
-      <span>Durasi 1 Jam</span>
+      <span>Durasi 30 Menit</span>
     </div>
 
     <button class="card-btn"
@@ -623,7 +676,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Photo Session</h3>
-      <span class="price-tag">Rp 200K</span>
+      <span class="price-tag">Rp 200.000</span>
     </div>
 
 
@@ -646,7 +699,7 @@
   <div class="card-overlay">
     <div class="card-header">
       <h3>Fun Game</h3>
-      <span class="price-tag">Rp 150K</span>
+      <span class="price-tag">Rp 150.000</span>
     </div>
 
 
@@ -784,6 +837,104 @@
 <script src="style.js"></script>
 <script>
   lucide.createIcons();
+</script>
+
+<script>
+  const heroSlides = [
+    {
+      cat: "River Adventure",
+      title: "Green Canyon",
+      sub: "Body Rafting",
+      desc: "Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.",
+      bg: "assets/greencanyon1.jpg"
+    },
+    {
+      cat: "River Adventure",
+      title: "Citumang",
+      sub: "Body Rafting",
+      desc: "Rasakan petualangan sungai yang memukau di Citumang dengan suasana alam yang tenang dan menyegarkan.",
+      bg: "assets/citumang1.jpg"
+    },
+    {
+      cat: "Sea Adventure",
+      title: "Jetski",
+      sub: "Sea Adventure",
+      desc: "Pacu adrenalin di atas ombak Pangandaran dengan pengalaman jetski yang seru dan berkesan.",
+      bg: "assets/jetski3.jpg"
+    },
+    {
+      cat: "Outbound",
+      title: "Fun Game",
+      sub: "Team Building",
+      desc: "Ciptakan momen kebersamaan yang seru bersama tim lewat aktivitas outbound yang interaktif dan menyenangkan.",
+      bg: "assets/fungame3.png"
+    }
+  ];
+
+  let heroIndex = 0;
+
+  const heroBg = document.getElementById("heroBmBg");
+  const heroCat = document.getElementById("heroBmCat");
+  const heroTitle = document.getElementById("heroBmTitle");
+  const heroDesc = document.getElementById("heroBmDesc");
+  const heroCount = document.getElementById("heroBmCount");
+  const heroBigNum = document.getElementById("heroBmBigNum");
+  const heroProgress = document.getElementById("heroBmProgress");
+  const heroPrev = document.getElementById("heroPrev");
+  const heroNext = document.getElementById("heroNext");
+  const heroCards = document.querySelectorAll(".hero-mini-card");
+
+  function renderHero() {
+    const item = heroSlides[heroIndex];
+    const num = String(heroIndex + 1).padStart(2, "0");
+
+    if (heroBg) heroBg.src = item.bg;
+    if (heroCat) heroCat.textContent = item.cat;
+    if (heroTitle) heroTitle.innerHTML = item.title + "<span>" + item.sub + "</span>";
+    if (heroDesc) heroDesc.textContent = item.desc;
+    if (heroCount) heroCount.textContent = num + " / 04";
+    if (heroBigNum) heroBigNum.textContent = num;
+    if (heroProgress) {
+      heroProgress.style.width = ((heroIndex + 1) / heroSlides.length) * 100 + "%";
+    }
+
+    heroCards.forEach((card, idx) => {
+      card.classList.remove("is-active", "is-prev", "is-next", "is-far");
+
+      if (idx === heroIndex) {
+        card.classList.add("is-active");
+      } else if (idx === (heroIndex + 1) % heroSlides.length) {
+        card.classList.add("is-next");
+      } else if (idx === (heroIndex - 1 + heroSlides.length) % heroSlides.length) {
+        card.classList.add("is-prev");
+      } else {
+        card.classList.add("is-far");
+      }
+    });
+  }
+
+  if (heroPrev) {
+    heroPrev.addEventListener("click", function () {
+      heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
+      renderHero();
+    });
+  }
+
+  if (heroNext) {
+    heroNext.addEventListener("click", function () {
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      renderHero();
+    });
+  }
+
+  heroCards.forEach((card) => {
+    card.addEventListener("click", function () {
+      heroIndex = Number(card.dataset.idx);
+      renderHero();
+    });
+  });
+
+  renderHero();
 </script>
 </body>
 </html>

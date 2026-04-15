@@ -266,6 +266,8 @@ destinationSliders.forEach((slider) => {
     }, 300);
   }, 5000);
 });
+
+
 console.log("STYLE JS JALAN");
   
 });
