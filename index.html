@@ -1,940 +1,520 @@
 <!DOCTYPE html>
-<html lang="id">
+<html class="dark" lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Pangandaran.IN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>Pangandaran.in | Easy Way to Explore</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode:"class",
+      theme:{ extend:{
+        colors:{
+          "surface":"#00132f","background":"#00132f","surface-dim":"#00132f",
+          "surface-container-lowest":"#000e25","surface-container-low":"#051b39",
+          "surface-container":"#0a1f3d","surface-container-high":"#172a48",
+          "surface-container-highest":"#223554","surface-bright":"#273959",
+          "on-surface":"#d6e3ff","on-surface-variant":"#c2c6d4","on-background":"#d6e3ff",
+          "primary":"#aac7ff","primary-container":"#0059b3","primary-fixed":"#d7e3ff","primary-fixed-dim":"#aac7ff",
+          "on-primary":"#002f65","on-primary-container":"#bed4ff","on-primary-fixed":"#001b3e","on-primary-fixed-variant":"#00458e",
+          "secondary":"#a2e7ff","secondary-container":"#00d2fd","secondary-fixed":"#b4ebff","secondary-fixed-dim":"#3cd7ff",
+          "on-secondary":"#003642","on-secondary-container":"#005669","on-secondary-fixed":"#001f27","on-secondary-fixed-variant":"#004e5f",
+          "tertiary":"#b4c7ed","tertiary-container":"#495b7c","tertiary-fixed":"#d6e3ff","tertiary-fixed-dim":"#b4c7ed",
+          "on-tertiary":"#1e304f","on-tertiary-container":"#c0d3fa","on-tertiary-fixed":"#051b39","on-tertiary-fixed-variant":"#354767",
+          "outline":"#8c919d","outline-variant":"#424752",
+          "surface-variant":"#223554","surface-tint":"#aac7ff",
+          "inverse-surface":"#d6e3ff","inverse-on-surface":"#1e304f","inverse-primary":"#0c5db7",
+          "error":"#ffb4ab","on-error":"#690005","error-container":"#93000a","on-error-container":"#ffdad6"
+        },
+        fontFamily:{ headline:["Space Grotesk"], body:["Inter"], label:["Inter"] },
+        borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" }
+      }}
+    }
+  </script>
+  <style>
+    body { font-family:'Inter',sans-serif; background:#00132f; color:#d6e3ff; }
+    .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+    .glass { background:rgba(34,53,84,0.45); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+    .border-ghost { border:1px solid rgba(170,199,255,0.15); }
+    .neon { text-shadow:0 0 12px rgba(162,231,255,0.5); }
+    .hero-bg { transition:background-image 0.6s ease; }
+    .pkg-card { transition:all 0.3s ease; }
+    .pkg-card.hidden-card { display:none; }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#00132f; }
+    ::-webkit-scrollbar-thumb { background:#223554; border-radius:10px; }
+    ::-webkit-scrollbar-thumb:hover { background:#aac7ff; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+    .pulse-dot { animation:pulse-dot 2s infinite; }
+  </style>
 </head>
-<body class="home-page">
-<main class="main-content">
+<body class="bg-surface selection:bg-secondary/30">
 
+<!-- ===== TOPNAV ===== -->
+<nav class="fixed top-0 w-full z-50 bg-[#00132F]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(162,231,255,0.04)]">
+  <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-xl mx-auto">
+    <a href="index.html" class="text-xl md:text-2xl font-bold tracking-tighter text-white font-headline">Pangandaran.in</a>
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="brand">PANGANDARAN.IN</div>
+    <!-- Desktop Nav -->
+    <div class="hidden md:flex items-center space-x-8 font-headline tracking-wide text-sm">
+      <a href="index.html" class="text-secondary border-b-2 border-secondary pb-0.5 neon">Home</a>
+      <a href="#destinasi-scroll" class="text-slate-300 hover:text-secondary transition-colors">Destinasi</a>
+      <a href="#paket-scroll" class="text-slate-300 hover:text-secondary transition-colors">Paket</a>
+      <a href="#gallery" class="text-slate-300 hover:text-secondary transition-colors">Galeri</a>
+      <a href="about.html" class="text-slate-300 hover:text-secondary transition-colors">About</a>
+    </div>
 
-    <nav class="nav-pill">
-      <a href="index.html" class="active">Home</a>
-      <a href="#destinasi-scroll">Destinasi</a>
-      <a href="#paket-scroll">Paket</a>
-      <a href="#gallery">Galeri</a>
-      <a href="about.html">About</a>
-    </nav>
+    <div class="flex items-center gap-3">
+      <a href="booking.html" class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold px-5 py-2 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.4)] transition-all">
+        Booking Now ↗
+      </a>
+      <!-- Mobile hamburger -->
+      <button id="menuBtn" class="md:hidden p-2 text-primary">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
 
-    <a class="contact-btn" href="booking.html">
-      Booking Now
-      <span class="arrow">↗</span>
-    </a>
-  </header>
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="md:hidden hidden glass border-t border-white/10 px-6 py-4 space-y-3">
+    <a href="index.html" class="block text-secondary font-bold py-2">Home</a>
+    <a href="#destinasi-scroll" class="block text-slate-300 py-2" onclick="closeMobileMenu()">Destinasi</a>
+    <a href="#paket-scroll" class="block text-slate-300 py-2" onclick="closeMobileMenu()">Paket</a>
+    <a href="#gallery" class="block text-slate-300 py-2" onclick="closeMobileMenu()">Galeri</a>
+    <a href="about.html" class="block text-slate-300 py-2">About</a>
+  </div>
+</nav>
 
-  <!-- HERO BARU -->
-<section class="hero-bm" id="heroBm">
-  <img src="assets/greencanyon1.jpg" alt="Hero Pangandaran" class="hero-bm-bg" id="heroBmBg">
-  <div class="hero-bm-overlay"></div>
-  <div class="hero-bm-bottom"></div>
+<!-- ===== HERO ===== -->
+<header class="relative h-screen min-h-[680px] max-h-[900px] w-full overflow-hidden flex items-center">
+  <div class="absolute inset-0 z-0">
+    <img id="heroBg" src="assets/greencanyon1.jpg" alt="Hero" class="w-full h-full object-cover opacity-60 transition-all duration-700">
+    <div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/50 to-transparent"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+  </div>
 
-  <div class="hero-bm-inner">
-    <div class="hero-bm-left">
-      <div class="hero-bm-loc">
-        <span class="hero-bm-line"></span>
-        <span id="heroBmCat">River Adventure</span>
+  <div class="relative z-10 w-full max-w-screen-xl mx-auto px-6 md:px-8">
+    <div class="max-w-2xl space-y-6">
+      <div class="inline-flex items-center space-x-3 bg-secondary/10 border border-secondary/20 px-4 py-1.5 rounded-full">
+        <span class="flex h-2 w-2 rounded-full bg-secondary pulse-dot"></span>
+        <span id="heroCat" class="text-secondary font-headline text-xs tracking-[0.2em] uppercase font-bold">River Adventure</span>
       </div>
-
-      <h1 class="hero-bm-title" id="heroBmTitle">
-        Green Canyon
-        <span>Body Rafting</span>
+      <h1 id="heroTitle" class="text-5xl md:text-7xl font-headline font-bold text-white tracking-tighter leading-none">
+        Green Canyon <br><span class="text-secondary neon">Body Rafting</span>
       </h1>
-
-      <p class="hero-bm-desc" id="heroBmDesc">
+      <p id="heroDesc" class="text-on-surface-variant text-lg max-w-lg leading-relaxed font-light">
         Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.
       </p>
-
-      <a href="#paket-scroll" class="hero-bm-btn">Lihat Paket</a>
-    </div>
-
-    <div class="hero-bm-cards">
-      <button class="hero-mini-card is-far" data-idx="3" type="button">
-        <img src="assets/fungame3.png" alt="Fun Game">
-        <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-info">
-          <small>Outbound</small>
-          <strong>Fun Game</strong>
-        </div>
-      </button>
-
-      <button class="hero-mini-card is-prev" data-idx="2" type="button">
-        <img src="assets/jetski3.jpg" alt="Jetski">
-        <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-info">
-          <small>Sea Adventure</small>
-          <strong>Jetski</strong>
-        </div>
-      </button>
-
-      <button class="hero-mini-card is-active" data-idx="0" type="button">
-        <img src="assets/greencanyon1.jpg" alt="Green Canyon">
-        <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-info">
-          <small>River Adventure</small>
-          <strong>Green Canyon</strong>
-        </div>
-      </button>
-
-      <button class="hero-mini-card is-next" data-idx="1" type="button">
-        <img src="assets/citumang1.jpg" alt="Citumang">
-        <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-info">
-          <small>River Adventure</small>
-          <strong>Citumang</strong>
-        </div>
-      </button>
+      <div class="flex gap-4 pt-2">
+        <a href="#paket-scroll" class="bg-secondary text-surface font-headline font-bold px-7 py-3 rounded-full hover:shadow-[0_0_25px_rgba(162,231,255,0.4)] transition-all">
+          Lihat Paket
+        </a>
+        <a href="booking.html" class="border border-secondary/40 text-secondary font-headline font-bold px-7 py-3 rounded-full hover:bg-secondary/10 transition-all">
+          Booking Now
+        </a>
+      </div>
     </div>
   </div>
 
-  <div class="hero-bm-bottombar">
-    <div class="hero-bm-arrows">
-      <button type="button" class="hero-bm-arrow" id="heroPrev">‹</button>
-      <button type="button" class="hero-bm-arrow" id="heroNext">›</button>
+  <!-- Hero Controls -->
+  <div class="absolute bottom-8 left-0 right-0 z-10">
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button id="heroPrev" class="w-10 h-10 rounded-full border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary/10 transition-all">‹</button>
+        <button id="heroNext" class="w-10 h-10 rounded-full border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary/10 transition-all">›</button>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-24 h-0.5 bg-white/10 rounded-full overflow-hidden">
+          <div id="heroProgress" class="h-full bg-secondary rounded-full transition-all duration-500" style="width:25%"></div>
+        </div>
+        <span id="heroCount" class="text-secondary font-headline text-xs font-bold">01 / 04</span>
+      </div>
     </div>
-
-    <div class="hero-bm-progress">
-      <span class="hero-bm-progress-fill" id="heroBmProgress"></span>
-    </div>
-
-    <div class="hero-bm-count" id="heroBmCount">01 / 04</div>
   </div>
+  <!-- Big BG number -->
+  <div id="heroBigNum" class="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 text-[12rem] md:text-[18rem] font-headline font-bold text-white/3 select-none pointer-events-none leading-none">01</div>
+</header>
 
-  <div class="hero-bm-bgnum" id="heroBmBigNum">01</div>
-</section>
-
-<!-- ===== TRUST INDICATOR / STATS ===== -->
-<section class="stats-section">
-  <div class="stats">
-
-    <div class="s-card">
-      <div class="s-num">500+</div>
-      <div class="s-cap">Wisatawan Dilayani</div>
+<!-- ===== STATS ===== -->
+<section class="bg-surface-container-low py-16">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="text-center space-y-1 border-r border-white/5 last:border-none">
+      <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">500+</h2>
+      <p class="text-secondary text-xs font-bold tracking-widest uppercase">Wisatawan</p>
     </div>
-
-    <div class="s-card">
-      <div class="s-num">15+</div>
-      <div class="s-cap">Destinasi Wisata</div>
+    <div class="text-center space-y-1 border-r border-white/5 last:border-none">
+      <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">15+</h2>
+      <p class="text-secondary text-xs font-bold tracking-widest uppercase">Destinasi</p>
     </div>
-
-    <div class="s-card">
-      <div class="s-num">⭐ 4.9</div>
-      <div class="s-cap">Rating Pelanggan</div>
+    <div class="text-center space-y-1 border-r border-white/5 last:border-none">
+      <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">⭐ 4.9</h2>
+      <p class="text-secondary text-xs font-bold tracking-widest uppercase">Rating</p>
     </div>
-
-    <div class="s-card">
-      <div class="s-num">3+</div>
-      <div class="s-cap">Tahun Pengalaman</div>
-    </div>
-
-  </div>
-</section>
-        
-<!-- ================= MOST POPULAR DESTINATION ================= -->
-<section id="destinasi-scroll" class="popular-v2">
-  <div class="container">
-    <div class="popular-v2-head">
-      <span class="popular-v2-kicker">DESTINASI</span>
-      <h2 class="popular-v2-title">MOST POPULAR DESTINATION</h2>
-    </div>
-
-    <div class="popular-v2-grid">
-
-      <a class="dest-card dest-a" href="#paket-scroll" data-filter="multi">
-        <div class="dest-slider">
-          <img src="assets/fungame3.png" alt="Multi Day Trip 1">
-          <img src="assets/waterpsort3.png" alt="Multi Day Trip 2">
-          <img src="assets/citumang1.jpg" alt="Multi Day Trip 3">
-          <img src="assets/greencanyon2.jpeg" alt="Multi Day Trip 4">
-        </div>
-        <div class="dest-overlay">
-          <div class="dest-text">
-            <h3>Multi Day Trip</h3>
-            <p>Paket liburan praktis untuk pengalaman maksimal</p>
-          </div>
-          <div class="dest-cta" aria-label="View">
-            <i data-lucide="arrow-up-right"></i>
-          </div>
-        </div>
-      </a>
-
-      <a class="dest-card dest-b" href="#paket-scroll" data-filter="river">
-        <div class="dest-slider">
-          <img src="assets/ciwayang4.png" alt="River Adventure 1">
-          <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="River Adventure 2">
-          <img src="assets/citumang.jpg" alt="River Adventure 3">
-          <img src="assets/greencanyon2.jpeg" alt="River Adventure 4">
-        </div>
-        <div class="dest-overlay">
-          <div class="dest-text">
-            <h3>River Adventure</h3>
-            <p>Rasakan serunya petualangan sungai di tengah alam yang memukau</p>
-          </div>
-          <div class="dest-cta" aria-label="View">
-            <i data-lucide="arrow-up-right"></i>
-          </div>
-        </div>
-      </a>
-
-      <a class="dest-card dest-c" href="#paket-scroll" data-filter="sea">
-        <div class="dest-slider">
-          <img src="assets/jetski3.jpg" alt="Sea Adventure 1">
-          <img src="assets/watersport-2.jpeg" alt="Sea Adventure 2">
-          <img src="assets/snorkeling2.png" alt="Sea Adventure 3">
-          <img src="assets/standuppaddle2.jpeg" alt="Sea Adventure 4">
-        </div>
-        <div class="dest-overlay">
-          <div class="dest-text">
-            <h3>Sea Adventure</h3>
-            <p>Saatnya menikmati wisata laut paling seru untuk liburan yang lebih berkesan</p>
-          </div>
-          <div class="dest-cta" aria-label="View">
-            <i data-lucide="arrow-up-right"></i>
-          </div>
-        </div>
-      </a>
-
-      <a class="dest-card dest-d" href="#paket-scroll" data-filter="outbound">
-        <div class="dest-slider">
-          <img src="assets/fungame3.png" alt="Outbound 1">
-          <img src="assets/photosession-1-CWeHPraX.jpeg" alt="Outbound 2">
-          <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Outbound 3">
-          <img src="assets/outbond.jpg" alt="Outbound 4">
-        </div>
-        <div class="dest-overlay">
-          <div class="dest-text">
-            <h3>Outbound</h3>
-            <p>Ciptakan momen kebersamaan lewat aktivitas seru yang penuh kesan</p>
-          </div>
-          <div class="dest-cta" aria-label="View">
-            <i data-lucide="arrow-up-right"></i>
-          </div>
-        </div>
-      </a>
-
+    <div class="text-center space-y-1">
+      <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">3+</h2>
+      <p class="text-secondary text-xs font-bold tracking-widest uppercase">Tahun Pengalaman</p>
     </div>
   </div>
 </section>
-<!-- ================= PAKET WISATA ================= -->
 
+<!-- ===== DESTINATIONS ===== -->
+<section id="destinasi-scroll" class="py-20 md:py-28 bg-surface">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+    <div class="mb-12">
+      <h4 class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase mb-3">Destinasi Kami</h4>
+      <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">Most Popular Destination</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- River -->
+      <a href="#paket-scroll" onclick="filterPackages('river')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500">
+        <img src="assets/greencanyon1.jpg" alt="River Adventure" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
+        <div class="absolute bottom-0 p-6 w-full glass">
+          <span class="text-xs font-headline tracking-widest text-secondary block mb-1">EXPERIENCE 01</span>
+          <h3 class="text-xl font-headline font-bold text-white mb-2">River Adventure</h3>
+          <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Body rafting & river tubing di sungai jernih Pangandaran.</p>
+        </div>
+      </a>
+      <!-- Sea -->
+      <a href="#paket-scroll" onclick="filterPackages('sea')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500 lg:mt-10">
+        <img src="assets/jetski3.jpg" alt="Sea Adventure" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
+        <div class="absolute bottom-0 p-6 w-full glass">
+          <span class="text-xs font-headline tracking-widest text-secondary block mb-1">EXPERIENCE 02</span>
+          <h3 class="text-xl font-headline font-bold text-white mb-2">Sea Adventure</h3>
+          <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Jetski, snorkeling, watersport di perairan Pangandaran.</p>
+        </div>
+      </a>
+      <!-- Multi -->
+      <a href="#paket-scroll" onclick="filterPackages('multi')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500">
+        <img src="assets/chilltime1.jpeg" alt="Multi Day Trip" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
+        <div class="absolute bottom-0 p-6 w-full glass">
+          <span class="text-xs font-headline tracking-widest text-secondary block mb-1">EXPERIENCE 03</span>
+          <h3 class="text-xl font-headline font-bold text-white mb-2">Multi Day Trip</h3>
+          <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Paket liburan 1-3 hari paling komplit & berkesan.</p>
+        </div>
+      </a>
+      <!-- Outbound -->
+      <a href="#paket-scroll" onclick="filterPackages('outbound')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500 lg:mt-10">
+        <img src="assets/fungame3.png" alt="Outbound" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
+        <div class="absolute bottom-0 p-6 w-full glass">
+          <span class="text-xs font-headline tracking-widest text-secondary block mb-1">EXPERIENCE 04</span>
+          <h3 class="text-xl font-headline font-bold text-white mb-2">Outbound</h3>
+          <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Fun game, photo session & team building seru.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
 
-<section class="experience exp2">
-  <div class="exp2-left">
-    <h2 class="exp2-title">Rasakan Petualangan Baru Bersama Pangandaran.IN</h2>
+<!-- ===== EXPERIENCE ===== -->
+<section class="py-20 bg-surface-container-low overflow-hidden">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div class="space-y-6">
+        <h4 class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase">Kenapa Kami?</h4>
+        <h2 class="text-4xl font-headline font-bold text-white leading-tight">Rasakan Petualangan Baru Bersama Pangandaran.in</h2>
+        <p class="text-on-surface-variant leading-relaxed">Kami menghadirkan layanan terbaik dengan perencanaan matang, harga terjangkau, dan pengalaman yang tak terlupakan di Pangandaran.</p>
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 glass rounded-2xl p-4 border-ghost">
+            <span class="material-symbols-outlined text-secondary text-2xl mt-0.5">verified_user</span>
+            <div>
+              <h4 class="font-headline font-bold text-on-surface">Safe Traveling</h4>
+              <p class="text-on-surface-variant text-sm mt-1">Standar keamanan tinggi didampingi guide profesional bersertifikat.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 glass rounded-2xl p-4 border-ghost">
+            <span class="material-symbols-outlined text-secondary text-2xl mt-0.5">photo_camera</span>
+            <div>
+              <h4 class="font-headline font-bold text-on-surface">Dokumentasi Profesional</h4>
+              <p class="text-on-surface-variant text-sm mt-1">Setiap momen perjalanan didokumentasikan secara profesional.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="relative rounded-3xl overflow-hidden aspect-video border-ghost group cursor-pointer">
+          <video class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" autoplay muted loop playsinline><source src="assets/TRIP1.mp4" type="video/mp4"></video>
+          <div class="absolute inset-0 flex items-center justify-center bg-surface/40 group-hover:bg-surface/10 transition-colors">
+            <div class="h-16 w-16 rounded-full border-2 border-secondary flex items-center justify-center bg-surface/60 backdrop-blur group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-secondary text-3xl ml-1" style="font-variation-settings:'FILL' 1">play_arrow</span>
+            </div>
+          </div>
+          <div class="absolute bottom-4 left-4 bg-surface/80 backdrop-blur px-4 py-1.5 rounded-lg border-ghost">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="relative rounded-2xl overflow-hidden aspect-video border-ghost group cursor-pointer">
+            <video class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" autoplay muted loop playsinline><source src="assets/TRIP2.mp4" type="video/mp4"></video>
+            <div class="absolute inset-0 flex items-center justify-center bg-surface/40 group-hover:bg-surface/10 transition-colors">
+              <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">play_circle</span>
+            </div>
+          </div>
+          <div class="relative rounded-2xl overflow-hidden aspect-video border-ghost group cursor-pointer">
+            <video class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" autoplay muted loop playsinline><source src="assets/TRIP3.mp4" type="video/mp4"></video>
+            <div class="absolute inset-0 flex items-center justify-center bg-surface/40 group-hover:bg-surface/10 transition-colors">
+              <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">play_circle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <p class="exp2-desc">
-      Nikmati pengalaman perjalanan yang nyaman dan menyenangkan bersama
-      Pangandaran.IN. Kami menghadirkan layanan terbaik dengan perencanaan matang,
-      harga terjangkau, dan pengalaman yang tak terlupakan.
-    </p>
+<!-- ===== PACKAGES ===== -->
+<section id="paket-scroll" class="py-20 md:py-28 bg-surface">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+      <div>
+        <h4 class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase mb-2">Paket Wisata</h4>
+        <h2 class="text-4xl font-headline font-bold text-white">Expedition Packages</h2>
+      </div>
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap gap-2 bg-surface-container-high p-1.5 rounded-2xl border-ghost">
+        <button onclick="filterPackages('all')" data-filter="all" class="filter-btn active-filter px-5 py-2 rounded-xl bg-secondary text-surface font-bold text-sm transition-all">Semua</button>
+        <button onclick="filterPackages('sea')" data-filter="sea" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">Sea</button>
+        <button onclick="filterPackages('multi')" data-filter="multi" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">Multi Trip</button>
+        <button onclick="filterPackages('river')" data-filter="river" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">River</button>
+        <button onclick="filterPackages('outbound')" data-filter="outbound" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">Outbound</button>
+      </div>
+    </div>
 
-    <div class="exp2-features">
-      <div class="exp2-item">
-        <img class="exp2-ic" src="assets/safe.png" alt="Safe">
+    <div id="pkgGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+  </div>
+</section>
+
+<!-- ===== GALLERY ===== -->
+<section id="gallery" class="py-20 bg-surface-container-lowest">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+    <h2 class="text-4xl font-headline font-bold text-center text-white mb-4">Momen Perjalanan Anda</h2>
+    <p class="text-center text-on-surface-variant mb-12">Abadikan setiap petualangan bersama Pangandaran.in</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 auto-rows-[200px] md:auto-rows-[220px] gap-4">
+      <div class="md:col-span-2 md:row-span-2 rounded-3xl overflow-hidden border-ghost relative group">
+        <img src="assets/ciwayang.png" alt="Gallery" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+        <div class="absolute inset-0 bg-surface/20 group-hover:bg-transparent transition-all"></div>
+      </div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/greencanyon2.jpeg" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="row-span-2 rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/paddle.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/fungame.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/citumang1.jpg" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="md:col-span-2 rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/fungames-1-B6WDKIz9.jpeg" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/snorkeling2.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/waterpsort3.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/photoseason3.jpeg" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+      <div class="rounded-3xl overflow-hidden border-ghost relative group"><img src="assets/ciwayang3.png" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CLIENTS ===== -->
+<section class="py-20 border-y border-white/5 bg-surface">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+    <h4 class="text-center font-headline text-on-surface-variant uppercase tracking-[0.4em] text-xs mb-10">Our Strategic Partners</h4>
+    <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-50 hover:opacity-80 transition-all duration-500">
+      <img src="assets/ahm-Cw0Q8E6L.png" alt="AHM" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/biensi.jpeg" alt="Biensi" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/bni-B3utHgBQ.png" alt="BNI" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/indomarco-BMI6emVe.png" alt="Indomarco" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/kai-S8EPM5yB.png" alt="KAI" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/mandiri-BUSvWBm7.png" alt="Mandiri" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/peruri-cEIHI3nT.png" alt="Peruri" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+      <img src="assets/telkom-DUXquX-C.png" alt="Telkom" class="h-8 object-contain grayscale hover:grayscale-0 transition-all">
+    </div>
+    <p class="text-center text-on-surface-variant text-sm mt-8 opacity-60">Dan masih banyak lagi yang telah menjadi bagian dari perjalanan kami</p>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-[#00132F] border-t border-white/5 py-16 px-6 md:px-8">
+  <div class="max-w-screen-xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <img src="assets/logo.png" alt="Logo" class="h-10 object-contain" onerror="this.style.display='none'">
+          <span class="text-xl font-bold text-secondary font-headline">Pangandaran.in</span>
+        </div>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Easy Way to Explore. Mitra wisata terpercaya di Pangandaran, Jawa Barat.</p>
         <div>
-          <h4>Safe Traveling</h4>
-          <p>Perjalanan Anda kami rancang dengan standar keamanan tinggi dan didampingi tour guide profesional agar tetap aman dan nyaman.</p>
+          <p class="text-on-surface-variant/60 text-xs mb-1">Dsn. Parapat RT. 3 RW. 9, Desa Pangandaran</p>
+          <p class="text-on-surface-variant/60 text-xs">Kab. Pangandaran, Jawa Barat</p>
         </div>
       </div>
-
-      <div class="exp2-item">
-        <img class="exp2-ic" src="assets/dokumentasi.png" alt="Dokumentasi">
+      <div class="grid grid-cols-2 gap-8">
         <div>
-          <h4>Dokumentasi</h4>
-          <p>Perjalanan didokumentasikan secara profesional untuk mengabadikan setiap momen berharga.</p>
+          <h4 class="text-secondary font-bold mb-4 text-sm">Pages</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">Home</a></li>
+            <li><a href="#destinasi-scroll" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">Destinasi</a></li>
+            <li><a href="#paket-scroll" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">Paket</a></li>
+            <li><a href="#gallery" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">Galeri</a></li>
+            <li><a href="about.html" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">About</a></li>
+          </ul>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- KARTU MEDIA KANAN (MODEL GAMBAR KE-2) -->
-  <div class="exp2-media">
-    <video id="mainVideo" class="exp2-main" autoplay muted loop playsinline>
-      <source src="assets/TRIP1.mp4" type="video/mp4">
-    </video>
-
-    <div class="exp2-thumbs">
-      <button class="exp2-thumb active" data-video="assets/TRIP2.mp4" aria-label="Play 1">
-        <video muted loop playsinline preload="metadata">
-          <source src="assets/TRIP2.mp4" type="video/mp4">
-        </video>
-        <span class="exp2-play"></span>
-      </button>
-
-      <button class="exp2-thumb" data-video="assets/TRIP3.mp4" aria-label="Play 2">
-        <video muted loop playsinline preload="metadata">
-          <source src="assets/TRIP3.mp4" type="video/mp4">
-        </video>
-        <span class="exp2-play"></span>
-      </button>
-    </div>
-  </div>
-
-</section>
-
-<!-- DESTINATION -->
-<section id="paket-scroll" class="destination">
-    <div class="section-header">
-      <span>PAKET</span>
-      <h2>KUNJUNGI DESTINASI PAKET FAVORIT ANDA</h2>
-    </div>
-
-  <!-- FILTER ATAS (SATU-SATUNYA YANG AKTIF) -->
-  <div class="filter filter-tabs-main">
-    <button class="tab active" data-filter="all">Semua</button>
-    <button class="tab" data-filter="sea">Sea Adventure</button>
-    <button class="tab" data-filter="multi">Multi Day Trip</button>
-    <button class="tab" data-filter="river">River Adventure</button>
-    <button class="tab" data-filter="outbound">Outbound</button>
-  </div>
-
-<div class="grid">
-
-<!-- ================= RIVER ADVENTURE ================= -->
-
-<div class="card river">
-  <img src="assets/greencanyon1.jpg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Green Canyon Body Rafting</h3>
-      <span class="price-tag">Rp 250.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>River Adventure</span>
-      <span>Durasi 3,5 jam </span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('gc')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card river">
-  <img src="assets/ciwayang1.jpg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Ciwayang Body Rafting</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      
-      <span>River Adventure</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('ciwayang')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card river">
-  <img src="assets/citumang1.jpg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Citumang Body Rafting</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      
-      <span>River Adventure</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('citumang')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card river">
-  <img src="assets/santirah.png">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Santirah River Tubing</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-    <div class="card-meta">
-      <span>River Adventure</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('santirah')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-<!-- ================= MULTI DAY TRIP ================= -->
-
-<div class="card multi">
-
-  <div class="multi-slider">
-    <div class="multi-track">
-      <img src="assets/citumang1.jpg">
-      <img src="assets/greencanyon2.jpeg">
-      <img src="assets/watersport3.jpeg">
-      <img src="assets/chilltime1.jpeg">
-      <img src="assets/fungames-1-B6WDKIz9.jpeg">
-
-      <!-- DUPLIKAT FOTO PERTAMA -->
-      <img src="assets/watersport-2.jpeg">
-    </div>
-  </div>
-
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>One Day Tour Package</h3>
-      <span class="price-tag">Rp 260.000</span>
-    </div>
-
-    <div class="card-meta">
-      <span>Multi Day Trip</span>
-      <span>Durasi 1 Hari</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('oneday')">
-      Lihat Detail
-    </button>
-  </div>
-
-</div>
-
-<div class="card multi">
-
-  <div class="multi-slider">
-    <div class="multi-track">
-      <img src="assets/chilltime3.jpeg">
-      <img src="assets/outbond.jpg">
-      <img src="assets/greencanyon2.jpeg">
-      <img src="assets/ciwayang1.jpg">
-      <img src="assets/customtrip1.jpg">
-
-      <!-- DUPLIKAT FOTO PERTAMA -->
-      <img src="assets/waterpsort3.png">
-    </div>
-  </div>
-
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>2 Day 1 Night Package</h3>
-      <span class="price-tag">Rp 700.000</span>
-    </div>
-
-    <div class="card-meta">
-      <span>Multi Day Trip</span>
-      <span>Durasi 2 Hari 1 Malam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('2d1n')">
-      Lihat Detail
-    </button>
-  </div>
-
-</div>
-
-<div class="card multi">
-
-  <div class="multi-slider">
-    <div class="multi-track">
-      <img src="assets/santirah-1-DEyrdUd5.jpeg">
-      <img src="assets/ciwayang3.png">
-      <img src="assets/greencanyon1.jpg">
-      <img src="assets/fungame3.png">
-      <img src="assets/citumang.jpg">
-
-      <!-- DUPLIKAT FOTO PERTAMA -->
-      <img src="assets/waterpsort3.png">
-    </div>
-  </div>
-
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>3 Day 2 Night Package</h3>
-      <span class="price-tag">Rp 700.000</span>
-    </div>
-
-    <div class="card-meta">
-      <span>Multi Day Trip</span>
-      <span>Durasi 3 Hari 1 Malam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('3d2n')">
-      Lihat Detail
-    </button>
-  </div>
-
-</div>
-
-
-<div class="card multi">
-
-  <!-- SLIDER -->
-  <div class="multi-slider">
-    <div class="multi-track">
-      <img src="assets/watersport-2.jpeg">
-      <img src="assets/greencanyon1.jpg">
-      <img src="assets/fungame.png">
-      <img src="assets/citumang1.jpg">
-      <img src="assets/ciwayang1.jpg">
-
-      <!-- DUPLIKAT FOTO PERTAMA (WAJIB) -->
-      <img src="assets/gc.png">
-    </div>
-  </div>
-
-  <!-- OVERLAY -->
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Custom Trip</h3>
-      <span class="price-tag">Flexible</span>
-    </div>
-
-    <div class="card-meta">
-      <span>Multi Day Trip</span>
-      <span>Opsional</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('custom')">
-      Lihat Detail
-    </button>
-  </div>
-
-</div>
-
-
-
-
-<!-- ================= SEA ADVENTURE ================= -->
-
-<div class="card sea">
-  <img src="assets/jetski-1-Y9ZJopoJ.jpeg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Jetski</h3>
-      <span class="price-tag">Rp 350.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 15 Menit</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('jetski')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-<div class="card sea">
-  <img src="assets/jetski-2.jpeg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Drone Areal + Jetski</h3>
-      <span class="price-tag">Rp 650.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 15 Menit</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('jetski_areal')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-<div class="card sea">
-  <img src="assets/jetski3.jpg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>FVP Drone + Jetski</h3>
-      <span class="price-tag">Rp 1.200.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 15 Menit</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('jetski_fvp')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-<div class="card sea">
-  <img src="assets/watersport3.jpeg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Water Sport</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 30 Menit</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('watersport')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card sea">
-  <img src="assets/paddle.png">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Stand Up Paddle</h3>
-      <span class="price-tag">Rp 350.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('standuppaddle')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card sea">
-  <img src="assets/snorkeling2.png">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Snorkeling</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-    <div class="card-meta">
-      <span>Sea Adventure</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('snorkeling')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<!-- ================= OUTBOUND ================= -->
-
-<div class="card outbound">
-  <img src="assets/photosession-1-CWeHPraX.jpeg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Photo Session</h3>
-      <span class="price-tag">Rp 200.000</span>
-    </div>
-
-
-
-    <div class="card-meta">
-      <span>Outbound</span>
-      <span>Durasi 2 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('photosession')">
-      Lihat Detail
-    </button>
-  </div>
-</div>
-
-
-<div class="card outbound">
-  <img src="assets/fungames-1-B6WDKIz9.jpeg">
-  <div class="card-overlay">
-    <div class="card-header">
-      <h3>Fun Game</h3>
-      <span class="price-tag">Rp 150.000</span>
-    </div>
-
-
-    <div class="card-meta">
-      <span>Outbound</span>
-      <span>Durasi 3 jam</span>
-    </div>
-
-    <button class="card-btn"
-      onclick="goDetail('fungame')">
-      Lihat Detail
-          </button>
-  </div>
-</div>
-
-</div>
-</section>
-
-<section id="gallery" class="editorial-gallery">
-  <div class="gallery-header">
-    <span>GALERI</span>
-    <h2>MOMEN PERJALANAN ANDA</h2>
-  </div>
-
-  <div class="editorial-grid">
-    <div class="item large">
-      <img src="assets/ciwayang.png" alt="Ciwayang">
-    </div>
-
-    <div class="item wide">
-      <img src="assets/greencanyon2.jpeg" alt="Green Canyon">
-    </div>
-
-    <div class="item">
-      <img src="assets/paddle.png" alt="Paddle">
-    </div>
-
-    <div class="item">
-      <img src="assets/fungame.png" alt="Fun Game">
-    </div>
-
-    <div class="item">
-      <img src="assets/citumang1.jpg" alt="Citumang">
-    </div>
-
-    <div class="item wide">
-      <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Fun Games">
-    </div>
-
-    <div class="item">
-      <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="Jetski">
-    </div>
-
-    <div class="item">
-      <img src="assets/waterpsort3.png" alt="Water Sport">
-    </div>
-
-    <div class="item">
-      <img src="assets/chilltime1.jpeg" alt="Chill Time">
-    </div>
-  </div>
-</section>
-
-<section class="our-clients">
-  <div class="clients-container">
-
-    <div class="clients-head">
-      <span class="clients-kicker">PARTNERSHIP</span>
-      <h2 class="clients-title">OUR CLIENTS</h2>
-    </div>
-
-    <div class="clients-grid">
-      <div class="client-card"><img src="assets/ahm-Cw0Q8E6L.png" alt="AHM"></div>
-      <div class="client-card"><img src="assets/biensi.jpeg" alt="Biensi"></div>
-
-      <div class="client-card"><img src="assets/bni-B3utHgBQ.png" alt="BNI"></div>
-      <div class="client-card"><img src="assets/indomarco-BMI6emVe.png" alt="Indomarco"></div>
-      <div class="client-card"><img src="assets/kai-S8EPM5yB.png" alt="KAI"></div>
-
-      <div class="client-card"><img src="assets/mandiri-BUSvWBm7.png" alt="Mandiri"></div>
-      <div class="client-card"><img src="assets/peruri-cEIHI3nT.png" alt="Peruri"></div>
-      <div class="client-card"><img src="assets/prudential-URrx6J0M.png" alt="Prudential"></div>
-
-      <div class="client-card"><img src="assets/rsud-profmano-C8YVFoov (1).webp" alt="Unsil"></div>
-      <div class="client-card"><img src="assets/telkom-DUXquX-C.png" alt="Telkom"></div>
-    </div>
-
-    <p class="clients-note">
-      Dan masih banyak lagi yang telah menjadi<br>
-      bagian dari perjalanan kami
-    </p>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="footer-container">
-
-    <div class="footer-left">
-      <div class="footer-brand">
-        <img src="assets/logo.png" alt="Pangandaran.in Logo">
         <div>
-          <h3>Pangandaran.in</h3>
-          <p>Easy Way to Explore</p>
+          <h4 class="text-secondary font-bold mb-4 text-sm">Social Media</h4>
+          <ul class="space-y-2">
+            <li><a href="https://www.tiktok.com/@pangandaran.in" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">TikTok</a></li>
+            <li><a href="https://www.instagram.com/pangandaran.in/" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">Instagram</a></li>
+            <li><a href="#" class="text-on-surface-variant hover:text-secondary transition-colors text-sm">WhatsApp</a></li>
+          </ul>
         </div>
       </div>
-
-      <div class="footer-address">
-        <h4>Operational Address</h4>
-        <p>Dsn. Parapat RT. 3 RW. 9, Desa Pangandaran</p>
-        <p>Kecamatan Pangandaran</p>
-        <p>Kab. Pangandaran, Jawa Barat</p>
+      <div>
+        <h4 class="text-secondary font-bold mb-4 text-sm">Quick Book</h4>
+        <p class="text-on-surface-variant text-sm mb-4">Siap memulai petualangan? Booking sekarang!</p>
+        <a href="booking.html" class="inline-block bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold px-6 py-3 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.3)] transition-all">
+          Booking Now ↗
+        </a>
       </div>
     </div>
-
-    <div class="footer-links">
-      <h4>Social Media</h4>
-      <a href="https://www.tiktok.com/@pangandaran.in">Tiktok</a>
-      <a href="https://www.instagram.com/pangandaran.in/">Instagram</a>
-      <a href="#">WhatsApp</a>
+    <div class="border-t border-white/5 pt-8 text-center">
+      <p class="text-on-surface-variant/40 text-xs uppercase tracking-widest">© 2026 Pangandaran.in • Easy Way to Explore</p>
     </div>
-
-    <div class="footer-links">
-      <h4>Pages</h4>
-      <a href="index.html">Home</a>
-      <a href="index.html#destinasi-scroll">Destinasi</a>
-      <a href="index.html#paket-scroll">Paket</a>
-      <a href="index.html#gallery">Galeri</a>
-      <a href="about.html">About</a>
-    </div>
-
   </div>
 </footer>
 
+<!-- ===== MOBILE BOTTOM NAV ===== -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10 px-4 py-3 pb-safe flex justify-around items-center">
+  <a href="index.html" class="flex flex-col items-center text-secondary">
+    <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1">home</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Home</span>
+  </a>
+  <a href="#destinasi-scroll" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">explore</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Destinasi</span>
+  </a>
+  <a href="booking.html" class="flex flex-col items-center -mt-6">
+    <div class="bg-secondary h-12 w-12 rounded-full shadow-[0_0_20px_rgba(162,231,255,0.4)] flex items-center justify-center">
+      <span class="material-symbols-outlined text-surface text-xl">add</span>
+    </div>
+    <span class="text-[9px] uppercase tracking-wider mt-1 text-secondary">Booking</span>
+  </a>
+  <a href="#gallery" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">photo_library</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Galeri</span>
+  </a>
+  <a href="about.html" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">info</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">About</span>
+  </a>
+</div>
+<div class="md:hidden h-20"></div>
 
-<script src="style.js"></script>
 <script>
-  lucide.createIcons();
-</script>
+// ===== PACKAGES DATA =====
+const packages = [
+  { key:'gc', name:'Green Canyon Body Rafting', cat:'river', label:'River Adventure', price:'Rp 250.000', dur:'3,5 jam', img:'assets/greencanyon1.jpg' },
+  { key:'ciwayang', name:'Ciwayang Body Rafting', cat:'river', label:'River Adventure', price:'Rp 150.000', dur:'2 jam', img:'assets/ciwayang1.jpg' },
+  { key:'citumang', name:'Citumang Body Rafting', cat:'river', label:'River Adventure', price:'Rp 150.000', dur:'2 jam', img:'assets/citumang1.jpg' },
+  { key:'santirah', name:'Santirah River Tubing', cat:'river', label:'River Adventure', price:'Rp 150.000', dur:'2 jam', img:'assets/santirah.png' },
+  { key:'oneday', name:'One Day Tour Package', cat:'multi', label:'Multi Day Trip', price:'Rp 260.000', dur:'1 Hari', img:'assets/chilltime1.jpeg' },
+  { key:'2d1n', name:'2 Day 1 Night Package', cat:'multi', label:'Multi Day Trip', price:'Rp 700.000', dur:'2 Hari 1 Malam', img:'assets/chilltime3.jpeg' },
+  { key:'3d2n', name:'3 Day 2 Night Package', cat:'multi', label:'Multi Day Trip', price:'Rp 700.000', dur:'3 Hari 2 Malam', img:'assets/santirah-1-DEyrdUd5.jpeg' },
+  { key:'custom', name:'Custom Trip', cat:'multi', label:'Multi Day Trip', price:'Flexible', dur:'Opsional', img:'assets/watersport-2.jpeg' },
+  { key:'jetski', name:'Jetski', cat:'sea', label:'Sea Adventure', price:'Rp 350.000', dur:'15 Menit', img:'assets/jetski-1-Y9ZJopoJ.jpeg' },
+  { key:'jetski_areal', name:'Drone Areal + Jetski', cat:'sea', label:'Sea Adventure', price:'Rp 650.000', dur:'15 Menit', img:'assets/jetski-2.jpeg' },
+  { key:'jetski_fvp', name:'FPV Drone + Jetski', cat:'sea', label:'Sea Adventure', price:'Rp 1.200.000', dur:'15 Menit', img:'assets/jetski3.jpg' },
+  { key:'watersport', name:'Water Sport', cat:'sea', label:'Sea Adventure', price:'Rp 150.000', dur:'1 Jam', img:'assets/watersport3.jpeg' },
+  { key:'standuppaddle', name:'Stand Up Paddle', cat:'sea', label:'Sea Adventure', price:'Rp 350.000', dur:'2 Jam', img:'assets/paddle.png' },
+  { key:'snorkeling', name:'Snorkeling', cat:'sea', label:'Sea Adventure', price:'Rp 150.000', dur:'2 Jam', img:'assets/snorkeling2.png' },
+  { key:'photosession', name:'Photo Session', cat:'outbound', label:'Outbound', price:'Rp 200.000', dur:'2 Jam', img:'assets/photosession-1-CWeHPraX.jpeg' },
+  { key:'fungame', name:'Fun Game', cat:'outbound', label:'Outbound', price:'Rp 150.000', dur:'3 Jam', img:'assets/fungames-1-B6WDKIz9.jpeg' },
+];
 
-<script>
-  const heroSlides = [
-    {
-      cat: "River Adventure",
-      title: "Green Canyon",
-      sub: "Body Rafting",
-      desc: "Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.",
-      bg: "assets/greencanyon1.jpg"
-    },
-    {
-      cat: "River Adventure",
-      title: "Citumang",
-      sub: "Body Rafting",
-      desc: "Rasakan petualangan sungai yang memukau di Citumang dengan suasana alam yang tenang dan menyegarkan.",
-      bg: "assets/citumang1.jpg"
-    },
-    {
-      cat: "Sea Adventure",
-      title: "Jetski",
-      sub: "Sea Adventure",
-      desc: "Pacu adrenalin di atas ombak Pangandaran dengan pengalaman jetski yang seru dan berkesan.",
-      bg: "assets/jetski3.jpg"
-    },
-    {
-      cat: "Outbound",
-      title: "Fun Game",
-      sub: "Team Building",
-      desc: "Ciptakan momen kebersamaan yang seru bersama tim lewat aktivitas outbound yang interaktif dan menyenangkan.",
-      bg: "assets/fungame3.png"
-    }
-  ];
+function goDetail(key){ window.location.href='detail.html?paket='+key; }
 
-  let heroIndex = 0;
-
-  const heroBg = document.getElementById("heroBmBg");
-  const heroCat = document.getElementById("heroBmCat");
-  const heroTitle = document.getElementById("heroBmTitle");
-  const heroDesc = document.getElementById("heroBmDesc");
-  const heroCount = document.getElementById("heroBmCount");
-  const heroBigNum = document.getElementById("heroBmBigNum");
-  const heroProgress = document.getElementById("heroBmProgress");
-  const heroPrev = document.getElementById("heroPrev");
-  const heroNext = document.getElementById("heroNext");
-  const heroCards = document.querySelectorAll(".hero-mini-card");
-
-  function renderHero() {
-    const item = heroSlides[heroIndex];
-    const num = String(heroIndex + 1).padStart(2, "0");
-
-    if (heroBg) heroBg.src = item.bg;
-    if (heroCat) heroCat.textContent = item.cat;
-    if (heroTitle) heroTitle.innerHTML = item.title + "<span>" + item.sub + "</span>";
-    if (heroDesc) heroDesc.textContent = item.desc;
-    if (heroCount) heroCount.textContent = num + " / 04";
-    if (heroBigNum) heroBigNum.textContent = num;
-    if (heroProgress) {
-      heroProgress.style.width = ((heroIndex + 1) / heroSlides.length) * 100 + "%";
-    }
-
-    heroCards.forEach((card, idx) => {
-      card.classList.remove("is-active", "is-prev", "is-next", "is-far");
-
-      if (idx === heroIndex) {
-        card.classList.add("is-active");
-      } else if (idx === (heroIndex + 1) % heroSlides.length) {
-        card.classList.add("is-next");
-      } else if (idx === (heroIndex - 1 + heroSlides.length) % heroSlides.length) {
-        card.classList.add("is-prev");
-      } else {
-        card.classList.add("is-far");
-      }
-    });
-  }
-
-  if (heroPrev) {
-    heroPrev.addEventListener("click", function () {
-      heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
-      renderHero();
-    });
-  }
-
-  if (heroNext) {
-    heroNext.addEventListener("click", function () {
-      heroIndex = (heroIndex + 1) % heroSlides.length;
-      renderHero();
-    });
-  }
-
-  heroCards.forEach((card) => {
-    card.addEventListener("click", function () {
-      heroIndex = Number(card.dataset.idx);
-      renderHero();
-    });
+function renderPackages(filter){
+  const grid = document.getElementById('pkgGrid');
+  grid.innerHTML='';
+  const filtered = filter==='all' ? packages : packages.filter(p=>p.cat===filter);
+  filtered.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='group bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost hover:bg-surface-container-high transition-all cursor-pointer';
+    div.onclick=()=>goDetail(p.key);
+    div.innerHTML=`
+      <div class="relative h-52 overflow-hidden">
+        <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-surface-container-low/80 to-transparent"></div>
+        <div class="absolute top-3 right-3 bg-surface/80 backdrop-blur px-2.5 py-1 rounded-full border-ghost text-secondary text-[10px] font-bold tracking-widest uppercase">${p.cat}</div>
+      </div>
+      <div class="p-5">
+        <h3 class="font-headline font-bold text-on-surface mb-2 leading-tight">${p.name}</h3>
+        <div class="flex items-center gap-4 text-on-surface-variant text-xs mb-4">
+          <div class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-secondary text-base">schedule</span>${p.dur}
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-secondary text-base">category</span>${p.label}
+          </div>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-lg font-headline font-bold text-white">${p.price}</span>
+          <div class="bg-surface-container-highest text-secondary border border-secondary/30 h-9 w-9 rounded-full flex items-center justify-center group-hover:bg-secondary group-hover:text-surface transition-all">
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(div);
   });
+}
 
-  renderHero();
+function filterPackages(filter){
+  // Update active button
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.classList.remove('bg-secondary','text-surface','active-filter');
+    btn.classList.add('text-on-surface-variant');
+    if(btn.dataset.filter===filter){
+      btn.classList.add('bg-secondary','text-surface');
+      btn.classList.remove('text-on-surface-variant');
+    }
+  });
+  renderPackages(filter);
+  if(filter!=='all'){
+    setTimeout(()=>{ document.getElementById('paket-scroll').scrollIntoView({behavior:'smooth'}); },50);
+  }
+}
+
+renderPackages('all');
+
+// ===== HERO SLIDER =====
+const heroSlides=[
+  { cat:'River Adventure', title:'Green Canyon', sub:'Body Rafting', desc:'Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.', bg:'assets/greencanyon1.jpg' },
+  { cat:'River Adventure', title:'Citumang', sub:'Body Rafting', desc:'Rasakan petualangan sungai yang memukau di Citumang dengan suasana alam yang tenang dan menyegarkan.', bg:'assets/citumang1.jpg' },
+  { cat:'Sea Adventure', title:'Jetski', sub:'Sea Adventure', desc:'Pacu adrenalin di atas ombak Pangandaran dengan pengalaman jetski yang seru dan berkesan.', bg:'assets/jetski3.jpg' },
+  { cat:'Outbound', title:'Fun Game', sub:'Team Building', desc:'Ciptakan momen kebersamaan yang seru bersama tim lewat aktivitas outbound yang interaktif.', bg:'assets/fungame3.png' }
+];
+let heroIdx=0;
+
+function renderHero(){
+  const s=heroSlides[heroIdx];
+  const num=String(heroIdx+1).padStart(2,'0');
+  document.getElementById('heroBg').src=s.bg;
+  document.getElementById('heroCat').textContent=s.cat;
+  document.getElementById('heroTitle').innerHTML=s.title+'<br><span class="text-secondary neon">'+s.sub+'</span>';
+  document.getElementById('heroDesc').textContent=s.desc;
+  document.getElementById('heroCount').textContent=num+' / 04';
+  document.getElementById('heroBigNum').textContent=num;
+  document.getElementById('heroProgress').style.width=((heroIdx+1)/heroSlides.length*100)+'%';
+}
+
+document.getElementById('heroPrev').addEventListener('click',()=>{ heroIdx=(heroIdx-1+heroSlides.length)%heroSlides.length; renderHero(); });
+document.getElementById('heroNext').addEventListener('click',()=>{ heroIdx=(heroIdx+1)%heroSlides.length; renderHero(); });
+setInterval(()=>{ heroIdx=(heroIdx+1)%heroSlides.length; renderHero(); },5000);
+renderHero();
+
+// ===== MOBILE MENU =====
+document.getElementById('menuBtn').addEventListener('click',()=>{
+  const m=document.getElementById('mobileMenu');
+  m.classList.toggle('hidden');
+});
+function closeMobileMenu(){ document.getElementById('mobileMenu').classList.add('hidden'); }
 </script>
 </body>
 </html>

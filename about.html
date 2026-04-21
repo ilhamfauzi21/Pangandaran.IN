@@ -1,178 +1,306 @@
 <!DOCTYPE html>
-<html lang="id">
+<html class="dark" lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>About — Pangandaran.in</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Pangandaran.in</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode:"class",
+      theme:{ extend:{
+        colors:{
+          "surface":"#00132f","background":"#00132f","surface-dim":"#00132f",
+          "surface-container-lowest":"#000e25","surface-container-low":"#051b39",
+          "surface-container":"#0a1f3d","surface-container-high":"#172a48",
+          "surface-container-highest":"#223554","surface-bright":"#273959",
+          "on-surface":"#d6e3ff","on-surface-variant":"#c2c6d4","on-background":"#d6e3ff",
+          "primary":"#aac7ff","primary-container":"#0059b3",
+          "on-primary":"#002f65","on-primary-container":"#bed4ff",
+          "secondary":"#a2e7ff","secondary-container":"#00d2fd",
+          "on-secondary":"#003642","on-secondary-container":"#005669",
+          "tertiary":"#b4c7ed","tertiary-container":"#495b7c",
+          "on-tertiary":"#1e304f","on-tertiary-container":"#c0d3fa",
+          "outline":"#8c919d","outline-variant":"#424752",
+          "surface-variant":"#223554","surface-tint":"#aac7ff",
+          "error":"#ffb4ab","on-error":"#690005"
+        },
+        fontFamily:{ headline:["Space Grotesk"], body:["Inter"], label:["Inter"] },
+        borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" }
+      }}
+    }
+  </script>
+  <style>
+    body { font-family:'Inter',sans-serif; background:#00132f; color:#d6e3ff; }
+    .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+    .glass { background:rgba(34,53,84,0.4); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    .border-ghost { border:1px solid rgba(170,199,255,0.15); }
+  </style>
 </head>
+<body class="selection:bg-secondary/30">
 
-<body>
+<!-- ===== TOPNAV ===== -->
+<nav class="fixed top-0 w-full z-50 bg-[#00132F]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(162,231,255,0.04)]">
+  <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-xl mx-auto">
+    <a href="index.html" class="text-xl md:text-2xl font-bold tracking-tighter text-white font-headline">Pangandaran.in</a>
 
-<header class="topbar">
-  <div class="brand">PANGANDARAN.IN</div>
-
-  <nav class="nav-pill">
-    <a href="index.html">Home</a>
-    <a href="index.html#destinasi-scroll">Destinasi</a>
-    <a href="index.html#paket-scroll">Paket</a>
-    <a href="index.html#gallery">Galeri</a>
-    <a href="about.html" class="active">About</a>
-  </nav>
-
-  <a class="contact-btn" href="booking.html">
-    Booking Now
-    <span class="arrow">↗</span>
-  </a>
-</header>
-
-<!-- ================= ABOUT ================= -->
-
-<section class="about">
-
-  <span class="section-label">ABOUT US</span>
-  <h1>Pangandaran.in</h1>
-
-  <div class="about-grid">
-
-    <div class="about-text">
-      <p>
-        CV Pangandaran In Group merupakan perusahaan yang bergerak di bidang Aktivitas
-        Biro Perjalanan Wisata, Jasa Informasi Wisata, serta Foto dan Videografi yang
-        berlokasi di Pangandaran, Jawa Barat.
-      </p>
-
-      <p>
-        Kami berfokus untuk memberikan berbagai kemudahan dan alternatif holiday tour
-        (paket wisata liburan) yang menarik untuk para konsumen.
-      </p>
-
-      <p>
-        Saat ini kami berupaya terus melakukan pembaharuan dalam meningkatkan kualitas
-        pelayanan secara berkesinambungan, pelayanan perjalanan yang terintegrasi,
-        output kegiatan (dokumentasi profesional), serta sistem reservasi online untuk
-        menjaga dan meningkatkan kepercayaan pelanggan.
-      </p>
+    <!-- Desktop Nav -->
+    <div class="hidden md:flex items-center space-x-8 font-headline tracking-wide text-sm">
+      <a href="index.html" class="text-slate-300 hover:text-secondary transition-colors">Home</a>
+      <a href="index.html#destinasi-scroll" class="text-slate-300 hover:text-secondary transition-colors">Destinasi</a>
+      <a href="index.html#paket-scroll" class="text-slate-300 hover:text-secondary transition-colors">Paket</a>
+      <a href="index.html#gallery" class="text-slate-300 hover:text-secondary transition-colors">Galeri</a>
+      <a href="about.html" class="text-secondary border-b-2 border-secondary pb-0.5 font-bold">About</a>
     </div>
 
-    <div class="member-card">
-      <h3>Member of:</h3>
+    <div class="flex items-center gap-3">
+      <a href="booking.html" class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold px-5 py-2 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.4)] transition-all">
+        Booking Now ↗
+      </a>
+      <button id="menuBtn" class="md:hidden p-2 text-primary">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
 
-      <div class="member-logos">
-        <div class="logo-box">
-          <img src="assets/asita.png">
-          <span>ASITA</span>
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="md:hidden hidden glass border-t border-white/10 px-6 py-4 space-y-3">
+    <a href="index.html" class="block text-slate-300 py-2">Home</a>
+    <a href="index.html#destinasi-scroll" class="block text-slate-300 py-2">Destinasi</a>
+    <a href="index.html#paket-scroll" class="block text-slate-300 py-2">Paket</a>
+    <a href="index.html#gallery" class="block text-slate-300 py-2">Galeri</a>
+    <a href="about.html" class="block text-secondary font-bold py-2">About</a>
+  </div>
+</nav>
+
+<main class="relative pt-24">
+  <!-- Background Accents -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-secondary/5 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-primary/5 blur-[120px] rounded-full"></div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="max-w-screen-xl mx-auto px-6 md:px-8 py-16 md:py-24 relative">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center space-x-3 bg-secondary/10 border border-secondary/20 px-4 py-1.5 rounded-full">
+          <span class="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
+          <span class="text-secondary font-headline text-xs tracking-[0.2em] uppercase font-bold">About Us</span>
         </div>
+        <h1 class="font-headline text-5xl md:text-7xl font-bold text-on-surface tracking-tighter leading-tight">
+          Tentang<br><span class="text-secondary">Kami</span>
+        </h1>
+        <div class="space-y-4 text-on-surface-variant leading-relaxed font-body">
+          <p>CV Pangandaran In Group merupakan perusahaan yang bergerak di bidang Aktivitas Biro Perjalanan Wisata, Jasa Informasi Wisata, serta Foto dan Videografi yang berlokasi di Pangandaran, Jawa Barat.</p>
+          <p>Kami berfokus untuk memberikan berbagai kemudahan dan alternatif holiday tour (paket wisata liburan) yang menarik untuk para konsumen.</p>
+          <p>Saat ini kami berupaya terus melakukan pembaharuan dalam meningkatkan kualitas pelayanan, output kegiatan (dokumentasi profesional), serta sistem reservasi online untuk menjaga dan meningkatkan kepercayaan pelanggan.</p>
+        </div>
+      </div>
 
-        <div class="logo-box">
-          <img src="assets/pphp.png">
-          <span>PHPWP</span>
+      <!-- Member Card -->
+      <div class="lg:col-span-5">
+        <div class="glass rounded-2xl p-8 border-ghost shadow-2xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 -mr-8 -mt-8 rounded-full blur-3xl"></div>
+          <h3 class="font-headline text-sm font-bold text-secondary mb-6 tracking-widest uppercase">Member Of</h3>
+          <div class="flex flex-col gap-8 items-center">
+            <div class="flex flex-col items-center text-center">
+              <img src="assets/asita.png" alt="ASITA" class="opacity-80 grayscale hover:grayscale-0 transition-all duration-500 h-14 object-contain" onerror="this.parentElement.querySelector('span').style.display='block'">
+              <span class="text-on-surface font-headline font-bold text-lg mt-3">ASITA</span>
+              <span class="text-xs font-label tracking-widest text-on-surface-variant/50 mt-1">Association of Indonesian Tours & Travel Agencies</span>
+            </div>
+            <div class="w-full h-px bg-outline-variant/20"></div>
+            <div class="flex flex-col items-center text-center">
+              <img src="assets/pphp.png" alt="PHPWP" class="opacity-80 grayscale hover:grayscale-0 transition-all duration-500 h-14 object-contain" onerror="this.parentElement.querySelector('span').style.display='block'">
+              <span class="text-on-surface font-headline font-bold text-lg mt-3">PHPWP</span>
+              <span class="text-xs font-label tracking-widest text-on-surface-variant/50 mt-1">Perhimpunan Hotel & Restoran Indonesia</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </section>
 
-  </div>
+  <!-- ===== VISION & MISSION ===== -->
+  <section class="bg-surface-container-low py-20 md:py-24">
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8">
+      <div class="text-center mb-12">
+        <span class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase">Arah Kami</span>
+        <h2 class="font-headline text-4xl font-bold text-on-surface mt-2">Visi & Misi</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Vision -->
+        <div class="relative group">
+          <div class="absolute -inset-0.5 bg-gradient-to-r from-secondary/20 to-primary/20 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-700"></div>
+          <div class="relative bg-surface-container-high rounded-2xl p-8 h-full border-ghost">
+            <div class="flex items-center mb-6">
+              <span class="material-symbols-outlined text-3xl text-secondary mr-4" style="font-variation-settings:'FILL' 1">visibility</span>
+              <h2 class="font-headline text-2xl font-bold text-on-surface">Visi</h2>
+            </div>
+            <p class="text-on-surface-variant leading-relaxed">
+              Menjadi mitra wisata terpercaya yang menggabungkan eksekusi lapangan terbaik yang menjadikan setiap perjalanan jadi cerita yang berkesan dan terdokumentasi dengan sempurna.
+            </p>
+          </div>
+        </div>
 
-  <!-- ================= VISION MISSION ================= -->
-
-  <div class="vm-grid">
-
-    <div class="vm-card">
-      <h2>Vision</h2>
-      <p>
-        Menjadi mitra wisata terpercaya yang menggabungkan eksekusi lapangan terbaik
-        yang menjadikan setiap perjalanan jadi cerita yang berkesan dan terdokumentasi
-        dengan sempurna.
-      </p>
+        <!-- Mission -->
+        <div class="relative group">
+          <div class="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-700"></div>
+          <div class="relative bg-surface-container-high rounded-2xl p-8 h-full border-ghost">
+            <div class="flex items-center mb-6">
+              <span class="material-symbols-outlined text-3xl text-secondary mr-4" style="font-variation-settings:'FILL' 1">rocket_launch</span>
+              <h2 class="font-headline text-2xl font-bold text-on-surface">Misi</h2>
+            </div>
+            <ul class="space-y-3 text-on-surface-variant">
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-base mt-0.5">arrow_forward</span>
+                <span>Memberikan layanan tour & travel yang terintegrasi dan profesional.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-base mt-0.5">arrow_forward</span>
+                <span>Menghadirkan layanan all-in-one mulai dari reservasi mudah hingga dokumentasi profesional.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-base mt-0.5">arrow_forward</span>
+                <span>Menjalin koneksi hangat dengan klien melalui pelayanan ramah dan cepat tanggap.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-base mt-0.5">arrow_forward</span>
+                <span>Menyajikan dokumentasi berkualitas tinggi dari setiap perjalanan.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-base mt-0.5">arrow_forward</span>
+                <span>Terus berinovasi dalam sistem pelayanan dan promosi digital.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="vm-card">
-      <h2>Mission</h2>
-      <ul>
-        <li>Memberikan layanan tour & travel yang terintegrasi dan profesional.</li>
-        <li>Menghadirkan layanan all-in-one mulai dari reservasi mudah hingga dokumentasi profesional.</li>
-        <li>Menjalin koneksi hangat dengan klien melalui pelayanan ramah dan cepat tanggap.</li>
-        <li>Menyajikan dokumentasi berkualitas tinggi.</li>
-        <li>Terus berinovasi dalam sistem pelayanan dan promosi digital.</li>
-      </ul>
+  <!-- ===== SERVICES ===== -->
+  <section class="max-w-screen-xl mx-auto px-6 md:px-8 py-20 md:py-24">
+    <div class="text-center mb-14">
+      <span class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase">Layanan</span>
+      <h2 class="font-headline text-4xl font-bold text-on-surface mt-2 mb-3">Our Services</h2>
+      <div class="h-0.5 w-16 bg-secondary mx-auto rounded-full"></div>
     </div>
-
-  </div>
-
-</section>
-
-<!-- ================= SERVICES ================= -->
-
-<section class="services">
-
-  <span class="section-label">SERVICES</span>
-  <h2>Our Services</h2>
-
-  <div class="services-grid">
-
-    <div class="service-card">
-      <h4>Paket Tur</h4>
-      <p>Kami menyediakan berbagai paket wisata menarik dan fleksibel.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="glass p-7 rounded-2xl border-ghost hover:bg-surface-container-highest transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">explore</span>
+        </div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2">Paket Tur</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Berbagai paket wisata menarik dan fleksibel sesuai kebutuhan Anda.</p>
+      </div>
+      <div class="glass p-7 rounded-2xl border-ghost hover:bg-surface-container-highest transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">apartment</span>
+        </div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2">Hotel / Penginapan</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Beragam pilihan penginapan yang nyaman dan strategis di Pangandaran.</p>
+      </div>
+      <div class="glass p-7 rounded-2xl border-ghost hover:bg-surface-container-highest transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">photo_camera</span>
+        </div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2">Dokumentasi</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Foto & videografi profesional untuk mengabadikan setiap perjalanan Anda.</p>
+      </div>
+      <div class="glass p-7 rounded-2xl border-ghost hover:bg-surface-container-highest transition-all duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">directions_bus</span>
+        </div>
+        <h3 class="font-headline text-lg font-bold text-on-surface mb-2">Transportasi</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Layanan transportasi aman, nyaman, dan terpercaya di seluruh area Pangandaran.</p>
+      </div>
     </div>
+  </section>
+</main>
 
-    <div class="service-card">
-      <h4>Hotel / Penginapan</h4>
-      <p>Beragam pilihan penginapan yang nyaman & strategis.</p>
-    </div>
-
-    <div class="service-card">
-      <h4>Dokumentasi Foto & Video</h4>
-      <p>Dokumentasi profesional untuk setiap perjalanan Anda.</p>
-    </div>
-
-    <div class="service-card">
-      <h4>Transportasi</h4>
-      <p>Layanan transportasi aman dan terpercaya.</p>
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= FOOTER ================= -->
-
-<footer class="footer">
-  <div class="footer-container">
-
-    <div class="footer-left">
-      <div class="footer-brand">
-        <img src="assets/logo.png" alt="Pangandaran.in Logo">
+<!-- ===== FOOTER ===== -->
+<footer class="bg-[#00132F] border-t border-white/5 py-12 px-6 md:px-8">
+  <div class="max-w-screen-xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <img src="assets/logo.png" alt="Logo" class="h-9 object-contain" onerror="this.style.display='none'">
+          <span class="text-lg font-bold text-secondary font-headline">Pangandaran.in</span>
+        </div>
+        <p class="text-on-surface-variant text-sm">Easy Way to Explore</p>
         <div>
-          <h3>Pangandaran.in</h3>
-          <p>Easy Way to Explore</p>
+          <p class="text-on-surface-variant/60 text-xs">Dsn. Parapat RT. 3 RW. 9, Desa Pangandaran</p>
+          <p class="text-on-surface-variant/60 text-xs">Kecamatan Pangandaran, Kab. Pangandaran, Jawa Barat</p>
         </div>
       </div>
-
-      <div class="footer-address">
-        <h4>Operational Address</h4>
-        <p>Dsn. Parapat RT. 3 RW. 9, Desa Pangandaran</p>
-        <p>Kecamatan Pangandaran</p>
-        <p>Kab. Pangandaran, Jawa Barat</p>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-secondary font-bold mb-3 text-sm">Pages</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">Home</a></li>
+            <li><a href="index.html#destinasi-scroll" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">Destinasi</a></li>
+            <li><a href="index.html#paket-scroll" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">Paket</a></li>
+            <li><a href="index.html#gallery" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">Galeri</a></li>
+            <li><a href="about.html" class="text-secondary text-sm font-bold">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-secondary font-bold mb-3 text-sm">Social Media</h4>
+          <ul class="space-y-2">
+            <li><a href="https://www.tiktok.com/@pangandaran.in" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">TikTok</a></li>
+            <li><a href="https://www.instagram.com/pangandaran.in/" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">Instagram</a></li>
+            <li><a href="#" class="text-on-surface-variant hover:text-secondary text-sm transition-colors">WhatsApp</a></li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-secondary font-bold mb-3 text-sm">Book Your Trip</h4>
+        <p class="text-on-surface-variant text-sm mb-4">Siap memulai petualangan di Pangandaran?</p>
+        <a href="booking.html" class="inline-block bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold px-6 py-2.5 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.3)] transition-all">
+          Booking Sekarang ↗
+        </a>
       </div>
     </div>
-
-    <div class="footer-links">
-      <h4>Social Media</h4>
-      <a href="https://www.tiktok.com/@pangandaran.in">Tiktok</a>
-      <a href="https://www.instagram.com/pangandaran.in/">Instagram</a>
-      <a href="#">WhatsApp</a>
+    <div class="border-t border-white/5 pt-6 text-center">
+      <p class="text-on-surface-variant/40 text-xs uppercase tracking-widest">© 2024 Pangandaran.in • Easy Way to Explore</p>
     </div>
-
-    <div class="footer-links">
-      <h4>Pages</h4>
-      <a href="index.html">Home</a>
-      <a href="index.html#destinasi-scroll">Destinasi</a>
-      <a href="index.html#paket-scroll">Paket</a>
-      <a href="index.html#gallery">Galeri</a>
-      <a href="about.html">About</a>
-    </div>
-
   </div>
 </footer>
 
+<!-- Mobile Bottom Nav -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10 px-4 py-3 flex justify-around items-center">
+  <a href="index.html" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">home</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Home</span>
+  </a>
+  <a href="index.html#paket-scroll" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">explore</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Paket</span>
+  </a>
+  <a href="booking.html" class="flex flex-col items-center -mt-6">
+    <div class="bg-secondary h-12 w-12 rounded-full shadow-[0_0_20px_rgba(162,231,255,0.4)] flex items-center justify-center">
+      <span class="material-symbols-outlined text-surface text-xl">add</span>
+    </div>
+    <span class="text-[9px] uppercase tracking-wider mt-1 text-secondary">Booking</span>
+  </a>
+  <a href="index.html#gallery" class="flex flex-col items-center text-on-surface-variant">
+    <span class="material-symbols-outlined text-xl">photo_library</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">Galeri</span>
+  </a>
+  <a href="about.html" class="flex flex-col items-center text-secondary">
+    <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1">info</span>
+    <span class="text-[9px] uppercase tracking-wider mt-0.5">About</span>
+  </a>
+</div>
+<div class="md:hidden h-20"></div>
+
+<script>
+document.getElementById('menuBtn').addEventListener('click',()=>{
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+</script>
 </body>
 </html>
