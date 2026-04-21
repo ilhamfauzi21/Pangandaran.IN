@@ -367,20 +367,14 @@ document.getElementById('btnBook').addEventListener('click', e => {
   const nomor = '6287793827592';
 
   // Save to database
-// 1. kirim ke database (AMAN walau pindah halaman)
-navigator.sendBeacon(
-  'save_booking.php',
-  new URLSearchParams({
-    nama,
-    paket,
-    tanggal,
-    peserta
-  })
-);
-
-// 2. langsung buka WhatsApp
-const waUrl = `https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`;
-window.location.href = waUrl;
+  fetch('save_booking.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:`nama=${encodeURIComponent(nama)}&paket=${encodeURIComponent(paket)}&tanggal=${encodeURIComponent(tanggal)}&peserta=${encodeURIComponent(peserta)}`
+  }).catch(()=>{}).finally(()=>{
+    window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, '_blank');
+  });
+});
 
 // Mobile menu
 document.getElementById('menuBtn').addEventListener('click',()=>{
