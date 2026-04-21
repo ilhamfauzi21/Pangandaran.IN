@@ -89,7 +89,7 @@
 </nav>
 
 <!-- ===== HERO ===== -->
-<header class="relative h-screen min-h-[680px] max-h-[900px] w-full overflow-hidden flex items-center">
+<header class="relative h-[75vh] md:h-screen min-h-[500px] md:min-h-[680px] max-h-[900px] w-full overflow-hidden flex items-center">
   <div class="absolute inset-0 z-0">
     <img id="heroBg" src="assets/greencanyon1.jpg" alt="Hero" class="w-full h-full object-cover opacity-60 transition-all duration-700">
     <div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/50 to-transparent"></div>
@@ -102,10 +102,10 @@
         <span class="flex h-2 w-2 rounded-full bg-secondary pulse-dot"></span>
         <span id="heroCat" class="text-secondary font-headline text-xs tracking-[0.2em] uppercase font-bold">River Adventure</span>
       </div>
-      <h1 id="heroTitle" class="text-5xl md:text-7xl font-headline font-bold text-white tracking-tighter leading-none">
+      <h1 id="heroTitle" class="text-3xl sm:text-4xl md:text-7xl font-headline font-bold text-white tracking-tighter leading-none">
         Green Canyon <br><span class="text-secondary neon">Body Rafting</span>
       </h1>
-      <p id="heroDesc" class="text-on-surface-variant text-lg max-w-lg leading-relaxed font-light">
+      <p id="heroDesc" class="text-on-surface-variant text-sm md:text-lg max-w-lg leading-relaxed font-light">
         Nikmati serunya body rafting di Green Canyon dengan panorama tebing megah dan air jernih yang ikonik.
       </p>
       <div class="flex gap-4 pt-2">
@@ -135,7 +135,7 @@
     </div>
   </div>
   <!-- Big BG number -->
-  <div id="heroBigNum" class="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 text-[12rem] md:text-[18rem] font-headline font-bold text-white/3 select-none pointer-events-none leading-none">01</div>
+  <div id="heroBigNum" class="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 text-[50px] sm:text-[80px] md:text-[18rem] font-headline font-bold text-white/80 md:text-white/80 select-none pointer-events-none leading-none">01</div>
 </header>
 
 <!-- ===== STATS ===== -->
@@ -455,7 +455,7 @@ function renderPackages(filter){
           </div>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-lg font-headline font-bold text-white">${p.price}</span>
+          <span class="text-sm md:text-lg font-headline font-bold text-white">${p.price}</span>
           <div class="bg-surface-container-highest text-secondary border border-secondary/30 h-9 w-9 rounded-full flex items-center justify-center group-hover:bg-secondary group-hover:text-surface transition-all">
             <span class="material-symbols-outlined text-base">arrow_forward</span>
           </div>
