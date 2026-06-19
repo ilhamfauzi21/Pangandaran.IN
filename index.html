@@ -56,8 +56,6 @@
 <nav class="fixed top-0 w-full z-50 bg-[#00132F]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(162,231,255,0.04)]">
   <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-xl mx-auto">
     <a href="index.html" class="text-xl md:text-2xl font-bold tracking-tighter text-white font-headline">Pangandaran.in</a>
-
-    <!-- Desktop Nav -->
     <div class="hidden md:flex items-center space-x-8 font-headline tracking-wide text-sm">
       <a href="index.html" class="text-secondary border-b-2 border-secondary pb-0.5 neon">Home</a>
       <a href="#destinasi-scroll" class="text-slate-300 hover:text-secondary transition-colors">Destinasi</a>
@@ -65,20 +63,16 @@
       <a href="#gallery" class="text-slate-300 hover:text-secondary transition-colors">Galeri</a>
       <a href="about.html" class="text-slate-300 hover:text-secondary transition-colors">About</a>
     </div>
-
     <div class="flex items-center gap-3">
       <a href="booking.html" class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold px-5 py-2 rounded-full text-sm flex items-center gap-2 whitespace-nowrap hover:shadow-[0_0_20px_rgba(170,199,255,0.4)] transition-all">
         <span>Booking Now</span>
-<span class="material-symbols-outlined text-base">north_east</span>
+        <span class="material-symbols-outlined text-base">north_east</span>
       </a>
-      <!-- Mobile hamburger -->
       <button id="menuBtn" class="md:hidden p-2 text-primary">
         <span class="material-symbols-outlined">menu</span>
       </button>
     </div>
   </div>
-
-  <!-- Mobile Menu -->
   <div id="mobileMenu" class="md:hidden hidden glass border-t border-white/10 px-6 py-4 space-y-3">
     <a href="index.html" class="block text-secondary font-bold py-2">Home</a>
     <a href="#destinasi-scroll" class="block text-slate-300 py-2" onclick="closeMobileMenu()">Destinasi</a>
@@ -95,7 +89,6 @@
     <div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/50 to-transparent"></div>
     <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
   </div>
-
   <div class="relative z-10 w-full max-w-screen-xl mx-auto px-6 md:px-8">
     <div class="max-w-2xl space-y-6">
       <div class="inline-flex items-center space-x-3 bg-secondary/10 border border-secondary/20 px-4 py-1.5 rounded-full">
@@ -118,8 +111,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Hero Controls -->
   <div class="absolute bottom-8 left-0 right-0 z-10">
     <div class="max-w-screen-xl mx-auto px-6 md:px-8 flex items-center justify-between">
       <div class="flex items-center gap-4">
@@ -134,7 +125,6 @@
       </div>
     </div>
   </div>
-  <!-- Big BG number -->
   <div id="heroBigNum" class="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 text-[50px] sm:text-[80px] md:text-[18rem] font-headline font-bold text-white/80 md:text-white/80 select-none pointer-events-none leading-none">01</div>
 </header>
 
@@ -168,7 +158,6 @@
       <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">Most Popular Destination</h2>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <!-- River -->
       <a href="#paket-scroll" onclick="filterPackages('river')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500">
         <img src="assets/greencanyon1.jpg" alt="River Adventure" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
         <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
@@ -178,7 +167,6 @@
           <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Body rafting & river tubing di sungai jernih Pangandaran.</p>
         </div>
       </a>
-      <!-- Sea -->
       <a href="#paket-scroll" onclick="filterPackages('sea')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500 lg:mt-10">
         <img src="assets/jetski3.jpg" alt="Sea Adventure" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
         <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
@@ -188,7 +176,6 @@
           <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Jetski, snorkeling, watersport di perairan Pangandaran.</p>
         </div>
       </a>
-      <!-- Multi -->
       <a href="#paket-scroll" onclick="filterPackages('multi')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500">
         <img src="assets/chilltime1.jpeg" alt="Multi Day Trip" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
         <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
@@ -198,7 +185,6 @@
           <p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-300">Paket liburan 1-3 hari paling komplit & berkesan.</p>
         </div>
       </a>
-      <!-- Outbound -->
       <a href="#paket-scroll" onclick="filterPackages('outbound')" class="group relative h-[380px] rounded-[2rem] overflow-hidden border-ghost cursor-pointer hover:scale-[1.02] transition-all duration-500 lg:mt-10">
         <img src="assets/fungame3.png" alt="Outbound" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
         <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent"></div>
@@ -245,8 +231,6 @@
               <span class="material-symbols-outlined text-secondary text-3xl ml-1" style="font-variation-settings:'FILL' 1">play_arrow</span>
             </div>
           </div>
-          <div class="absolute bottom-4 left-4 bg-surface/80 backdrop-blur px-4 py-1.5 rounded-lg border-ghost">
-          </div>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="relative rounded-2xl overflow-hidden aspect-video border-ghost group cursor-pointer">
@@ -275,7 +259,6 @@
         <h4 class="text-secondary font-headline font-bold tracking-[0.3em] text-xs uppercase mb-2">Paket Wisata</h4>
         <h2 class="text-4xl font-headline font-bold text-white">Expedition Packages</h2>
       </div>
-      <!-- Filter Tabs -->
       <div class="flex flex-wrap gap-2 bg-surface-container-high p-1.5 rounded-2xl border-ghost">
         <button onclick="filterPackages('all')" data-filter="all" class="filter-btn active-filter px-5 py-2 rounded-xl bg-secondary text-surface font-bold text-sm transition-all">Semua</button>
         <button onclick="filterPackages('sea')" data-filter="sea" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">Sea</button>
@@ -284,8 +267,13 @@
         <button onclick="filterPackages('outbound')" data-filter="outbound" class="filter-btn px-5 py-2 rounded-xl text-on-surface-variant hover:text-white font-bold text-sm transition-all">Outbound</button>
       </div>
     </div>
-
-    <div id="pkgGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    <div id="pkgGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Loading skeleton -->
+      <div class="bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost animate-pulse h-72"></div>
+      <div class="bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost animate-pulse h-72"></div>
+      <div class="bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost animate-pulse h-72"></div>
+      <div class="bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost animate-pulse h-72"></div>
+    </div>
   </div>
 </section>
 
@@ -369,7 +357,7 @@
       <div>
         <h4 class="text-secondary font-bold mb-4 text-sm">Quick Book</h4>
         <p class="text-on-surface-variant text-sm mb-4">Siap memulai petualangan? Booking sekarang!</p>
-        <a href="booking.html" class="inline-block bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold px-6 py-3 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.3)] transition-all">
+        <a href="booking.html" class="inline-flex items-center gap-1 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold px-6 py-3 rounded-full text-sm hover:shadow-[0_0_20px_rgba(170,199,255,0.3)] transition-all">
           <span>Booking Sekarang</span><span class="material-symbols-outlined text-base">north_east</span>
         </a>
       </div>
@@ -408,8 +396,37 @@
 <div class="md:hidden h-20"></div>
 
 <script>
-// ===== PACKAGES DATA =====
-const packages = [
+// ===== PACKAGES — FETCH DARI DATABASE =====
+let packages = [];
+
+async function loadPackages() {
+  try {
+    const res = await fetch('get_paket_admin.php');
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      packages = data.map(p => ({
+        key:   p.id,
+        name:  p.nama,
+        cat:   p.kategori,
+        label: p.subtitle ? p.subtitle.split('•')[0].trim() : p.kategori,
+        price: parseInt(p.harga) > 0 ? 'Rp ' + parseInt(p.harga).toLocaleString('id-ID') : 'Flexible',
+        dur:   p.durasi || '-',
+        img:   p.foto1 || 'assets/greencanyon1.jpg'
+      }));
+    } else {
+      // Fallback ke data hardcode jika DB kosong
+      packages = packagesStatic;
+    }
+  } catch(e) {
+    // Fallback ke data hardcode jika fetch gagal (misal buka langsung via file://)
+    packages = packagesStatic;
+  }
+  renderPackages('all');
+}
+
+// Data hardcode sebagai fallback
+const packagesStatic = [
   { key:'gc', name:'Green Canyon Body Rafting', cat:'river', label:'River Adventure', price:'Rp 250.000', dur:'3,5 jam', img:'assets/greencanyon1.jpg' },
   { key:'ciwayang', name:'Ciwayang Body Rafting', cat:'river', label:'River Adventure', price:'Rp 150.000', dur:'2 jam', img:'assets/ciwayang1.jpg' },
   { key:'citumang', name:'Citumang Body Rafting', cat:'river', label:'River Adventure', price:'Rp 150.000', dur:'2 jam', img:'assets/citumang1.jpg' },
@@ -434,6 +451,10 @@ function renderPackages(filter){
   const grid = document.getElementById('pkgGrid');
   grid.innerHTML='';
   const filtered = filter==='all' ? packages : packages.filter(p=>p.cat===filter);
+  if(filtered.length === 0){
+    grid.innerHTML='<p class="text-on-surface-variant col-span-4 text-center py-10 opacity-50">Tidak ada paket tersedia.</p>';
+    return;
+  }
   filtered.forEach(p=>{
     const div=document.createElement('div');
     div.className='group bg-surface-container-low rounded-[2rem] overflow-hidden border-ghost hover:bg-surface-container-high transition-all cursor-pointer';
@@ -467,7 +488,6 @@ function renderPackages(filter){
 }
 
 function filterPackages(filter){
-  // Update active button
   document.querySelectorAll('.filter-btn').forEach(btn=>{
     btn.classList.remove('bg-secondary','text-surface','active-filter');
     btn.classList.add('text-on-surface-variant');
@@ -482,7 +502,8 @@ function filterPackages(filter){
   }
 }
 
-renderPackages('all');
+// Jalankan load dari DB saat halaman pertama kali dibuka
+loadPackages();
 
 // ===== HERO SLIDER =====
 const heroSlides=[

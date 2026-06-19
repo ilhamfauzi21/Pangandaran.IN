@@ -7,6 +7,9 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     tailwind.config = {
       darkMode:"class",
@@ -41,11 +44,160 @@
     .gallery-scroll { scroll-snap-type:x mandatory; }
     .gallery-scroll::-webkit-scrollbar { display:none; }
     .gallery-item { scroll-snap-align:start; }
+
+    /* INVOICE OVERLAY */
+    #invOverlay {
+      position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;
+      display:none;align-items:center;justify-content:center;
+      padding:16px;backdrop-filter:blur(6px);
+    }
+    #invOverlay.show { display:flex; }
+    .inv-box {
+      background:#fff;border-radius:16px;width:100%;
+      max-width:640px;max-height:92vh;overflow-y:auto;
+      position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6);
+    }
+    .inv-close {
+      position:absolute;top:10px;right:14px;background:none;
+      border:none;font-size:26px;cursor:pointer;color:#bbb;
+      line-height:1;z-index:1;padding:2px 8px;
+    }
+    .inv-close:hover{color:#555}
+    .rcp{padding:32px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#222}
+    .rcp-head{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:2.5px solid #e0e0e0;margin-bottom:20px}
+    .rcp-brand{display:flex;align-items:center;gap:12px}
+    .rcp-logo{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#0059b3,#a2e7ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:17px;flex-shrink:0}
+    .rcp-brand-info h2{font-size:18px;font-weight:800;color:#0059b3;margin:0}
+    .rcp-brand-info p{font-size:9px;color:#aaa;margin:2px 0}
+    .rcp-right{text-align:right}
+    .rcp-right .meta{font-size:9px;color:#aaa;line-height:1.9}
+    .rcp-right .title{font-size:23px;font-weight:800;color:#111;margin-top:6px}
+    .rcp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+    .rcp-section h3{font-size:12.5px;font-weight:700;color:#111;padding-bottom:5px;border-bottom:1.5px solid #eee;margin-bottom:9px}
+    .rcp-row{display:flex;gap:8px;margin-bottom:5px;font-size:11px}
+    .rcp-row .k{color:#999;min-width:72px;flex-shrink:0}
+    .rcp-row .v{font-weight:600;color:#222}
+    .rcp-tbl{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:11px}
+    .rcp-tbl thead th{background:#f5f6f8;padding:8px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#777;border-bottom:2px solid #ddd;text-align:left}
+    .rcp-tbl thead th.r{text-align:right}
+    .rcp-tbl tbody td{padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#333}
+    .rcp-tbl tbody td.r{text-align:right;font-weight:500}
+    .rcp-sum{margin-left:auto;width:260px;font-size:11px}
+    .rcp-sum-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;color:#666}
+    .rcp-sum-row.bold{font-weight:700;color:#111;font-size:12px;border-top:2px solid #333;border-bottom:none;padding-top:8px;margin-top:2px}
+    .rcp-sum-row.orange{color:#d97706;font-weight:600;border-bottom:none}
+    .rcp-sum-row.green{color:#16a34a;font-weight:600;border-bottom:none}
+    .rcp-foot{margin-top:24px;padding-top:14px;border-top:1.5px solid #eee;text-align:right}
+    .rcp-foot p{font-size:10px;color:#aaa}
+    .rcp-foot strong{font-size:13px;font-weight:800;color:#0059b3}
+    .inv-actions{display:grid;grid-template-columns:1fr 1fr}
+    .inv-actions button{padding:15px;font-weight:700;font-size:13px;border:none;cursor:pointer;transition:opacity .2s}
+    .inv-actions button:hover{opacity:.88}
+    .inv-btn-pdf{background:linear-gradient(135deg,#aac7ff,#0059b3);color:#001b3e;border-radius:0 0 0 16px;font-family:'Space Grotesk',sans-serif}
+    .inv-btn-wa{background:#25D366;color:#fff;border-radius:0 0 16px 0;font-family:'Space Grotesk',sans-serif}
+
+    #toast {
+      position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);
+      background:rgba(34,53,84,.95);border:1px solid rgba(162,231,255,.2);
+      color:#d6e3ff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:500;
+      z-index:9998;opacity:0;transition:all .3s;pointer-events:none;
+      backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(0,0,0,.4);white-space:nowrap;
+    }
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Pay radio highlight */
+    .pay-opt { transition: all .2s; }
+    .pay-opt.active { border-color:rgba(162,231,255,.4); background:rgba(162,231,255,.08); }
   </style>
 </head>
 <body class="bg-surface text-on-surface selection:bg-secondary/30">
 
-<!-- ===== TOPNAV ===== -->
+<div id="toast"></div>
+
+<!-- INVOICE OVERLAY -->
+<div id="invOverlay">
+  <div class="inv-box">
+    <button class="inv-close" onclick="document.getElementById('invOverlay').classList.remove('show')">×</button>
+    <div id="rcpContent"></div>
+    <div class="inv-actions">
+      <button class="inv-btn-pdf" id="btnPDF">Download Invoice PDF</button>
+      <button class="inv-btn-wa" id="btnWA">Download Invoice & Buka WA</button>
+    </div>
+  </div>
+</div>
+
+<!-- QRIS PAYMENT OVERLAY -->
+<style>
+#qrisOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,7,20,.82);backdrop-filter:blur(8px)}
+.qz-card{position:relative;width:100%;max-width:392px;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#fff,#f3f8ff);box-shadow:0 40px 90px rgba(0,0,0,.55);animation:qzPop .45s cubic-bezier(.2,.85,.25,1)}
+.qz-card::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:160px;background:radial-gradient(circle,rgba(0,180,224,.35),transparent 70%);filter:blur(10px)}
+@keyframes qzPop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+.qz-top{position:relative;z-index:1;padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.qz-merchant{display:flex;align-items:center;gap:10px}
+.qz-logo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0059b3,#00b4e0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Space Grotesk',sans-serif;font-size:16px;box-shadow:0 6px 16px rgba(0,89,179,.35)}
+.qz-mname{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:15px;color:#0a1f3d;line-height:1.1}
+.qz-msub{font-size:10.5px;color:#9aa3b2;margin-top:1px}
+.qz-qrispill{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:12px;letter-spacing:1px;color:#0059b3;background:#e9f2fd;border:1px solid #cfe2fb;padding:5px 10px;border-radius:8px}
+.qz-amount-wrap{position:relative;z-index:1;text-align:center;padding:16px 24px 4px}
+.qz-amount-label{font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9aa3b2}
+.qz-amount{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;margin-top:2px;background:linear-gradient(90deg,#0059b3,#00a0d6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.qz-qrbox{position:relative;z-index:1;width:230px;margin:8px auto 0;padding:16px;border-radius:20px;background:#fff;box-shadow:0 18px 40px rgba(10,31,61,.16);border:1px solid #eef2f8}
+.qz-qrbox img{width:100%;display:block;border-radius:8px}
+.qz-c{position:absolute;width:24px;height:24px;border:3px solid #0059b3;z-index:2}
+.qz-c.tl{top:9px;left:9px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.qz-c.tr{top:9px;right:9px;border-left:0;border-bottom:0;border-radius:0 7px 0 0}
+.qz-c.bl{bottom:9px;left:9px;border-right:0;border-top:0;border-radius:0 0 0 7px}
+.qz-c.br{bottom:9px;right:9px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+.qz-scan{position:absolute;left:16px;right:16px;top:16px;height:26px;border-radius:8px;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(0,180,224,0),rgba(0,180,224,.35));box-shadow:0 6px 10px rgba(0,180,224,.45);border-bottom:2px solid #00b4e0;animation:qzScan 2.4s ease-in-out infinite}
+@keyframes qzScan{0%{top:16px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 42px);opacity:0}}
+.qz-timer{display:inline-flex;align-items:center;gap:7px;margin:14px auto 0;background:#fff4e6;border:1px solid #ffe0b8;color:#b9740a;font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:999px}
+.qz-timer b{font-family:'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums}
+.qz-hint{font-size:11.5px;color:#8a93a3;margin:12px 24px 0;line-height:1.55;text-align:center}
+.qz-body{position:relative;z-index:1;padding:0 24px 24px;text-align:center}
+.qz-status{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px;padding:13px;border-radius:14px;background:#f1f5fa;border:1px solid #e6edf5;color:#5b6473;font-weight:700;font-size:13px}
+.qz-dot{width:9px;height:9px;border-radius:50%;background:#f59e0b;flex-shrink:0;box-shadow:0 0 0 0 rgba(245,158,11,.5);animation:qzPing 1.4s infinite}
+@keyframes qzPing{0%{box-shadow:0 0 0 0 rgba(245,158,11,.5)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}
+.qz-pay{position:relative;overflow:hidden;width:100%;margin-top:14px;border:none;cursor:pointer;padding:16px;border-radius:16px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:14.5px;letter-spacing:.3px;background:linear-gradient(135deg,#16a34a,#0e8a3e);box-shadow:0 14px 30px rgba(22,163,74,.4);transition:transform .2s,box-shadow .2s}
+.qz-pay:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(22,163,74,.5)}
+.qz-pay::after{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .65s}
+.qz-pay:hover::after{left:140%}
+.qz-cancel{width:100%;margin-top:10px;border:none;background:transparent;cursor:pointer;padding:11px;color:#9aa3b2;font-weight:700;font-size:13px;border-radius:12px;transition:.15s}
+.qz-cancel:hover{background:#f2f5f9;color:#5b6473}
+.qz-secure{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;color:#aab2bf;font-size:10.5px}
+.qz-secure svg{width:12px;height:12px}
+</style>
+<div id="qrisOverlay">
+  <div class="qz-card">
+    <div class="qz-top">
+      <div class="qz-merchant">
+        <img class="qz-logo" src="assets/logo.png" onerror="this.outerHTML='<div class=\'qz-logo\'>P</div>'">
+        <div><div class="qz-mname">Pangandaran.in</div><div class="qz-msub">CV Pangandaran in Group</div></div>
+      </div>
+      <span class="qz-qrispill">QRIS</span>
+    </div>
+    <div class="qz-amount-wrap">
+      <div class="qz-amount-label">Total Pembayaran</div>
+      <div class="qz-amount" id="qrisAmount">Rp 0</div>
+    </div>
+    <div class="qz-qrbox">
+      <span class="qz-c tl"></span><span class="qz-c tr"></span><span class="qz-c bl"></span><span class="qz-c br"></span>
+      <span class="qz-scan"></span>
+      <img src="assets/qris.png" alt="QRIS Pangandaran.in">
+    </div>
+    <div style="text-align:center">
+      <span class="qz-timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Selesaikan pembayaran <b id="qrisCountdown"></b></span>
+    </div>
+    <p class="qz-hint">Buka aplikasi e-wallet atau m-banking (DANA, GoPay, OVO, ShopeePay), pilih bayar QRIS, lalu pindai kode di atas.</p>
+    <div class="qz-body">
+      <div class="qz-status"><span class="qz-dot"></span><span id="paymentStatusText">Menunggu pembayaran...</span></div>
+      <button type="button" id="qrisPaidBtn" class="qz-pay">Saya Sudah Bayar</button>
+      <button type="button" class="qz-cancel" onclick="document.getElementById('qrisOverlay').style.display='none'">Batal</button>
+      <div class="qz-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Pembayaran diproses melalui QRIS &middot; Aman</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPNAV -->
 <header class="bg-[#00132F]/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/5">
   <nav class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-xl mx-auto">
     <a href="index.html" class="text-xl md:text-2xl font-bold tracking-tighter text-secondary font-headline">Pangandaran.in</a>
@@ -71,7 +223,6 @@
 </header>
 
 <main class="relative">
-  <!-- ===== HERO IMAGE ===== -->
   <section class="relative h-[50vh] md:h-[65vh] min-h-[300px] max-h-[600px] w-full overflow-hidden">
     <img id="heroImg" src="" alt="" class="w-full h-full object-cover opacity-75 transition-all duration-700">
     <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/30 to-[#00132F]/50"></div>
@@ -88,7 +239,7 @@
             <span class="material-symbols-outlined text-secondary text-sm">location_on</span>
             <span class="text-xs font-medium">Pangandaran, Jawa Barat</span>
           </div>
-          <div id="durasiPill" class="flex items-center gap-2 glass px-3 py-1.5 rounded-full border-ghost">
+          <div class="flex items-center gap-2 glass px-3 py-1.5 rounded-full border-ghost">
             <span class="material-symbols-outlined text-secondary text-sm">schedule</span>
             <span id="durasiText" class="text-xs font-medium">—</span>
           </div>
@@ -101,24 +252,16 @@
     </div>
   </section>
 
-  <!-- ===== CONTENT GRID ===== -->
   <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-10 grid grid-cols-1 lg:grid-cols-12 gap-10 relative">
-
-    <!-- LEFT: Detail Content -->
+    <!-- LEFT: Detail konten -->
     <div class="lg:col-span-8 space-y-10">
-
-      <!-- Gallery Strip -->
       <section>
         <div class="flex items-center gap-4 mb-4">
           <h2 class="font-headline text-lg font-bold uppercase tracking-widest text-on-surface">Galeri Foto</h2>
           <div class="h-px flex-1 bg-gradient-to-r from-secondary/40 to-transparent"></div>
         </div>
-        <div id="galleryStrip" class="flex gap-3 overflow-x-auto gallery-scroll pb-2">
-          <!-- Injected by JS -->
-        </div>
+        <div id="galleryStrip" class="flex gap-3 overflow-x-auto gallery-scroll pb-2"></div>
       </section>
-
-      <!-- Description -->
       <section>
         <div class="flex items-center gap-4 mb-5">
           <h2 class="font-headline text-lg font-bold uppercase tracking-widest text-on-surface">Deskripsi</h2>
@@ -126,36 +269,29 @@
         </div>
         <p id="descPaket" class="text-on-surface-variant text-base leading-relaxed font-light">Memuat informasi paket...</p>
       </section>
-
-      <!-- Highlights -->
       <section>
         <div class="flex items-center gap-4 mb-5">
           <h2 class="font-headline text-lg font-bold uppercase tracking-widest text-on-surface">Highlights</h2>
           <div class="h-px flex-1 bg-gradient-to-r from-secondary/40 to-transparent"></div>
         </div>
-        <ul id="highlightsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <!-- Injected by JS -->
-        </ul>
+        <ul id="highlightsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></ul>
       </section>
-
-      <!-- Inclusions -->
       <section>
         <div class="flex items-center gap-4 mb-5">
           <h2 class="font-headline text-lg font-bold uppercase tracking-widest text-on-surface">Yang Termasuk</h2>
           <div class="h-px flex-1 bg-gradient-to-r from-secondary/40 to-transparent"></div>
         </div>
-        <div id="inclusionsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          <!-- Injected by JS -->
-        </div>
+        <div id="inclusionsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
       </section>
-
     </div>
 
-    <!-- RIGHT: Booking Sidebar -->
+    <!-- RIGHT: Form Booking (diperbarui) -->
     <aside class="lg:col-span-4">
       <div class="sticky top-24">
-        <div class="glass p-7 rounded-3xl border border-secondary/20 shadow-2xl">
-          <div class="mb-6">
+        <div class="glass p-6 rounded-3xl border border-secondary/20 shadow-2xl">
+
+          <!-- Harga -->
+          <div class="mb-5">
             <span class="text-[10px] uppercase tracking-widest text-secondary/70 font-bold block mb-1">Mulai dari</span>
             <div class="flex items-baseline gap-2">
               <h3 id="hargaPaket" class="text-3xl font-headline font-bold text-secondary neon">Rp 0</h3>
@@ -163,49 +299,125 @@
             </div>
           </div>
 
-          <div class="space-y-4">
+          <div class="space-y-3">
+            <!-- Nama -->
             <div>
-              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Nama</label>
-              <input id="nama" type="text" placeholder="Masukkan nama" class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
+              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Nama Lengkap *</label>
+              <input id="nama" type="text" placeholder="Masukkan nama lengkap"
+                class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
             </div>
+            <!-- WhatsApp -->
             <div>
-              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Tanggal</label>
-              <input id="tanggal" type="date" class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all text-sm [color-scheme:dark]">
+              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">WhatsApp *</label>
+              <input id="whatsapp" type="tel" placeholder="+62 8xx-xxxx-xxxx"
+                class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
             </div>
+            <!-- Media Sosial -->
+            <div>
+              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Media Sosial</label>
+              <input id="medsos" type="text" placeholder="Instagram / TikTok, contoh: @username"
+                class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
+            </div>
+            <!-- Tanggal + Waktu -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Tanggal *</label>
+                <input id="tanggal" type="date"
+                  class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-3 py-3 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all text-sm [color-scheme:dark]">
+              </div>
+              <div>
+                <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Perkiraan Waktu</label>
+                <input id="waktu" type="text" inputmode="numeric" maxlength="5" placeholder="Contoh: 10.00"
+  oninput="formatJamOtomatis(this)" onblur="rapikanJam(this)"
+  class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-3 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
+              </div>
+            </div>
+            <!-- Jumlah Peserta -->
             <div>
               <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Jumlah Peserta</label>
               <div class="flex items-center bg-surface-container-highest/60 rounded-xl overflow-hidden border border-white/5">
-                <button id="minusPax" class="px-4 py-3 hover:bg-white/10 text-secondary transition-colors font-bold text-lg">−</button>
-                <input id="peserta" type="number" min="1" value="1" class="w-full bg-transparent border-0 text-center text-on-surface font-bold focus:ring-0 text-base">
+                <button id="minusPax" class="px-4 py-3 hover:bg-white/10 text-secondary transition-colors font-bold text-lg">-</button>
+                <input id="peserta" type="number" min="1" value="1"
+                  class="w-full bg-transparent border-0 text-center text-on-surface font-bold focus:ring-0 text-base">
                 <button id="plusPax" class="px-4 py-3 hover:bg-white/10 text-secondary transition-colors font-bold text-lg">+</button>
+              </div>
+            </div>
+
+           
+                        <!-- Jenis Pembayaran -->
+            <div>
+              <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">Jenis Pembayaran</label>
+              <div class="space-y-2">
+                <label id="payFull" class="pay-opt active flex items-center justify-between p-3 rounded-xl border cursor-pointer">
+                  <div class="flex items-center gap-2.5">
+                    <input type="radio" name="payType" value="full" checked class="accent-secondary shrink-0">
+                    <div>
+                      <div class="text-xs font-bold text-on-surface uppercase tracking-wide">Full Payment</div>
+                      <div class="text-[10px] text-on-surface-variant">Bayar penuh via QRIS</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] bg-green-500/15 text-green-400 border border-green-500/25 px-2 py-0.5 rounded-full font-bold">QRIS</span>
+                    <span id="fpLabel" class="text-xs font-bold text-secondary whitespace-nowrap">Rp 0</span>
+                  </div>
+                </label>
+
+                <label id="payDP" class="pay-opt flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 cursor-pointer">
+                  <div class="flex items-center gap-2.5">
+                    <input type="radio" name="payType" value="dp" class="accent-secondary shrink-0">
+                    <div>
+                      <div class="text-xs font-bold text-on-surface uppercase tracking-wide">DP (Uang Muka)</div>
+                      <div class="text-[10px] text-on-surface-variant">Minimal 30% via QRIS</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded-full font-bold">QRIS</span>
+                    <span id="dpLabel" class="text-xs font-bold text-amber-400 whitespace-nowrap">Min Rp 0</span>
+                  </div>
+                </label>
+              </div>
+
+              <div id="dpBox" class="hidden mt-2">
+                <input id="dpNominal" type="number" min="0" placeholder="Masukkan nominal DP minimal 30%"
+                  class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-2.5 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
+                <p id="dpHint" class="text-[10px] text-amber-400/70 mt-1 px-1">Minimal DP 30% dari total invoice</p>
               </div>
             </div>
           </div>
 
-          <div class="mt-6 pt-5 border-t border-white/10 space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-on-surface-variant text-sm font-medium">Total</span>
-              <span class="text-xl font-headline font-bold text-secondary neon">Rp <span id="totalHarga">0</span></span>
+          <!-- Ringkasan + Tombol -->
+          <div class="mt-5 pt-4 border-t border-white/10">
+            <div class="space-y-1.5 mb-4 text-sm">
+              <div class="flex justify-between text-on-surface-variant text-xs">
+                <span>Total Harga</span>
+                <span>Rp <span id="totalHarga">0</span></span>
+              </div>
+              <div class="flex justify-between font-bold text-on-surface border-t border-white/10 pt-2">
+                <span>Total Invoice</span>
+                <span class="text-secondary neon">Rp <span id="totalInvoice">0</span></span>
+              </div>
+              <div id="sisaRow" class="hidden flex justify-between text-amber-400 text-xs">
+                <span>Sisa Tagihan</span>
+                <span>Rp <span id="sisaTagihan">0</span></span>
+              </div>
             </div>
-            <button id="bookWA" class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(170,199,255,0.2)] hover:shadow-[0_0_40px_rgba(170,199,255,0.4)] hover:scale-[1.02] active:scale-95 transition-all">
-              Booking Sekarang
+            <button id="bookWA" class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(170,199,255,0.2)] hover:shadow-[0_0_40px_rgba(170,199,255,0.4)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-base">payment</span>
+              Lanjut ke Pembayaran
             </button>
-            <p class="text-center text-[10px] text-on-surface-variant/50 uppercase tracking-widest leading-relaxed">Admin akan konfirmasi via WhatsApp</p>
+            <p class="text-center text-[10px] text-on-surface-variant/50 uppercase tracking-widest leading-relaxed mt-2">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai</p>
           </div>
         </div>
-
-        <!-- Back to packages -->
         <a href="index.html#paket-scroll" class="mt-4 flex items-center justify-center gap-2 text-on-surface-variant hover:text-secondary transition-colors text-sm">
           <span class="material-symbols-outlined text-base">arrow_back</span>
           Lihat semua paket
         </a>
       </div>
     </aside>
-
   </div>
 </main>
 
-<!-- ===== MOBILE BOOKING BAR ===== -->
+<!-- Mobile bottom bar -->
 <div class="lg:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10 px-5 py-4 flex items-center justify-between gap-4">
   <div>
     <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">Mulai dari</span>
@@ -217,479 +429,915 @@
 </div>
 <div class="lg:hidden h-20"></div>
 
-<!-- ========== ALL PACKAGE TEMPLATES ========== -->
-
-<!-- River Adventure -->
-<template id="paket-gc">
-  <data title="Green Canyon Body Rafting" subtitle="River Adventure • Durasi 3,5 jam" desc="Nikmati pengalaman seru body rafting di Green Canyon dengan panorama tebing megah & air jernih yang ikonik. Salah satu destinasi paling terkenal di Pangandaran dengan keindahan alam yang memukau." price="250000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/greencanyon1.jpg" alt="Green Canyon 1">
-    <img src="assets/greencanyon2.jpeg" alt="Green Canyon 2">
-    <img src="assets/greencanyoon.5.jpeg" alt="Green Canyon 3">
-  </images>
-  <highlights>
-    <li>Air jernih & tebing ikonik</li>
-    <li>Body rafting + cliff jump (opsional)</li>
-    <li>Cocok untuk pemula (dipandu)</li>
-    <li>Spot foto dramatis</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Pelindung kaki</li></group>
-    <group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-ciwayang">
-  <data title="Ciwayang Body Rafting" subtitle="River Adventure • Durasi 2 jam" desc="Body rafting dengan arus lebih menantang, cocok untuk kamu yang suka adventure. Nikmati keindahan alam Ciwayang yang masih asri dan alami." price="150000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/ciwayang1.jpg" alt="Ciwayang 1">
-    <img src="assets/ciwayang.png" alt="Ciwayang 2">
-    <img src="assets/ciwayang3.png" alt="Ciwayang 3">
-  </images>
-  <highlights>
-    <li>Arus lebih menantang</li>
-    <li>Spot lompatan air (opsional)</li>
-    <li>Pemandangan masih asri</li>
-    <li>Seru untuk grup</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Pelindung kaki</li></group>
-    <group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-citumang">
-  <data title="Citumang Body Rafting" subtitle="River Adventure • Durasi 2 jam" desc="Body rafting santai dengan air sebening kristal & nuansa alam yang menenangkan. Cocok untuk keluarga dan pemula yang ingin menikmati keindahan sungai." price="150000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/Citumang2.png" alt="Citumang 1">
-    <img src="assets/citumang1.jpg" alt="Citumang 2">
-    <img src="assets/Citumang3.png" alt="Citumang 3">
-  </images>
-  <highlights>
-    <li>Air bening seperti kristal</li>
-    <li>Lebih santai & family-friendly</li>
-    <li>Cocok untuk pemula</li>
-    <li>Nuansa alam menenangkan</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Helm</li><li>Life jacket</li></group>
-    <group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-santirah">
-  <data title="Santirah River Tubing" subtitle="River Adventure • Durasi 2 jam" desc="Pengalaman unik menyusuri sungai bawah tanah yang eksotis dan spektakuler. Rasakan sensasi berbeda menjelajahi gua alam dengan arus sungai yang menyegarkan." price="150000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="Santirah 1">
-    <img src="assets/santirah.png" alt="Santirah 2">
-    <img src="assets/Santirah3.png" alt="Santirah 3">
-  </images>
-  <highlights>
-    <li>Sungai + gua bawah tanah</li>
-    <li>Tubing lebih fun</li>
-    <li>Spot foto dramatis</li>
-    <li>Pengalaman unik & eksotis</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Ban tubing</li></group>
-    <group label="Guide"><li>Guide lokal berpengalaman</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group>
-  </inclusions>
-</template>
-
-<!-- Multi Day Trip -->
-<template id="paket-oneday">
-  <data title="One Day Tour Package" subtitle="Multi Day Trip • Durasi 1 Hari" desc="Paket wisata praktis untuk menikmati Pangandaran dalam satu hari penuh. Itinerary tersusun rapi dengan berbagai destinasi terbaik yang bisa kamu kunjungi." price="260000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/chilltime1.jpeg" alt="One Day 1">
-    <img src="assets/greencanyon2.jpeg" alt="One Day 2">
-    <img src="assets/watersport3.jpeg" alt="One Day 3">
-  </images>
-  <highlights>
-    <li>Itinerary 1 hari penuh</li>
-    <li>Koordinasi spot terbaik</li>
-    <li>Tour leader berpengalaman</li>
-    <li>Dokumentasi (opsional)</li>
-  </highlights>
-  <inclusions>
-    <group label="Program"><li>Itinerary 1 hari</li><li>Tour leader</li></group>
-    <group label="Support"><li>Koordinasi spot</li><li>Dokumentasi (opsional)</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-2d1n">
-  <data title="2 Day 1 Night Package" subtitle="Multi Day Trip • Durasi 2 Hari 1 Malam" desc="Liburan lebih santai dengan pengalaman menginap & eksplorasi destinasi terbaik. Nikmati keindahan Pangandaran dari pagi hingga malam dengan paket lengkap." price="700000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/chilltime3.jpeg" alt="2D1N 1">
-    <img src="assets/outbond.jpg" alt="2D1N 2">
-    <img src="assets/customtrip1.jpg" alt="2D1N 3">
-  </images>
-  <highlights>
-    <li>Menginap 1 malam nyaman</li>
-    <li>Lebih santai & fleksibel</li>
-    <li>Bisa custom destinasi</li>
-    <li>Koordinator trip profesional</li>
-  </highlights>
-  <inclusions>
-    <group label="Akomodasi"><li>Hotel/penginapan 1 malam</li></group>
-    <group label="Trip"><li>Itinerary 2 hari</li><li>Koordinator trip</li></group>
-    <group label="Support"><li>Dokumentasi (opsional)</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-3d2n">
-  <data title="3 Day 2 Night Package" subtitle="Multi Day Trip • Durasi 3 Hari 2 Malam" desc="Eksplorasi Pangandaran lebih lengkap dengan itinerary wisata yang maksimal. Lebih banyak destinasi, lebih banyak kenangan yang bisa kamu bawa pulang." price="700000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/santirah-1-DEyrdUd5.jpeg" alt="3D2N 1">
-    <img src="assets/greencanyon1.jpg" alt="3D2N 2">
-    <img src="assets/fungame3.png" alt="3D2N 3">
-  </images>
-  <highlights>
-    <li>Eksplorasi lebih lengkap</li>
-    <li>Banyak destinasi</li>
-    <li>Fleksibel & customizable</li>
-    <li>Koordinator trip profesional</li>
-  </highlights>
-  <inclusions>
-    <group label="Akomodasi"><li>Hotel/penginapan 2 malam</li></group>
-    <group label="Trip"><li>Itinerary 3 hari</li><li>Koordinator trip</li></group>
-    <group label="Support"><li>Dokumentasi (opsional)</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-custom">
-  <data title="Custom Trip" subtitle="Multi Day Trip • Durasi Fleksibel" desc="Bebas tentukan konsep perjalanan sesuai kebutuhan & gaya liburan Anda. Cocok untuk corporate, komunitas, atau keluarga dengan kebutuhan khusus." price="0" unit="/ nego" wa="6287793827592"></data>
-  <images>
-    <img src="assets/watersport-2.jpeg" alt="Custom 1">
-    <img src="assets/fungame.png" alt="Custom 2">
-    <img src="assets/citumang1.jpg" alt="Custom 3">
-  </images>
-  <highlights>
-    <li>Bebas pilih destinasi</li>
-    <li>Bebas pilih hotel</li>
-    <li>Cocok corporate/komunitas</li>
-    <li>Budget & jadwal fleksibel</li>
-  </highlights>
-  <inclusions>
-    <group label="Fleksibel"><li>Rute, jadwal, budget menyesuaikan</li><li>Konsultasi itinerary</li></group>
-    <group label="Support"><li>Koordinator trip</li><li>Diskusi kebutuhan trip</li></group>
-  </inclusions>
-</template>
-
-<!-- Sea Adventure -->
-<template id="paket-jetski">
-  <data title="Jetski" subtitle="Sea Adventure • Durasi 15 Menit" desc="Rasakan sensasi kecepatan di atas ombak Pangandaran dengan pengalaman seru & aman. Dipandu oleh instruktur profesional untuk keamanan optimal." price="350000" unit="/ ride" wa="6287793827592"></data>
-  <images>
-    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="Jetski 1">
-    <img src="assets/jetski-2.jpeg" alt="Jetski 2">
-    <img src="assets/jetski3.jpg" alt="Jetski 3">
-  </images>
-  <highlights>
-    <li>Aman untuk pemula</li>
-    <li>Briefing keselamatan lengkap</li>
-    <li>Instruktur berpengalaman</li>
-    <li>Sensasi seru di atas ombak</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Life jacket</li></group>
-    <group label="Support"><li>Instruktur/crew</li><li>Briefing keselamatan</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-jetski_areal">
-  <data title="Drone Areal + Jetski" subtitle="Sea Adventure • Durasi 15 Menit" desc="Jetski + dokumentasi drone areal yang cinematic di Pantai Pangandaran. Dapatkan video dan foto udara yang spektakuler sebagai kenangan tak terlupakan." price="650000" unit="/ paket" wa="6287793827592"></data>
-  <images>
-    <img src="assets/jetski-2.jpeg" alt="Drone+Jetski 1">
-    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="Drone+Jetski 2">
-    <img src="assets/jetski3.jpg" alt="Drone+Jetski 3">
-  </images>
-  <highlights>
-    <li>Drone areal cinematic</li>
-    <li>Jetski seru di laut</li>
-    <li>Crew drone profesional</li>
-    <li>File digital siap share</li>
-  </highlights>
-  <inclusions>
-    <group label="Ride"><li>Jetski sesuai paket</li><li>Briefing keselamatan</li></group>
-    <group label="Dokumentasi"><li>Video drone areal</li><li>File digital</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-jetski_fvp">
-  <data title="FPV Drone + Jetski" subtitle="Sea Adventure • Durasi 15 Menit" desc="Paket jetski dengan video FPV drone untuk hasil yang lebih profesional dan spektakuler. Rekaman sinematik yang akan membuat semua teman terpukau." price="1200000" unit="/ paket" wa="6287793827592"></data>
-  <images>
-    <img src="assets/jetski3.jpg" alt="FPV+Jetski 1">
-    <img src="assets/jetski-1-Y9ZJopoJ.jpeg" alt="FPV+Jetski 2">
-    <img src="assets/jetski-2.jpeg" alt="FPV+Jetski 3">
-  </images>
-  <highlights>
-    <li>Video FPV sinematik premium</li>
-    <li>Aksi dinamis lebih dramatis</li>
-    <li>Crew FPV profesional</li>
-    <li>File digital siap share</li>
-  </highlights>
-  <inclusions>
-    <group label="Ride"><li>Jetski sesuai paket</li><li>Briefing keselamatan</li></group>
-    <group label="Dokumentasi"><li>Video FPV drone</li><li>File digital</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-watersport">
-  <data title="Water Sport" subtitle="Sea Adventure • Durasi 1 Jam" desc="Beragam aktivitas laut seru yang memacu adrenalin & penuh keseruan. Pilihan permainan lengkap, cocok untuk rombongan keluarga atau teman." price="150000" unit="/ paket" wa="6287793827592"></data>
-  <images>
-    <img src="assets/watersport3.jpeg" alt="Watersport 1">
-    <img src="assets/watersport-2.jpeg" alt="Watersport 2">
-    <img src="assets/waterpsort3.png" alt="Watersport 3">
-  </images>
-  <highlights>
-    <li>Pilihan permainan beragam</li>
-    <li>Cocok rame-rame/grup</li>
-    <li>Briefing keselamatan</li>
-    <li>Instruktur berpengalaman</li>
-  </highlights>
-  <inclusions>
-    <group label="Safety Gear"><li>Life jacket</li><li>Peralatan sesuai permainan</li></group>
-    <group label="Support"><li>Instruktur/crew</li><li>Briefing keselamatan</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-standuppaddle">
-  <data title="Stand Up Paddle" subtitle="Sea Adventure • Durasi 2 Jam" desc="Aktivitas santai menikmati air/ombak dengan pengalaman relaxing & menyenangkan. Olahraga air yang menyegarkan dengan pemandangan pantai Pangandaran." price="350000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/paddle.png" alt="SUP 1">
-    <img src="assets/standuppaddle-1-DIYrHU0i.jpeg" alt="SUP 2">
-    <img src="assets/standuppaddle3.png" alt="SUP 3">
-  </images>
-  <highlights>
-    <li>Board + Paddle lengkap</li>
-    <li>Life jacket tersedia</li>
-    <li>Cocok untuk pemula</li>
-    <li>Olahraga santai & menyenangkan</li>
-  </highlights>
-  <inclusions>
-    <group label="Gear"><li>Board SUP</li><li>Paddle</li></group>
-    <group label="Safety"><li>Life jacket</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Pendamping/crew</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-snorkeling">
-  <data title="Snorkeling" subtitle="Sea Adventure • Durasi 2 Jam" desc="Jelajahi keindahan bawah laut Pangandaran yang kaya warna & kehidupan. Temukan keindahan terumbu karang dan ikan-ikan tropis yang menawan." price="150000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/snorekling3.png" alt="Snorkeling 1">
-    <img src="assets/snorkeling2.png" alt="Snorkeling 2">
-    <img src="assets/snorekling2.png" alt="Snorkeling 3">
-  </images>
-  <highlights>
-    <li>Masker + snorkel lengkap</li>
-    <li>Briefing keselamatan</li>
-    <li>Guide/crew berpengalaman</li>
-    <li>Keindahan bawah laut menakjubkan</li>
-  </highlights>
-  <inclusions>
-    <group label="Gear"><li>Masker</li><li>Snorkel</li><li>Fin (jika tersedia)</li></group>
-    <group label="Safety"><li>Life jacket</li><li>Briefing keselamatan</li></group>
-    <group label="Support"><li>Guide/crew</li><li>Perahu (jika include trip)</li></group>
-  </inclusions>
-</template>
-
-<!-- Outbound -->
-<template id="paket-photosession">
-  <data title="Photo Session" subtitle="Outbound • Durasi 2 Jam" desc="Abadikan momen perjalanan dengan hasil foto profesional yang estetik & berkelas. Fotografer berpengalaman kami siap membuat kenangan indah Anda." price="200000" unit="/ sesi" wa="6287793827592"></data>
-  <images>
-    <img src="assets/photosession-1-CWeHPraX.jpeg" alt="Photo 1">
-    <img src="assets/photoseason2.jpeg" alt="Photo 2">
-    <img src="assets/photoseason3.jpeg" alt="Photo 3">
-  </images>
-  <highlights>
-    <li>Arahan pose profesional</li>
-    <li>Editing basic included</li>
-    <li>Foto digital siap download</li>
-    <li>Lokasi sesuai kesepakatan</li>
-  </highlights>
-  <inclusions>
-    <group label="Output"><li>Foto digital</li><li>Seleksi & editing basic</li></group>
-    <group label="Support"><li>Arahan pose</li><li>Lokasi sesuai kesepakatan</li></group>
-  </inclusions>
-</template>
-
-<template id="paket-fungame">
-  <data title="Fun Game" subtitle="Outbound • Durasi 3 Jam" desc="Aktivitas interaktif seru untuk menciptakan kebersamaan & energi positif. Ice breaking dan berbagai permainan tim yang dipandu fasilitator berpengalaman." price="150000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Fun Game 1">
-    <img src="assets/fungame.png" alt="Fun Game 2">
-    <img src="assets/fungame3.png" alt="Fun Game 3">
-  </images>
-  <highlights>
-    <li>Ice breaking seru</li>
-    <li>Dipandu fasilitator berpengalaman</li>
-    <li>Team building activity</li>
-    <li>Cocok untuk semua usia</li>
-  </highlights>
-  <inclusions>
-    <group label="Program"><li>Rundown fun game</li><li>Fasilitator</li></group>
-    <group label="Peralatan"><li>Alat permainan</li><li>Sound system (jika tersedia)</li></group>
-    <group label="Dokumentasi"><li>Foto (opsional tergantung paket)</li></group>
-  </inclusions>
-</template>
-
-<!-- Team Building (bonus) -->
-<template id="paket-teambuilding">
-  <data title="Team Building" subtitle="Outbound • Durasi Fleksibel" desc="Program team building komprehensif untuk perusahaan dan komunitas. Dirancang khusus untuk meningkatkan kekompakan, komunikasi, dan semangat tim." price="200000" unit="/ orang" wa="6287793827592"></data>
-  <images>
-    <img src="assets/outbond.jpg" alt="Team Building 1">
-    <img src="assets/fungame3.png" alt="Team Building 2">
-    <img src="assets/fungames-1-B6WDKIz9.jpeg" alt="Team Building 3">
-  </images>
-  <highlights>
-    <li>Program team building terstruktur</li>
-    <li>Fasilitator profesional</li>
-    <li>Cocok untuk perusahaan</li>
-    <li>Aktivitas customizable</li>
-  </highlights>
-  <inclusions>
-    <group label="Program"><li>Rundown team building</li><li>Fasilitator</li></group>
-    <group label="Peralatan"><li>Alat permainan & aktivitas</li></group>
-    <group label="Support"><li>Dokumentasi foto</li></group>
-  </inclusions>
-</template>
-
-<!-- ===== SCRIPT ===== -->
+<!-- PACKAGE TEMPLATES -->
+<template id="paket-gc"><data title="Green Canyon Body Rafting" subtitle="River Adventure - Durasi 3,5 jam" desc="Nikmati pengalaman seru body rafting di Green Canyon dengan panorama tebing megah & air jernih yang ikonik." price="250000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/greencanyon1.jpg"><img src="assets/greencanyon2.jpeg"><img src="assets/greencanyoon.5.jpeg"></images><highlights><li>Air jernih & tebing ikonik</li><li>Body rafting + cliff jump (opsional)</li><li>Cocok untuk pemula (dipandu)</li><li>Spot foto dramatis</li></highlights><inclusions><group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Pelindung kaki</li></group><group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group><group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group></inclusions></template>
+<template id="paket-ciwayang"><data title="Ciwayang Body Rafting" subtitle="River Adventure - Durasi 2 jam" desc="Body rafting dengan arus lebih menantang, cocok untuk kamu yang suka adventure." price="150000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/ciwayang1.jpg"><img src="assets/ciwayang.png"><img src="assets/ciwayang3.png"></images><highlights><li>Arus lebih menantang</li><li>Spot lompatan air (opsional)</li><li>Pemandangan masih asri</li><li>Seru untuk grup</li></highlights><inclusions><group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Pelindung kaki</li></group><group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group><group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group></inclusions></template>
+<template id="paket-citumang"><data title="Citumang Body Rafting" subtitle="River Adventure - Durasi 2 jam" desc="Body rafting santai dengan air sebening kristal & nuansa alam yang menenangkan." price="150000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/Citumang2.png"><img src="assets/citumang1.jpg"><img src="assets/Citumang3.png"></images><highlights><li>Air bening seperti kristal</li><li>Lebih santai & family-friendly</li><li>Cocok untuk pemula</li><li>Nuansa alam menenangkan</li></highlights><inclusions><group label="Safety Gear"><li>Helm</li><li>Life jacket</li></group><group label="Guide"><li>River guide profesional</li><li>Briefing keselamatan</li></group><group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group></inclusions></template>
+<template id="paket-santirah"><data title="Santirah River Tubing" subtitle="River Adventure - Durasi 2 jam" desc="Pengalaman unik menyusuri sungai bawah tanah yang eksotis dan spektakuler." price="150000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/santirah-1-DEyrdUd5.jpeg"><img src="assets/santirah.png"><img src="assets/Santirah3.png"></images><highlights><li>Sungai + gua bawah tanah</li><li>Tubing lebih fun</li><li>Spot foto dramatis</li><li>Pengalaman unik & eksotis</li></highlights><inclusions><group label="Safety Gear"><li>Helm</li><li>Life jacket</li><li>Ban tubing</li></group><group label="Guide"><li>Guide lokal berpengalaman</li><li>Briefing keselamatan</li></group><group label="Support"><li>Dry bag</li><li>Dokumentasi foto/video</li></group></inclusions></template>
+<template id="paket-oneday"><data title="One Day Tour Package" subtitle="Multi Day Trip - Durasi 1 Hari" desc="Paket wisata praktis untuk menikmati Pangandaran dalam satu hari penuh." price="260000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/chilltime1.jpeg"><img src="assets/greencanyon2.jpeg"><img src="assets/watersport3.jpeg"></images><highlights><li>Itinerary 1 hari penuh</li><li>Koordinasi spot terbaik</li><li>Tour leader berpengalaman</li><li>Dokumentasi (opsional)</li></highlights><inclusions><group label="Program"><li>Itinerary 1 hari</li><li>Tour leader</li></group><group label="Support"><li>Koordinasi spot</li><li>Dokumentasi (opsional)</li></group></inclusions></template>
+<template id="paket-2d1n"><data title="2 Day 1 Night Package" subtitle="Multi Day Trip - Durasi 2 Hari 1 Malam" desc="Liburan lebih santai dengan pengalaman menginap & eksplorasi destinasi terbaik." price="700000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/chilltime3.jpeg"><img src="assets/outbond.jpg"><img src="assets/customtrip1.jpg"></images><highlights><li>Menginap 1 malam nyaman</li><li>Lebih santai & fleksibel</li><li>Bisa custom destinasi</li><li>Koordinator trip profesional</li></highlights><inclusions><group label="Akomodasi"><li>Hotel/penginapan 1 malam</li></group><group label="Trip"><li>Itinerary 2 hari</li><li>Koordinator trip</li></group><group label="Support"><li>Dokumentasi (opsional)</li></group></inclusions></template>
+<template id="paket-3d2n"><data title="3 Day 2 Night Package" subtitle="Multi Day Trip - Durasi 3 Hari 2 Malam" desc="Eksplorasi Pangandaran lebih lengkap dengan itinerary wisata yang maksimal." price="700000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/santirah-1-DEyrdUd5.jpeg"><img src="assets/greencanyon1.jpg"><img src="assets/fungame3.png"></images><highlights><li>Eksplorasi lebih lengkap</li><li>Banyak destinasi</li><li>Fleksibel & customizable</li><li>Koordinator trip profesional</li></highlights><inclusions><group label="Akomodasi"><li>Hotel/penginapan 2 malam</li></group><group label="Trip"><li>Itinerary 3 hari</li><li>Koordinator trip</li></group><group label="Support"><li>Dokumentasi (opsional)</li></group></inclusions></template>
+<template id="paket-custom"><data title="Custom Trip" subtitle="Multi Day Trip - Durasi Fleksibel" desc="Bebas tentukan konsep perjalanan sesuai kebutuhan & gaya liburan Anda." price="0" unit="/ nego" wa="6287793827592"></data><images><img src="assets/watersport-2.jpeg"><img src="assets/fungame.png"><img src="assets/citumang1.jpg"></images><highlights><li>Bebas pilih destinasi</li><li>Bebas pilih hotel</li><li>Cocok corporate/komunitas</li><li>Budget & jadwal fleksibel</li></highlights><inclusions><group label="Fleksibel"><li>Rute, jadwal, budget menyesuaikan</li><li>Konsultasi itinerary</li></group><group label="Support"><li>Koordinator trip</li><li>Diskusi kebutuhan trip</li></group></inclusions></template>
+<template id="paket-jetski"><data title="Jetski" subtitle="Sea Adventure - Durasi 15 Menit" desc="Rasakan sensasi kecepatan di atas ombak Pangandaran dengan pengalaman seru & aman." price="350000" unit="/ ride" wa="6287793827592"></data><images><img src="assets/jetski-1-Y9ZJopoJ.jpeg"><img src="assets/jetski-2.jpeg"><img src="assets/jetski3.jpg"></images><highlights><li>Aman untuk pemula</li><li>Briefing keselamatan lengkap</li><li>Instruktur berpengalaman</li><li>Sensasi seru di atas ombak</li></highlights><inclusions><group label="Safety Gear"><li>Life jacket</li></group><group label="Support"><li>Instruktur/crew</li><li>Briefing keselamatan</li></group></inclusions></template>
+<template id="paket-jetski_areal"><data title="Drone Areal + Jetski" subtitle="Sea Adventure - Durasi 15 Menit" desc="Jetski + dokumentasi drone areal yang cinematic di Pantai Pangandaran." price="650000" unit="/ paket" wa="6287793827592"></data><images><img src="assets/jetski-2.jpeg"><img src="assets/jetski-1-Y9ZJopoJ.jpeg"><img src="assets/jetski3.jpg"></images><highlights><li>Drone areal cinematic</li><li>Jetski seru di laut</li><li>Crew drone profesional</li><li>File digital siap share</li></highlights><inclusions><group label="Ride"><li>Jetski sesuai paket</li><li>Briefing keselamatan</li></group><group label="Dokumentasi"><li>Video drone areal</li><li>File digital</li></group></inclusions></template>
+<template id="paket-jetski_fvp"><data title="FPV Drone + Jetski" subtitle="Sea Adventure - Durasi 15 Menit" desc="Paket jetski dengan video FPV drone untuk hasil yang lebih profesional." price="1200000" unit="/ paket" wa="6287793827592"></data><images><img src="assets/jetski3.jpg"><img src="assets/jetski-1-Y9ZJopoJ.jpeg"><img src="assets/jetski-2.jpeg"></images><highlights><li>Video FPV sinematik premium</li><li>Aksi dinamis lebih dramatis</li><li>Crew FPV profesional</li><li>File digital siap share</li></highlights><inclusions><group label="Ride"><li>Jetski sesuai paket</li><li>Briefing keselamatan</li></group><group label="Dokumentasi"><li>Video FPV drone</li><li>File digital</li></group></inclusions></template>
+<template id="paket-watersport"><data title="Water Sport" subtitle="Sea Adventure - Durasi 1 Jam" desc="Beragam aktivitas laut seru yang memacu adrenalin & penuh keseruan." price="150000" unit="/ paket" wa="6287793827592"></data><images><img src="assets/watersport3.jpeg"><img src="assets/watersport-2.jpeg"><img src="assets/waterpsort3.png"></images><highlights><li>Pilihan permainan beragam</li><li>Cocok rame-rame/grup</li><li>Briefing keselamatan</li><li>Instruktur berpengalaman</li></highlights><inclusions><group label="Safety Gear"><li>Life jacket</li><li>Peralatan sesuai permainan</li></group><group label="Support"><li>Instruktur/crew</li><li>Briefing keselamatan</li></group></inclusions></template>
+<template id="paket-standuppaddle"><data title="Stand Up Paddle" subtitle="Sea Adventure - Durasi 2 Jam" desc="Aktivitas santai menikmati air/ombak dengan pengalaman relaxing & menyenangkan." price="350000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/paddle.png"><img src="assets/standuppaddle-1-DIYrHU0i.jpeg"><img src="assets/standuppaddle3.png"></images><highlights><li>Board + Paddle lengkap</li><li>Life jacket tersedia</li><li>Cocok untuk pemula</li><li>Olahraga santai & menyenangkan</li></highlights><inclusions><group label="Gear"><li>Board SUP</li><li>Paddle</li></group><group label="Safety"><li>Life jacket</li><li>Briefing keselamatan</li></group><group label="Support"><li>Pendamping/crew</li></group></inclusions></template>
+<template id="paket-snorkeling"><data title="Snorkeling" subtitle="Sea Adventure - Durasi 2 Jam" desc="Jelajahi keindahan bawah laut Pangandaran yang kaya warna & kehidupan." price="150000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/snorekling3.png"><img src="assets/snorkeling2.png"><img src="assets/snorekling2.png"></images><highlights><li>Masker + snorkel lengkap</li><li>Briefing keselamatan</li><li>Guide/crew berpengalaman</li><li>Keindahan bawah laut menakjubkan</li></highlights><inclusions><group label="Gear"><li>Masker</li><li>Snorkel</li><li>Fin (jika tersedia)</li></group><group label="Safety"><li>Life jacket</li><li>Briefing keselamatan</li></group><group label="Support"><li>Guide/crew</li></group></inclusions></template>
+<template id="paket-photosession"><data title="Photo Session" subtitle="Outbound - Durasi 2 Jam" desc="Abadikan momen perjalanan dengan hasil foto profesional yang estetik & berkelas." price="200000" unit="/ sesi" wa="6287793827592"></data><images><img src="assets/photosession-1-CWeHPraX.jpeg"><img src="assets/photoseason2.jpeg"><img src="assets/photoseason3.jpeg"></images><highlights><li>Arahan pose profesional</li><li>Editing basic included</li><li>Foto digital siap download</li><li>Lokasi sesuai kesepakatan</li></highlights><inclusions><group label="Output"><li>Foto digital</li><li>Seleksi & editing basic</li></group><group label="Support"><li>Arahan pose</li><li>Lokasi sesuai kesepakatan</li></group></inclusions></template>
+<template id="paket-fungame"><data title="Fun Game" subtitle="Outbound - Durasi 3 Jam" desc="Aktivitas interaktif seru untuk menciptakan kebersamaan & energi positif." price="150000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/fungames-1-B6WDKIz9.jpeg"><img src="assets/fungame.png"><img src="assets/fungame3.png"></images><highlights><li>Ice breaking seru</li><li>Dipandu fasilitator berpengalaman</li><li>Team building activity</li><li>Cocok untuk semua usia</li></highlights><inclusions><group label="Program"><li>Rundown fun game</li><li>Fasilitator</li></group><group label="Peralatan"><li>Alat permainan</li><li>Sound system (jika tersedia)</li></group><group label="Dokumentasi"><li>Foto (opsional)</li></group></inclusions></template>
+<template id="paket-teambuilding"><data title="Team Building" subtitle="Outbound - Durasi Fleksibel" desc="Program team building komprehensif untuk perusahaan dan komunitas." price="200000" unit="/ orang" wa="6287793827592"></data><images><img src="assets/outbond.jpg"><img src="assets/fungame3.png"><img src="assets/fungames-1-B6WDKIz9.jpeg"></images><highlights><li>Program team building terstruktur</li><li>Fasilitator profesional</li><li>Cocok untuk perusahaan</li><li>Aktivitas customizable</li></highlights><inclusions><group label="Program"><li>Rundown team building</li><li>Fasilitator</li></group><group label="Peralatan"><li>Alat permainan & aktivitas</li></group><group label="Support"><li>Dokumentasi foto</li></group></inclusions></template>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// ===== GLOBAL STATE =====
+let _curInvoice = null;
+let _curWA      = '6287793827592';
+let _curTitle   = '';
+let _curPrice   = 0;
+
+// ===== TOAST =====
+function showToast(msg, duration) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration || 3000);
+}
+
+// ===== FORMAT =====
+function fmtRp(n) { return (parseInt(n)||0).toLocaleString('id-ID'); }
+function fmtDate() { return new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); }
+function formatJamOtomatis(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+
+  if (v.length > 4) {
+    v = v.slice(0, 4);
+  }
+
+  if (v.length === 4) {
+    el.value = v.slice(0, 2) + '.' + v.slice(2, 4);
+  } else {
+    el.value = v;
+  }
+}
+
+function rapikanJam(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+
+  if (v.length > 4) {
+    v = v.slice(0, 4);
+  }
+
+  if (v.length === 3) {
+    v = '0' + v;
+  }
+
+  if (v.length === 4) {
+    el.value = v.slice(0, 2) + '.' + v.slice(2, 4);
+  }
+}
+// ===== GALLERY =====
+function renderGallery(fotos) {
+  const el = document.getElementById('galleryStrip');
+  el.innerHTML = '';
+  fotos.filter(Boolean).forEach((src,i) => {
+    const d = document.createElement('div');
+    d.className = 'gallery-item shrink-0 rounded-2xl overflow-hidden border-ghost cursor-pointer hover:opacity-90 transition-opacity';
+    d.style.cssText = 'width:240px;height:160px;';
+    d.innerHTML = '<img src="'+src+'" alt="foto '+(i+1)+'" class="w-full h-full object-cover">';
+    el.appendChild(d);
+  });
+}
+
+// ===== HIGHLIGHTS & INCLUSIONS =====
+function renderHighlights(items) {
+  const el = document.getElementById('highlightsList');
+  el.innerHTML = '';
+  items.forEach(txt => {
+    const li = document.createElement('li');
+    li.className = 'flex items-start gap-3 text-on-surface-variant bg-surface-container-low/60 p-3.5 rounded-xl border-ghost';
+    li.innerHTML = '<span class="material-symbols-outlined text-secondary text-base mt-0.5" style="font-variation-settings:\'FILL\' 1">task_alt</span><span class="text-sm">'+txt+'</span>';
+    el.appendChild(li);
+  });
+}
+function renderInclusions(groups) {
+  const el = document.getElementById('inclusionsList');
+  el.innerHTML = '';
+  const colors = ['border-primary','border-secondary','border-tertiary'];
+  groups.forEach((g,i) => {
+    const box = document.createElement('div');
+    box.className = 'bg-surface-container p-6 rounded-2xl border-l-4 '+colors[i%3]+' border-ghost';
+    box.innerHTML = '<h4 class="font-headline font-bold text-sm mb-4 tracking-wide">'+g.label+'</h4><ul class="space-y-2.5">'+g.items.map(t=>'<li class="flex items-center gap-2 text-on-surface-variant text-xs"><span class="w-1.5 h-1.5 rounded-full bg-secondary/60 flex-shrink-0"></span>'+t+'</li>').join('')+'</ul>';
+    el.appendChild(box);
+  });
+}
+
+// ===== INVOICE MODAL =====
+function showInvoiceModal(inv) {
+  _curInvoice = inv;
+  const hSat  = parseInt(inv.harga_satuan) || 0;
+  const total = parseInt(inv.total_invoice || inv.total_harga) || (hSat * parseInt(inv.peserta || 1));
+  const metode = (inv.metode_bayar || 'full').toLowerCase();
+  const isLunas = metode === 'full';
+  const nominalBayar = isLunas ? total : parseInt(inv.dp || inv.nominal_bayar || 0);
+  const dpAmt = isLunas ? 0 : nominalBayar;
+  const finalPaid = isLunas ? total : 0;
+  const sisa  = isLunas ? 0 : parseInt(inv.sisa_bayar ?? Math.max(0, total - dpAmt));
+  const sc    = isLunas ? '#16a34a' : '#d97706';
+  const statusLabel = isLunas ? 'Paid Off' : 'Pending — DP';
+  const tgl   = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+  function fD(n){ return (parseInt(n)||0).toLocaleString('id-ID'); }
+
+  // Build items array dari single booking (detail page)
+  const items = inv.items || [{ produk: inv.paket, harga: hSat, qty: inv.peserta||1, subtotal: total }];
+
+  const rows = items.map(it =>
+    `<tr>
+      <td style="padding:12px 0;font-size:13px;color:#333;border-bottom:1px solid #e8e8e8;font-family:Georgia,serif;vertical-align:top;line-height:1.5">${it.produk||'—'}</td>
+      <td style="padding:12px 14px;font-size:13px;text-align:right;color:#333;border-bottom:1px solid #e8e8e8;font-family:Georgia,serif;white-space:nowrap;vertical-align:top">${fD(it.harga)}</td>
+      <td style="padding:12px 10px;font-size:13px;text-align:center;color:#333;border-bottom:1px solid #e8e8e8;font-family:Georgia,serif;vertical-align:top">${it.qty}</td>
+      <td style="padding:12px 0 12px 14px;font-size:13px;text-align:right;color:#333;border-bottom:1px solid #e8e8e8;font-family:Georgia,serif;white-space:nowrap;vertical-align:top">${fD(it.subtotal)}</td>
+    </tr>`
+  ).join('');
+
+  document.getElementById('rcpContent').innerHTML = `
+  <div id="inv-print-area" style="padding:44px 52px 56px;font-family:Georgia,serif;background:#fff;color:#333;font-size:13px">
+
+    <!-- HEADER -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:18px">
+        <img src="assets/logo.png" width="84" height="84"
+          style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="display:none;width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#0059b3,#a2e7ff);align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:28px;flex-shrink:0">P</div>
+        <div>
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:900;color:#000;letter-spacing:-.3px;line-height:1.1">Pangandaran.in</div>
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;margin-top:4px">CV. Pangandaran in Group</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <table style="border-collapse:collapse;margin-left:auto">
+          <tr>
+            <td style="font-size:12px;color:#555;padding:3px 0;text-align:right;white-space:nowrap;font-family:Arial,sans-serif">https://pangandaran.in</td>
+            <td style="padding:3px 0 3px 10px;vertical-align:middle">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid #aaa;border-radius:50%;color:#aaa">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:12px;color:#555;padding:3px 0;text-align:right;white-space:nowrap;font-family:Arial,sans-serif">pangandaraningroup@gmail.com</td>
+            <td style="padding:3px 0 3px 10px;vertical-align:middle">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid #aaa;border-radius:3px;color:#aaa">
+                <svg width="11" height="9" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 18"><rect x="2" y="2" width="20" height="14" rx="2"/><polyline points="2,2 12,11 22,2"/></svg>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:12px;color:#555;padding:3px 0;text-align:right;white-space:nowrap;font-family:Arial,sans-serif">@pangandaran.in</td>
+            <td style="padding:3px 0 3px 10px;vertical-align:middle">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid #aaa;border-radius:5px;color:#aaa">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              </span>
+            </td>
+          </tr>
+        </table>
+        <div style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#000;margin-top:12px">Receipt</div>
+      </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div style="border-top:1px solid #ccc;margin:18px 0 28px"></div>
+
+    <!-- BILL TO + PAYMENT DETAILS -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:32px">
+  <div>
+    <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:14px">Bill to</div>
+    <table style="border-collapse:collapse">
+      <tr>
+        <td style="color:#777;padding:5px 0;width:78px;font-family:Georgia,serif;font-size:13px;vertical-align:top">Name</td>
+        <td style="color:#777;padding:5px 8px">:</td>
+        <td style="color:#222;padding:5px 0;font-family:Georgia,serif;font-size:13px;font-weight:600">${inv.nama || '—'}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:5px 0;font-family:Georgia,serif;font-size:13px">WhatsApp</td>
+        <td style="color:#777;padding:5px 8px">:</td>
+        <td style="color:#222;padding:5px 0;font-family:Georgia,serif;font-size:13px">${inv.whatsapp || '—'}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:5px 0;font-family:Georgia,serif;font-size:13px">Media Sosial</td>
+        <td style="color:#777;padding:5px 8px">:</td>
+        <td style="color:#222;padding:5px 0;font-family:Georgia,serif;font-size:13px">${inv.medsos || '—'}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div>
+    <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:14px">Payment Details</div>
+    <table style="border-collapse:collapse">
+      <tr>
+        <td style="color:#777;padding:4px 0;width:112px;font-family:Georgia,serif;font-size:13px">No. Order</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="color:#0059b3;padding:4px 0;font-family:Georgia,serif;font-size:13px;font-weight:700">${inv.no_invoice || '—'}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Status</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="padding:4px 0;font-family:Georgia,serif;font-size:13px;font-weight:700;color:${sc}">${statusLabel}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Booking Date</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="color:#222;padding:4px 0;font-family:Georgia,serif;font-size:13px">${tgl}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Trip Date</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="color:#222;padding:4px 0;font-family:Georgia,serif;font-size:13px">${inv.tanggal || '—'}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Trip Time</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="color:#222;padding:4px 0;font-family:Georgia,serif;font-size:13px">${inv.waktu_kegiatan || inv.waktu || '—'}</td>
+      </tr>
+
+      <tr>
+        <td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Payment Method</td>
+        <td style="color:#777;padding:4px 8px">:</td>
+        <td style="color:#222;padding:4px 0;font-family:Georgia,serif;font-size:13px">${metode === 'full' ? 'Full Payment' : 'DP'}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+    <!-- ORDER DETAILS -->
+    <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:12px">Order Details</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-top:1.5px solid #222;border-bottom:1.5px solid #222">
+        <th style="padding:12px 0;font-size:13px;font-weight:700;text-align:left;color:#000;font-family:Georgia,serif">Product</th>
+        <th style="padding:12px 14px;font-size:13px;font-weight:700;text-align:right;color:#000;font-family:Georgia,serif">Price<br>(Rp)</th>
+        <th style="padding:12px 10px;font-size:13px;font-weight:700;text-align:center;color:#000;font-family:Georgia,serif">QTY</th>
+        <th style="padding:12px 0 12px 14px;font-size:13px;font-weight:700;text-align:right;color:#000;font-family:Georgia,serif">Total<br>(Rp)</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <!-- SUMMARY -->
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="width:55%;padding:0"></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Total</td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif;text-align:right;white-space:nowrap">${fD(total)}</td></tr>
+      <tr><td style="width:55%;padding:0"></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Discount (Rp.)</td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif;text-align:right">0</td></tr>
+      <tr style="border-top:1.5px solid #222"><td style="width:55%;padding:0"></td><td style="padding:11px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Total Invoice Amount</td><td style="padding:11px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif;text-align:right;white-space:nowrap">${fD(total)}</td></tr>
+      <tr><td style="width:55%;padding:0"></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Ammount Paid (DP)</td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif;text-align:right">${dpAmt>0?fD(dpAmt):'—'}</td></tr>
+      <tr><td style="width:55%;padding:0"></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Amount Paid (Final)</td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif;text-align:right">${isLunas?fD(finalPaid):'—'}</td></tr>
+      <tr style="border-top:1.5px solid #222;border-bottom:1.5px solid #222"><td style="width:55%;padding:0"></td><td style="padding:12px 0;font-weight:700;font-size:14px;color:#000;font-family:Georgia,serif">Outstanding Balance</td><td style="padding:12px 0;font-weight:900;font-size:16px;color:#000;font-family:Georgia,serif;text-align:right;white-space:nowrap">${fD(sisa)}</td></tr>
+    </table>
+
+    <div style="height:80px"></div>
+    <div style="text-align:right">
+      <div style="font-weight:700;font-size:14px;color:#000;font-family:Georgia,serif;margin-bottom:10px">Best Regards</div>
+      <div style="font-weight:900;font-size:18px;color:#000;font-family:Arial,Helvetica,sans-serif">Pangandaran.in</div>
+    </div>
+  </div>`;
+
+  document.getElementById('btnPDF').onclick = () => generatePDF(_curInvoice);
+  document.getElementById('btnWA').onclick = async () => {
+  const area = document.getElementById('inv-print-area');
+
+  if(!area){
+    showToast('Invoice tidak ditemukan.');
+    return;
+  }
+
+  showToast('Invoice sedang dibuat menjadi gambar...');
+
+  const canvas = await html2canvas(area, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff'
+  });
+
+  const link = document.createElement('a');
+  link.download = 'Invoice_' + (inv.no_invoice || 'Pangandaran') + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  setTimeout(function(){
+    const num = '6287793827592';
+    window.open('https://web.whatsapp.com/send?phone=' + num, '_blank');
+  }, 700);
+};
+  document.getElementById('invOverlay').classList.add('show');
+}
+
+// ===== GENERATE PDF =====
+async function generatePDF(inv) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const hSat  = parseInt(inv.harga_satuan) || 0;
+  const total = parseInt(inv.total_invoice || inv.total_harga) || (hSat * parseInt(inv.peserta || 1));
+  const metode = (inv.metode_bayar || 'full').toLowerCase();
+  const isLunas = metode === 'full';
+  const nominalBayar = isLunas ? total : parseInt(inv.dp || inv.nominal_bayar || 0);
+  const dpAmt = isLunas ? 0 : nominalBayar;
+  const finalPaid = isLunas ? total : 0;
+  const sisa  = isLunas ? 0 : parseInt(inv.sisa_bayar ?? Math.max(0, total - dpAmt));
+  const sc    = isLunas ? [22,163,74] : [217,119,6];
+  const statusLabel = isLunas ? 'Paid Off' : 'Pending - DP';
+  const tgl   = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+  function fD(n){ return (parseInt(n)||0).toLocaleString('id-ID'); }
+
+  // Build items
+  const items = inv.items || [{ produk: inv.paket, harga: hSat, qty: inv.peserta||1, subtotal: total }];
+
+  // ── Logo circular ──
+  await new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const cv = document.createElement('canvas');
+        cv.width = img.naturalWidth || 120; cv.height = img.naturalHeight || 120;
+        const ctx = cv.getContext('2d');
+        ctx.beginPath(); ctx.arc(cv.width/2, cv.height/2, cv.width/2, 0, Math.PI*2); ctx.clip();
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        doc.addImage(cv.toDataURL('image/png'), 'PNG', 13, 10, 24, 24);
+      } catch(e){}
+      resolve();
+    };
+    img.onerror = resolve;
+    img.src = 'assets/logo.png';
+    setTimeout(resolve, 3000);
+  });
+
+  // ── Brand ──
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(0);
+  doc.text('Pangandaran.in', 41, 18);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(130);
+  doc.text('CV. Pangandaran in Group', 41, 24);
+
+  // ── Kontak kanan ──
+  doc.setFontSize(8); doc.setTextColor(100);
+  doc.text('https://pangandaran.in',       196, 12, {align:'right'});
+  doc.text('pangandaraningroup@gmail.com', 196, 17, {align:'right'});
+  doc.text('@pangandaran.in',              196, 22, {align:'right'});
+
+  // ── Receipt ──
+  doc.setFont('helvetica','bold'); doc.setFontSize(24); doc.setTextColor(0);
+  doc.text('Receipt', 196, 34, {align:'right'});
+
+  // ── Divider ──
+  doc.setDrawColor(180); doc.setLineWidth(0.5); doc.line(13, 41, 196, 41);
+
+  // ── Bill to ──
+doc.setFont('helvetica','bold'); 
+doc.setFontSize(12); 
+doc.setTextColor(0);
+doc.text('Bill to', 13, 52);
+
+[
+  ['Name', inv.nama || '—'],
+  ['WhatsApp', inv.whatsapp || '—'],
+  ['Media Sosial', inv.medsos || '—']
+].forEach(([k, v], i) => {
+  const y = 60 + i * 8;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(k, 13, y);
+  doc.text(':', 35, y);
+
+  doc.setFont('helvetica','bold');
+  doc.setTextColor(30);
+  doc.text(String(v), 39, y);
+});
+
+  // ── Payment Details ──
+doc.setFont('helvetica','bold'); 
+doc.setFontSize(12); 
+doc.setTextColor(0);
+doc.text('Payment Details', 108, 52);
+
+[
+  ['No. Order', inv.no_invoice || '—', [0,89,179]],
+  ['Status', statusLabel, sc],
+  ['Booking Date', tgl, [30,30,30]],
+  ['Trip Date', inv.tanggal || '—', [30,30,30]],
+  ['Trip Time', inv.waktu_kegiatan || inv.waktu || '—', [30,30,30]],
+  ['Payment Method', metode === 'full' ? 'Full Payment' : 'DP', [30,30,30]]
+].forEach(([k, v, c], i) => {
+  const y = 60 + i * 8;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(k, 108, y);
+  doc.text(':', 135, y);
+
+  doc.setFont('helvetica','bold');
+  doc.setTextColor(...c);
+  doc.text(String(v), 140, y);
+});
+
+  // ── Order Details ──
+  const tableY = 116;
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(0);
+  doc.text('Order Details', 13, tableY - 4);
+
+  doc.autoTable({
+    startY: tableY,
+    head: [['Product','Price\n(Rp)','QTY','Total(Rp)']],
+    body: items.map(it => [it.produk||'—', fD(it.harga), String(it.qty||1), fD(it.subtotal)]),
+    theme: 'plain',
+    styles: { font:'helvetica', fontSize:9, textColor:[40], cellPadding:4 },
+    headStyles: { fillColor:[255,255,255], textColor:[0], fontStyle:'bold', fontSize:9, lineWidth:{top:0.6,bottom:0.6}, lineColor:[40] },
+    columnStyles: { 0:{halign:'left'}, 1:{cellWidth:28,halign:'right'}, 2:{cellWidth:14,halign:'center'}, 3:{cellWidth:28,halign:'right'} },
+    bodyStyles: { lineWidth:{bottom:0.2}, lineColor:[200] },
+    margin: {left:13, right:13},
+  });
+
+  // ── Summary ──
+  let y = doc.lastAutoTable.finalY + 5;
+  [
+    ['Total',                fD(total),              false, false],
+    ['Discount (Rp.)',       '0',                    false, false],
+    ['Total Invoice Amount', fD(total),              true,  false],
+    ['Ammount Paid (DP)',    dpAmt>0?fD(dpAmt):'—', false, false],
+    ['Amount Paid (Final)',  isLunas?fD(finalPaid):'—',  false, false],
+    ['Outstanding Balance',  fD(sisa),               false, true ],
+  ].forEach(([label, val, topLine, bottomLine]) => {
+    if(topLine){ doc.setDrawColor(40); doc.setLineWidth(0.5); doc.line(118, y-3, 197, y-3); y+=2; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(bottomLine?10.5:9); doc.setTextColor(0);
+    doc.text(label, 118, y); doc.text(val, 197, y, {align:'right'});
+    y += 8;
+    if(bottomLine){ doc.setDrawColor(40); doc.setLineWidth(0.5); doc.line(118, y-3, 197, y-3); }
+  });
+
+  // ── Footer ──
+  y += 18;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(80);
+  doc.text('Best Regards', 197, y, {align:'right'});
+  doc.setFontSize(13); doc.setTextColor(0);
+  doc.text('Pangandaran.in', 197, y+8, {align:'right'});
+
+  doc.save('Receipt_' + (inv.no_invoice||'Invoice') + '.pdf');
+}
+
+// ===== MAIN INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const key = params.get('paket') || 'gc';
 
-  const tpl = document.getElementById('paket-' + key) || document.getElementById('paket-gc');
-  if(!tpl) return;
+  let fromDB = false, dbData = null;
+  try {
+    const res = await fetch('get_paket_admin.php?id='+encodeURIComponent(key));
+    const db = await res.json();
+    if (db && db.id && !db.error) { fromDB = true; dbData = db; }
+  } catch(e) {}
 
-  const frag = tpl.content.cloneNode(true);
-  const data = frag.querySelector('data');
-  const images = [...frag.querySelectorAll('images img')].slice(0,3);
-  const highlights = [...frag.querySelectorAll('highlights li')];
-  const groups = [...frag.querySelectorAll('inclusions group')];
-
-  const title = data?.getAttribute('title') || 'Paket';
-  const subtitle = data?.getAttribute('subtitle') || '';
-  const desc = data?.getAttribute('desc') || '';
-  const price = Number(data?.getAttribute('price') || 0);
-  const unit = data?.getAttribute('unit') || '/ orang';
-  const wa = data?.getAttribute('wa') || '6287793827592';
-
-  const formatRp = n => n > 0 ? 'Rp ' + n.toLocaleString('id-ID') : 'Hubungi Kami';
-
-  // Set page title
-  document.title = title + ' | Pangandaran.in';
-
-  // Set hero
-  if(images[0]) {
-    document.getElementById('heroImg').src = images[0].getAttribute('src');
-    document.getElementById('heroImg').alt = title;
-  }
-  document.getElementById('heroLabel').textContent = subtitle.split(' • ')[0] || 'Paket Wisata';
-  document.getElementById('namaPaket').textContent = title;
-  document.getElementById('subtitlePaket').textContent = subtitle;
-
-  // Duration pill
-  const durText = subtitle.includes('Durasi') ? subtitle.split('Durasi ')[1] : subtitle;
-  document.getElementById('durasiText').textContent = durText || '—';
-
-  // Gallery strip
-  const galleryEl = document.getElementById('galleryStrip');
-  galleryEl.innerHTML = '';
-  images.forEach((img, i) => {
-    const div = document.createElement('div');
-    div.className = 'gallery-item shrink-0 rounded-2xl overflow-hidden border-ghost cursor-pointer hover:opacity-90 transition-opacity';
-    div.style.cssText = 'width:240px;height:160px;';
-    div.innerHTML = `<img src="${img.getAttribute('src')}" alt="foto ${i+1}" class="w-full h-full object-cover" onclick="this.closest('.gallery-item').requestFullscreen&&this.closest('.gallery-item').requestFullscreen()">`;
-    galleryEl.appendChild(div);
-  });
-
-  // Description
-  document.getElementById('descPaket').textContent = desc;
-
-  // Highlights
-  const hlEl = document.getElementById('highlightsList');
-  hlEl.innerHTML = '';
-  highlights.forEach(li => {
-    const item = document.createElement('li');
-    item.className = 'flex items-start gap-3 text-on-surface-variant bg-surface-container-low/60 p-3.5 rounded-xl border-ghost';
-    item.innerHTML = `<span class="material-symbols-outlined text-secondary text-base mt-0.5" style="font-variation-settings:'FILL' 1">task_alt</span><span class="text-sm">${li.textContent.trim()}</span>`;
-    hlEl.appendChild(item);
-  });
-
-  // Inclusions
-  const incEl = document.getElementById('inclusionsList');
-  incEl.innerHTML = '';
-  const colors = ['border-primary','border-secondary','border-tertiary'];
-  const iconColors = ['text-primary','text-secondary','text-tertiary'];
-  groups.forEach((g, idx) => {
-    const label = g.getAttribute('label') || 'Include';
-    const items = [...g.querySelectorAll('li')].map(x => x.textContent.trim()).filter(Boolean);
-    const box = document.createElement('div');
-    box.className = `bg-surface-container p-6 rounded-2xl border-l-4 ${colors[idx%3]} border-ghost`;
-    box.innerHTML = `
-      <h4 class="font-headline font-bold text-sm mb-4 tracking-wide">${label}</h4>
-      <ul class="space-y-2.5">${items.map(t=>`<li class="flex items-center gap-2 text-on-surface-variant text-xs"><span class="w-1.5 h-1.5 rounded-full bg-secondary/60 flex-shrink-0"></span>${t}</li>`).join('')}</ul>
-    `;
-    incEl.appendChild(box);
-  });
-
-  // Price display
-  const priceDisplay = price > 0 ? 'Rp '+price.toLocaleString('id-ID') : 'Nego';
-  document.getElementById('hargaPaket').textContent = priceDisplay;
-  document.getElementById('unitPaket').textContent = unit;
-  document.getElementById('mobilePriceDisplay').textContent = priceDisplay;
-
-  // Total calculation
-  const pesertaInput = document.getElementById('peserta');
-  const totalEl = document.getElementById('totalHarga');
-
-  function updateTotal() {
-    const n = Math.max(1, parseInt(pesertaInput.value)||1);
-    pesertaInput.value = n;
-    totalEl.textContent = (n * price).toLocaleString('id-ID');
+  const tpl = document.getElementById('paket-'+key) || document.getElementById('paket-gc');
+  let tplHighlights=[], tplGroups=[], tplImages=[];
+  if (tpl) {
+    const frag = tpl.content.cloneNode(true);
+    tplHighlights = [...frag.querySelectorAll('highlights li')].map(li=>li.textContent.trim());
+    tplGroups = [...frag.querySelectorAll('inclusions group')].map(g=>({label:g.getAttribute('label')||'Include',items:[...g.querySelectorAll('li')].map(li=>li.textContent.trim())}));
+    tplImages = [...frag.querySelectorAll('images img')].slice(0,3).map(img=>img.getAttribute('src'));
   }
 
-  document.getElementById('plusPax').addEventListener('click', ()=>{ pesertaInput.value=parseInt(pesertaInput.value)+1; updateTotal(); });
-  document.getElementById('minusPax').addEventListener('click', ()=>{ if(parseInt(pesertaInput.value)>1){pesertaInput.value=parseInt(pesertaInput.value)-1;} updateTotal(); });
-  pesertaInput.addEventListener('input', updateTotal);
-  updateTotal();
+  let title, subtitle, desc, price, unit, wa, fotos;
+  if (fromDB) {
+    title=dbData.nama; subtitle=dbData.subtitle||''; desc=dbData.deskripsi||'';
+    price=parseInt(dbData.harga)||0; unit=dbData.unit||'/ orang'; wa=dbData.wa||'6287793827592';
+    fotos=[dbData.foto1,dbData.foto2,dbData.foto3].filter(Boolean);
+    if(!fotos.length) fotos=tplImages;
+  } else if (tpl) {
+    const frag2=tpl.content.cloneNode(true); const d=frag2.querySelector('data');
+    title=d?.getAttribute('title')||'Paket'; subtitle=d?.getAttribute('subtitle')||'';
+    desc=d?.getAttribute('desc')||''; price=Number(d?.getAttribute('price')||0);
+    unit=d?.getAttribute('unit')||'/ orang'; wa=d?.getAttribute('wa')||'6287793827592';
+    fotos=tplImages;
+  } else { return; }
 
-  // Booking
-  function doBooking() {
-    const nama = document.getElementById('nama').value.trim();
-    const tanggal = document.getElementById('tanggal').value;
-    const peserta = parseInt(pesertaInput.value)||1;
-    const total = totalEl.textContent;
+  _curWA=wa; _curTitle=title; _curPrice=price;
+  const priceDisp = price>0 ? 'Rp '+price.toLocaleString('id-ID') : 'Hubungi Kami';
 
-    if(!nama){ alert('Silakan isi nama.'); document.getElementById('nama').focus(); return; }
-    if(!tanggal){ alert('Silakan pilih tanggal.'); document.getElementById('tanggal').focus(); return; }
+  document.title=title+' | Pangandaran.in';
+  if(fotos[0]) document.getElementById('heroImg').src=fotos[0];
+  document.getElementById('heroLabel').textContent=subtitle.split(/\s[•-]\s/)[0]||'Paket Wisata';
+  document.getElementById('namaPaket').textContent=title;
+  document.getElementById('subtitlePaket').textContent=subtitle;
+  document.getElementById('durasiText').textContent=subtitle.includes('Durasi')?subtitle.split('Durasi ')[1]:(dbData?.durasi||'—');
+  document.getElementById('descPaket').textContent=desc;
+  document.getElementById('hargaPaket').textContent=priceDisp;
+  document.getElementById('unitPaket').textContent=unit;
+  document.getElementById('mobilePriceDisplay').textContent=priceDisp;
+  renderGallery(fotos); renderHighlights(tplHighlights); renderInclusions(tplGroups);
 
-    const pesan = `Halo kak, saya tertarik dengan paket trip bareng Pangandaran.in\n\nDetail Pemesanan:\nPaket   : ${title}\nNama    : ${nama}\nTanggal : ${tanggal}\nPeserta : ${peserta} orang\nTotal   : Rp ${total}\n\nMohon info ketersediaan jadwal ya kak. Terima kasih 🙏`;
+  // ─── WA format ───
+  document.getElementById('whatsapp').addEventListener('input', function(){
+  if(/[a-zA-Z]/.test(this.value)){
+    showToast('WhatsApp hanya boleh angka.');
+    this.value = this.value.replace(/[a-zA-Z]/g,'');
+  }
 
-    fetch('save_booking.php', {
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:`nama=${encodeURIComponent(nama)}&paket=${encodeURIComponent(title)}&tanggal=${encodeURIComponent(tanggal)}&peserta=${encodeURIComponent(peserta)}`
-    }).catch(()=>{}).finally(()=>{
-      window.open(`https://wa.me/${wa}?text=${encodeURIComponent(pesan)}`, '_blank');
+  let v = this.value.replace(/\s/g,'').replace(/[^0-9+]/g,'');
+
+  if(v.startsWith('08')) this.value = '+628' + v.slice(2);
+  else if(v.startsWith('8') && v.length >= 9) this.value = '+62' + v;
+  else this.value = v;
+});
+
+// ─── Media Sosial auto @ ───
+document.getElementById('medsos').addEventListener('input', function(){
+  let v = this.value.trim();
+
+  if(!v){
+    this.value = '';
+    return;
+  }
+
+  v = v.replace(/\s+/g,'');
+
+  if(v.startsWith('@')){
+    this.value = '@' + v.replace(/^@+/, '');
+  } else {
+    this.value = '@' + v;
+  }
+});
+
+  // ─── Peserta ───
+  const pesertaEl=document.getElementById('peserta');
+  document.getElementById('plusPax').addEventListener('click',()=>{pesertaEl.value=parseInt(pesertaEl.value)+1;updateTotal();});
+  document.getElementById('minusPax').addEventListener('click',()=>{if(parseInt(pesertaEl.value)>1)pesertaEl.value=parseInt(pesertaEl.value)-1;updateTotal();});
+  pesertaEl.addEventListener('input',updateTotal);
+
+  // ─── Payment type ───
+document.querySelectorAll('input[name="payType"]').forEach(function(r){
+  r.addEventListener('change', function(){
+    const v = this.value;
+    const isDP = v === 'dp';
+
+    ['payFull','payDP'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el) {
+        el.className = 'pay-opt flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 cursor-pointer';
+      }
     });
-  }
 
-  document.getElementById('bookWA').addEventListener('click', doBooking);
-  document.getElementById('mobileBookBtn').addEventListener('click', ()=>{
-    window.scrollTo({top:document.getElementById('namaPaket').offsetTop-100, behavior:'smooth'});
-    setTimeout(()=>{ if(!document.getElementById('nama').value){ document.getElementById('nama').focus(); } else { doBooking(); }}, 500);
+    const active = document.getElementById(v === 'full' ? 'payFull' : 'payDP');
+    if(active) {
+      active.className = 'pay-opt active flex items-center justify-between p-3 rounded-xl border cursor-pointer';
+    }
+
+    document.getElementById('dpBox').classList.toggle('hidden', !isDP);
+    document.getElementById('sisaRow').classList.toggle('hidden', !isDP);
+
+    updateTotal();
   });
 });
 
-// Mobile menu
+document.getElementById('dpNominal').addEventListener('input', updateTotal);
+
+function updateTotal() {
+  const n = Math.max(1, parseInt(pesertaEl.value) || 1);
+  pesertaEl.value = n;
+
+  const total = n * price;
+  const payType = document.querySelector('input[name="payType"]:checked')?.value || 'full';
+  const minDP = Math.ceil(total * 0.3);
+
+  const dpInput = document.getElementById('dpNominal');
+  const dp = payType === 'dp' ? Math.max(0, parseInt(dpInput.value) || 0) : 0;
+  const sisa = payType === 'dp' ? Math.max(0, total - dp) : 0;
+
+  document.getElementById('totalHarga').textContent = fmtRp(total);
+  document.getElementById('totalInvoice').textContent = fmtRp(total);
+  document.getElementById('fpLabel').textContent = 'Rp ' + fmtRp(total);
+
+  const dpLabel = document.getElementById('dpLabel');
+  if(dpLabel){
+    dpLabel.textContent = dp > 0 ? 'Rp ' + fmtRp(dp) : 'Min Rp ' + fmtRp(minDP);
+  }
+
+  const dpHint = document.getElementById('dpHint');
+  if(dpHint){
+    dpHint.textContent = 'Minimal DP 30%: Rp ' + fmtRp(minDP);
+  }
+
+  if(dpInput && !dpInput.value){
+    dpInput.placeholder = 'Minimal DP Rp ' + fmtRp(minDP);
+  }
+
+  if(payType === 'dp'){
+    document.getElementById('sisaTagihan').textContent = fmtRp(sisa);
+  }
+}
+updateTotal();
+
+function formatWaktuInput(value) {
+  let v = (value || '').replace(/[^0-9]/g, '');
+
+  // kalau user isi 100000, ambil 4 angka pertama jadi 1000
+  if (v.length > 4) {
+    v = v.slice(0, 4);
+  }
+
+  // kalau user isi 930, jadi 0930
+  if (v.length === 3) {
+    v = '0' + v;
+  }
+
+  // 1000 -> 10.00
+  if (v.length >= 3) {
+    return v.slice(0, 2) + '.' + v.slice(2, 4);
+  }
+
+  return v;
+}
+
+    // ─── doBooking ───
+  async function doBooking() {
+    const nama    = document.getElementById('nama').value.trim();
+    const wa2     = document.getElementById('whatsapp').value.trim();
+    const medsos  = document.getElementById('medsos').value.trim();
+    const tanggal = document.getElementById('tanggal').value;
+
+    rapikanJam(document.getElementById('waktu'));
+    const waktu = document.getElementById('waktu').value.trim();
+
+    const peserta = parseInt(pesertaEl.value) || 1;
+    const payType = document.querySelector('input[name="payType"]:checked')?.value || 'full';
+    const dpAmt   = payType === 'dp' ? Math.max(0, parseInt(document.getElementById('dpNominal').value) || 0) : 0;
+    const totalHarga = peserta * price;
+    const minDP = Math.ceil(totalHarga * 0.3);
+
+    if(!nama) {
+      showToast('Nama lengkap wajib diisi.');
+      document.getElementById('nama').focus();
+      return;
+    }
+
+    if(!wa2) {
+      showToast('WhatsApp wajib diisi.');
+      document.getElementById('whatsapp').focus();
+      return;
+    }
+
+    if(!medsos) {
+      showToast('Media sosial wajib diisi.');
+      document.getElementById('medsos').focus();
+      return;
+    }
+
+    if(!tanggal) {
+      showToast('Silakan pilih tanggal.');
+      document.getElementById('tanggal').focus();
+      return;
+    }
+
+    if(!waktu) {
+      showToast('Perkiraan waktu wajib diisi. Contoh: 10.00');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    if(!/^\d{2}\.\d{2}$/.test(waktu)) {
+      showToast('Format waktu salah. Gunakan format 10.00 atau 09.30');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    const jamParts = waktu.split('.');
+    const jam = parseInt(jamParts[0], 10);
+    const menit = parseInt(jamParts[1], 10);
+
+    if(jam < 0 || jam > 23 || menit < 0 || menit > 59) {
+      showToast('Jam tidak valid. Gunakan jam antara 00.00 sampai 23.59');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    if(payType === 'dp' && dpAmt < minDP) {
+      showToast('DP minimal 30%: Rp ' + fmtRp(minDP));
+      document.getElementById('dpNominal').focus();
+      return;
+    }
+
+    if(payType === 'dp' && dpAmt >= totalHarga) {
+      showToast('DP tidak boleh sama atau lebih besar dari total. Pilih Full Payment.');
+      document.getElementById('dpNominal').focus();
+      return;
+    }
+
+    const nominalBayar = payType === 'full' ? totalHarga : dpAmt;
+    const dpUntukDB = payType === 'full' ? totalHarga : dpAmt;
+    const sisaBayar = payType === 'full' ? 0 : Math.max(0, totalHarga - dpAmt);
+
+    const body = 'nama=' + encodeURIComponent(nama)
+  + '&whatsapp=' + encodeURIComponent(wa2)
+  + '&medsos=' + encodeURIComponent(medsos)
+  + '&paket=' + encodeURIComponent(title)
+  + '&tanggal=' + encodeURIComponent(tanggal)
+  + '&waktu=' + encodeURIComponent(waktu)
+  + '&waktu_kegiatan=' + encodeURIComponent(waktu)
+  + '&peserta=' + encodeURIComponent(peserta)
+  + '&sumber=detail'
+  + '&harga_satuan=' + encodeURIComponent(price)
+  + '&total_harga=' + encodeURIComponent(totalHarga)
+  + '&total_invoice=' + encodeURIComponent(totalHarga)
+  + '&metode_bayar=' + encodeURIComponent(payType)
+  + '&dp=' + encodeURIComponent(dpUntukDB)
+  + '&sisa_bayar=' + encodeURIComponent(sisaBayar)
+  + '&nominal_bayar=' + encodeURIComponent(nominalBayar);
+
+showToast('Membuat pembayaran QRIS...');
+
+try {
+  const res = await fetch('create_payment.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: body
+  });
+
+  const data = await res.json();
+
+  if(data.status === 'ok') {
+    document.getElementById('qrisAmount').textContent = 'Rp ' + fmtRp(data.nominal_bayar || nominalBayar);
+    document.getElementById('paymentStatusText').textContent = 'Menunggu pembayaran...';
+    document.getElementById('qrisOverlay').style.display = 'flex';
+
+    //cekStatusPembayaran(data.no_invoice);
+
+        const simBtn =
+      document.getElementById('qrisPaidBtn') ||
+      document.getElementById('simPaidBtn');
+
+    if (simBtn) {
+      simBtn.disabled = false;
+
+  simBtn.onclick = function () {
+    simulasiPembayaran(data.no_invoice);
+  };
+} else {
+  console.error('Tombol simulasi bayar tidak ditemukan');
+}
+  } else {
+    showToast(data.message || 'Gagal membuat pembayaran.');
+  }
+} catch(e) {
+  showToast('Gagal terhubung ke server pembayaran.');
+}
+
+  }
+  function cekStatusPembayaran(noInvoice) {
+  let percobaan = 0;
+  const maxPercobaan = 100;
+
+  const timer = setInterval(async function(){
+    percobaan++;
+
+    try {
+      const res = await fetch('check_payment_status.php?no_invoice=' + encodeURIComponent(noInvoice));
+      const data = await res.json();
+
+      if(data.payment_status === 'paid') {
+        clearInterval(timer);
+
+        document.getElementById('paymentStatusText').textContent = 'Pembayaran berhasil. Invoice sedang dibuat...';
+
+        setTimeout(function(){
+          document.getElementById('qrisOverlay').style.display = 'none';
+          showInvoiceModal(data.invoice);
+        }, 700);
+
+        return;
+      }
+
+      if(data.payment_status === 'expired' || data.payment_status === 'failed') {
+        clearInterval(timer);
+        document.getElementById('paymentStatusText').textContent = 'Pembayaran gagal / expired.';
+        showToast('Pembayaran gagal atau expired.');
+        return;
+      }
+
+      document.getElementById('paymentStatusText').textContent = 'Menunggu pembayaran...';
+
+      if(percobaan >= maxPercobaan) {
+        clearInterval(timer);
+        document.getElementById('paymentStatusText').textContent = 'Waktu pembayaran habis.';
+        showToast('Waktu pembayaran habis. Silakan ulangi booking.');
+      }
+    } catch(e) {
+      document.getElementById('paymentStatusText').textContent = 'Mengecek status pembayaran...';
+    }
+  }, 3000);
+}
+
+async function simulasiPembayaran(noInvoice) {
+  if(!noInvoice){
+    showToast('No invoice tidak ditemukan.');
+    return;
+  }
+
+  document.getElementById('paymentStatusText').textContent = 'Memproses simulasi pembayaran...';
+
+  try {
+    const res = await fetch(
+      'payment_callback.php?secret=GANTI_SECRET_PANGANDARAN_2026&no_invoice='
+      + encodeURIComponent(noInvoice)
+      + '&payment_status=paid'
+    );
+
+    const data = await res.json();
+
+    if(data.status === 'ok'){
+      document.getElementById('paymentStatusText').textContent = 'Pembayaran berhasil. Invoice sedang dibuat...';
+
+      setTimeout(async function(){
+        const cek = await fetch('check_payment_status.php?no_invoice=' + encodeURIComponent(noInvoice));
+        const hasil = await cek.json();
+
+        if(hasil.payment_status === 'paid'){
+          document.getElementById('qrisOverlay').style.display = 'none';
+          showInvoiceModal(hasil.invoice);
+        } else {
+          showToast('Status pembayaran belum paid.');
+        }
+      }, 700);
+    } else {
+      document.getElementById('paymentStatusText').textContent = 'Simulasi gagal.';
+      showToast(data.message || 'Simulasi pembayaran gagal.');
+    }
+  } catch(e) {
+    document.getElementById('paymentStatusText').textContent = 'Simulasi gagal.';
+    showToast('Gagal memproses simulasi pembayaran.');
+  }
+}
+  function fallbackWA(nama,wa2,tanggal,peserta,total,dp,payType) {
+  showToast('Invoice sedang dibuat...', 2000);
+
+  const noInv = 'PNT' + new Date().toISOString().slice(2,10).replace(/-/g,'') + Math.floor(1000 + Math.random() * 9000);
+
+    const medsos = document.getElementById('medsos').value.trim();
+    const waktuKegiatan = document.getElementById('waktu').value.trim();
+
+    const nominalBayar = payType === 'full' ? total : dp;
+    const sisaBayar = payType === 'full' ? 0 : Math.max(0, total - dp);
+
+    const inv = {
+      status: 'ok',
+      payment_status: 'paid',
+      no_invoice: noInv,
+
+      nama: nama,
+      whatsapp: wa2,
+      medsos: medsos,
+
+      tanggal: tanggal,
+      waktu: waktuKegiatan,
+      waktu_kegiatan: waktuKegiatan,
+
+      peserta: peserta,
+      paket: title,
+
+      harga_satuan: price,
+      total_harga: total,
+      total_invoice: total,
+
+      metode_bayar: payType,
+      dp: payType === 'dp' ? dp : 0,
+      nominal_bayar: nominalBayar,
+      sisa_bayar: sisaBayar,
+      status_bayar: payType === 'full' ? 'Lunas' : 'DP',
+
+      items: [{
+        produk: title,
+        harga: price,
+        qty: peserta,
+        subtotal: total
+      }]
+    };
+
+  setTimeout(function(){
+    showInvoiceModal(inv);
+  }, 400);
+}
+
+
+  document.getElementById('bookWA').addEventListener('click', doBooking);
+  document.getElementById('mobileBookBtn').addEventListener('click', ()=>{
+    window.scrollTo({top:document.getElementById('namaPaket').offsetTop-100,behavior:'smooth'});
+    setTimeout(()=>{ if(!document.getElementById('nama').value){document.getElementById('nama').focus();}else{doBooking();} },500);
+  });
+});
+
 document.getElementById('menuBtn').addEventListener('click',()=>{
   document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+document.getElementById('invOverlay').addEventListener('click', function(e){
+  if(e.target===this) this.classList.remove('show');
 });
 </script>
 </body>

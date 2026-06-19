@@ -1,385 +1,1035 @@
-<!DOCTYPE html>
-<html class="dark" lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking | Pangandaran.in</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode:"class",
-      theme:{ extend:{
-        colors:{
-          "surface":"#00132f","background":"#00132f","surface-dim":"#00132f",
-          "surface-container-lowest":"#000e25","surface-container-low":"#051b39",
-          "surface-container":"#0a1f3d","surface-container-high":"#172a48",
-          "surface-container-highest":"#223554","surface-bright":"#273959",
-          "on-surface":"#d6e3ff","on-surface-variant":"#c2c6d4","on-background":"#d6e3ff",
-          "primary":"#aac7ff","primary-container":"#0059b3",
-          "on-primary":"#002f65","on-primary-container":"#bed4ff",
-          "secondary":"#a2e7ff","secondary-container":"#00d2fd",
-          "on-secondary":"#003642","on-secondary-container":"#005669",
-          "tertiary":"#b4c7ed","tertiary-container":"#495b7c",
-          "outline":"#8c919d","outline-variant":"#424752",
-          "surface-variant":"#223554","surface-tint":"#aac7ff",
-          "error":"#ffb4ab","on-error":"#690005"
-        },
-        fontFamily:{ headline:["Space Grotesk"], body:["Inter"], label:["Inter"] },
-        borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" }
-      }}
-    }
-  </script>
-  <style>
-    body { font-family:'Inter',sans-serif; background:#00132f; color:#d6e3ff; }
-    .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
-    .glass { background:rgba(34,53,84,0.45); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
-    .border-ghost { border:1px solid rgba(170,199,255,0.15); }
-    .neon { text-shadow:0 0 12px rgba(162,231,255,0.5); }
-    select option { background:#0a1f3d; color:#d6e3ff; }
-    select optgroup { background:#051b39; color:#a2e7ff; font-weight:bold; }
-    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
-    .pulse-dot { animation:pulse-dot 2s infinite; }
-  </style>
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Booking | Pangandaran.in</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="booking.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#00132f;color:#d6e3ff;min-height:100vh}
+.inp{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(162,231,255,.15);background:rgba(0,14,37,.8);color:#d6e3ff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:.2s}
+.inp:focus{border-color:rgba(162,231,255,.4);box-shadow:0 0 0 3px rgba(162,231,255,.07)}
+.inp::placeholder{color:rgba(162,231,255,.22)}
+select.inp option{background:#0a1f3d}
+select.inp optgroup{background:#051b39;color:#a2e7ff;font-weight:700}
+label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(162,231,255,.45);display:block;margin-bottom:8px}
+.card{background:rgba(5,27,57,.72);border:1px solid rgba(162,231,255,.12);border-radius:20px;padding:26px 28px}
+.snum{width:28px;height:28px;border-radius:50%;background:rgba(162,231,255,.1);color:#a2e7ff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icard{background:rgba(0,14,37,.65);border:1px solid rgba(162,231,255,.1);border-radius:14px;padding:16px;margin-bottom:10px;transition:.2s}
+.icard:hover{border-color:rgba(162,231,255,.2)}
+.dbtn{width:32px;height:32px;border-radius:9px;background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.16);color:rgba(255,100,100,.55);cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;line-height:1}
+.dbtn:hover{background:rgba(255,80,80,.14);color:#ff7070}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding:20px;backdrop-filter:blur(8px);overflow-y:auto}
+#overlay.show{display:flex}
+.ibox{background:#fff;border-radius:16px;width:100%;max-width:750px;margin:auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7)}
+#toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-14px);background:rgba(5,27,57,.97);border:1px solid rgba(162,231,255,.25);color:#d6e3ff;padding:11px 26px;border-radius:11px;font-size:13px;font-weight:500;z-index:99999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fi .2s ease}
+.rek{background:rgba(0,89,179,.1);border:1px solid rgba(0,89,179,.26);border-radius:13px;padding:14px 18px}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1px solid rgba(162,231,255,.1);cursor:pointer;transition:.2s;background:rgba(0,14,37,.5)}
+.pay-opt:hover{border-color:rgba(162,231,255,.25);background:rgba(0,14,37,.7)}
+.pay-opt.selected{border-color:#a2e7ff;background:rgba(162,231,255,.07)}
+.pay-opt input[type=radio]{accent-color:#a2e7ff;width:16px;height:16px;flex-shrink:0}
+</style>
 </head>
-<body class="bg-surface selection:bg-secondary/30">
+<body style="background:#00132f">
+<div id="toast"></div>
 
-<!-- ===== TOPNAV ===== -->
-<nav class="fixed top-0 w-full z-50 bg-[#00132F]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(162,231,255,0.04)]">
-  <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-xl mx-auto">
-    <a href="index.html" class="text-xl md:text-2xl font-bold tracking-tighter text-white font-headline">Pangandaran.in</a>
-    <div class="hidden md:flex items-center space-x-8 font-headline tracking-wide text-sm">
-      <a href="index.html" class="text-slate-300 hover:text-secondary transition-colors">Home</a>
-      <a href="index.html#destinasi-scroll" class="text-slate-300 hover:text-secondary transition-colors">Destinasi</a>
-      <a href="index.html#paket-scroll" class="text-slate-300 hover:text-secondary transition-colors">Paket</a>
-      <a href="index.html#gallery" class="text-slate-300 hover:text-secondary transition-colors">Galeri</a>
-      <a href="about.html" class="text-slate-300 hover:text-secondary transition-colors">About</a>
+<div id="overlay">
+  <div class="ibox">
+    <div id="invContent"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1.5px solid #e0e0e0">
+      <button id="btnPDF" style="padding:17px;background:linear-gradient(135deg,#0059b3,#3a8fe8);color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:0 0 0 16px">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </button>
+      <button id="btnWA" style="padding:17px;background:#25D366;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:0 0 16px 0">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884z"/></svg>
+        Kirim via WA
+      </button>
     </div>
-    <div class="flex items-center gap-3">
-      <a href="booking.html" class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold px-5 py-2 rounded-full text-sm flex items-center gap-2 whitespace-nowrap shadow-[0_0_15px_rgba(170,199,255,0.3)]">
-        <span>Booking Now</span><span class="material-symbols-outlined text-base">north_east</span>
-      </a>
-      <button id="menuBtn" class="md:hidden p-2 text-primary"><span class="material-symbols-outlined">menu</span></button>
+    <button onclick="closeOverlay()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:26px;cursor:pointer;color:#bbb;z-index:1;padding:2px 8px;line-height:1">&#215;</button>
+  </div>
+</div>
+
+<!-- QRIS PAYMENT OVERLAY -->
+<style>
+#qrisOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,7,20,.82);backdrop-filter:blur(8px)}
+.qz-card{position:relative;width:100%;max-width:392px;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#fff,#f3f8ff);box-shadow:0 40px 90px rgba(0,0,0,.55);animation:qzPop .45s cubic-bezier(.2,.85,.25,1)}
+.qz-card::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:280px;height:160px;background:radial-gradient(circle,rgba(0,180,224,.35),transparent 70%);filter:blur(10px)}
+@keyframes qzPop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+.qz-top{position:relative;z-index:1;padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.qz-merchant{display:flex;align-items:center;gap:10px}
+.qz-logo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0059b3,#00b4e0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Space Grotesk',sans-serif;font-size:16px;box-shadow:0 6px 16px rgba(0,89,179,.35)}
+.qz-mname{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:15px;color:#0a1f3d;line-height:1.1}
+.qz-msub{font-size:10.5px;color:#9aa3b2;margin-top:1px}
+.qz-qrispill{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:12px;letter-spacing:1px;color:#0059b3;background:#e9f2fd;border:1px solid #cfe2fb;padding:5px 10px;border-radius:8px}
+.qz-amount-wrap{position:relative;z-index:1;text-align:center;padding:16px 24px 4px}
+.qz-amount-label{font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9aa3b2}
+.qz-amount{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;margin-top:2px;background:linear-gradient(90deg,#0059b3,#00a0d6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.qz-qrbox{position:relative;z-index:1;width:230px;margin:8px auto 0;padding:16px;border-radius:20px;background:#fff;box-shadow:0 18px 40px rgba(10,31,61,.16);border:1px solid #eef2f8}
+.qz-qrbox img{width:100%;display:block;border-radius:8px}
+.qz-c{position:absolute;width:24px;height:24px;border:3px solid #0059b3;z-index:2}
+.qz-c.tl{top:9px;left:9px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.qz-c.tr{top:9px;right:9px;border-left:0;border-bottom:0;border-radius:0 7px 0 0}
+.qz-c.bl{bottom:9px;left:9px;border-right:0;border-top:0;border-radius:0 0 0 7px}
+.qz-c.br{bottom:9px;right:9px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+.qz-scan{position:absolute;left:16px;right:16px;top:16px;height:26px;border-radius:8px;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(0,180,224,0),rgba(0,180,224,.35));box-shadow:0 6px 10px rgba(0,180,224,.45);border-bottom:2px solid #00b4e0;animation:qzScan 2.4s ease-in-out infinite}
+@keyframes qzScan{0%{top:16px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 42px);opacity:0}}
+.qz-timer{display:inline-flex;align-items:center;gap:7px;margin:14px auto 0;background:#fff4e6;border:1px solid #ffe0b8;color:#b9740a;font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:999px}
+.qz-timer b{font-family:'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums}
+.qz-hint{font-size:11.5px;color:#8a93a3;margin:12px 24px 0;line-height:1.55;text-align:center}
+.qz-body{position:relative;z-index:1;padding:0 24px 24px;text-align:center}
+.qz-status{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px;padding:13px;border-radius:14px;background:#f1f5fa;border:1px solid #e6edf5;color:#5b6473;font-weight:700;font-size:13px}
+.qz-dot{width:9px;height:9px;border-radius:50%;background:#f59e0b;flex-shrink:0;box-shadow:0 0 0 0 rgba(245,158,11,.5);animation:qzPing 1.4s infinite}
+@keyframes qzPing{0%{box-shadow:0 0 0 0 rgba(245,158,11,.5)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}
+.qz-pay{position:relative;overflow:hidden;width:100%;margin-top:14px;border:none;cursor:pointer;padding:16px;border-radius:16px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:14.5px;letter-spacing:.3px;background:linear-gradient(135deg,#16a34a,#0e8a3e);box-shadow:0 14px 30px rgba(22,163,74,.4);transition:transform .2s,box-shadow .2s}
+.qz-pay:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(22,163,74,.5)}
+.qz-pay::after{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .65s}
+.qz-pay:hover::after{left:140%}
+.qz-cancel{width:100%;margin-top:10px;border:none;background:transparent;cursor:pointer;padding:11px;color:#9aa3b2;font-weight:700;font-size:13px;border-radius:12px;transition:.15s}
+.qz-cancel:hover{background:#f2f5f9;color:#5b6473}
+.qz-secure{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;color:#aab2bf;font-size:10.5px}
+.qz-secure svg{width:12px;height:12px}
+</style>
+<div id="qrisOverlay">
+  <div class="qz-card">
+    <div class="qz-top">
+      <div class="qz-merchant">
+        <img class="qz-logo" src="assets/logo.png" onerror="this.outerHTML='<div class=\'qz-logo\'>P</div>'">
+        <div><div class="qz-mname">Pangandaran.in</div><div class="qz-msub">CV Pangandaran in Group</div></div>
+      </div>
+      <span class="qz-qrispill">QRIS</span>
+    </div>
+    <div class="qz-amount-wrap">
+      <div class="qz-amount-label">Total Pembayaran</div>
+      <div class="qz-amount" id="qrisAmount">Rp 0</div>
+    </div>
+    <div class="qz-qrbox">
+      <span class="qz-c tl"></span><span class="qz-c tr"></span><span class="qz-c bl"></span><span class="qz-c br"></span>
+      <span class="qz-scan"></span>
+      <img src="assets/qris.png" alt="QRIS Pangandaran.in">
+    </div>
+    <div style="text-align:center">
+      <span class="qz-timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Selesaikan pembayaran <b id="qrisCountdown"></b></span>
+    </div>
+    <p class="qz-hint">Buka aplikasi e-wallet atau m-banking (DANA, GoPay, OVO, ShopeePay), pilih bayar QRIS, lalu pindai kode di atas.</p>
+    <div class="qz-body">
+      <div class="qz-status"><span class="qz-dot"></span><span id="paymentStatusText">Menunggu pembayaran...</span></div>
+      <button type="button" id="qrisPaidBtn" class="qz-pay">Saya Sudah Bayar</button>
+      <button type="button" class="qz-cancel" onclick="document.getElementById('qrisOverlay').style.display='none'">Batal</button>
+      <div class="qz-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Pembayaran diproses melalui QRIS &middot; Aman</div>
     </div>
   </div>
-  <div id="mobileMenu" class="md:hidden hidden glass border-t border-white/10 px-6 py-4 space-y-3">
-    <a href="index.html" class="block text-slate-300 py-2">Home</a>
-    <a href="index.html#paket-scroll" class="block text-slate-300 py-2">Paket</a>
-    <a href="about.html" class="block text-slate-300 py-2">About</a>
+</div>
+
+<!-- NAVBAR -->
+<nav style="position:sticky;top:0;background:rgba(0,19,47,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(162,231,255,.1);z-index:100;padding:14px 28px;display:flex;justify-content:space-between;align-items:center">
+  <a href="index.html" style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#fff;text-decoration:none">Pangandaran.in</a>
+  <div style="display:flex;gap:12px;align-items:center">
+    <a href="index.html" style="color:rgba(162,231,255,.5);text-decoration:none;font-size:13px">Home</a>
+    <a href="booking.html" style="background:linear-gradient(135deg,#aac7ff,#0059b3);color:#001b3e;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;padding:9px 20px;border-radius:20px;text-decoration:none">Booking</a>
   </div>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="relative h-64 md:h-80 overflow-hidden">
-  <img src="assets/background2.jpg" alt="Booking Hero" class="w-full h-full object-cover opacity-50" onerror="this.src='assets/greencanyon1.jpg'">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#00132F]/60 via-transparent to-surface"></div>
-  <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-    <div class="inline-flex items-center space-x-2 bg-secondary/10 border border-secondary/20 px-4 py-1.5 rounded-full mb-4">
-      <span class="flex h-2 w-2 rounded-full bg-secondary pulse-dot"></span>
-      <span class="text-secondary font-headline text-xs tracking-[0.2em] uppercase font-bold">Quick Booking</span>
-    </div>
-    <h1 class="font-headline text-4xl md:text-5xl font-bold text-white tracking-tight neon">Mulai Booking<br>Dalam 1 Menit</h1>
-    <p class="text-on-surface-variant mt-3 text-sm max-w-md">Pilih paket, tentukan tanggal, isi jumlah peserta, lalu kirim otomatis ke WhatsApp.</p>
+<!-- HERO -->
+<div style="height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,rgba(0,89,179,.1),transparent)">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(162,231,255,.08);border:1px solid rgba(162,231,255,.18);border-radius:20px;padding:6px 16px;margin-bottom:14px">
+    <span style="width:7px;height:7px;background:#a2e7ff;border-radius:50%;display:inline-block"></span>
+    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#a2e7ff">Booking Langsung</span>
   </div>
-</section>
-
-<!-- ===== BOOKING FORM ===== -->
-<main class="max-w-screen-xl mx-auto px-6 md:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-  <!-- FORM -->
-  <div class="lg:col-span-7">
-    <div class="glass rounded-3xl p-6 md:p-8 border-ghost">
-      <h2 class="font-headline text-xl font-bold text-on-surface mb-6">Detail Pemesanan</h2>
-
-      <form id="bookingForm" class="space-y-5">
-        <!-- Nama -->
-        <div>
-          <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">
-            Nama <span class="text-error">*</span>
-          </label>
-          <input id="nama" name="nama" type="text" placeholder="Masukkan nama lengkap" autocomplete="name"
-            class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3.5 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
-          <p class="text-[11px] text-on-surface-variant/50 mt-1.5 px-1">Gunakan nama asli agar admin mudah mengkonfirmasi.</p>
-        </div>
-
-        <!-- Pilih Paket -->
-        <div>
-          <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">
-            Pilih Paket <span class="text-error">*</span>
-          </label>
-          <select id="paket" name="paket"
-            class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all text-sm appearance-none cursor-pointer">
-            <option value="" selected disabled class="text-outline">Pilih paket wisata...</option>
-
-            <optgroup label="River Adventure">
-              <option value="Green Canyon Body Rafting" data-harga="250000">Green Canyon Body Rafting — Rp 250.000</option>
-              <option value="Ciwayang Body Rafting" data-harga="150000">Ciwayang Body Rafting — Rp 150.000</option>
-              <option value="Citumang Body Rafting" data-harga="150000">Citumang Body Rafting — Rp 150.000</option>
-              <option value="Santirah River Tubing" data-harga="150000">Santirah River Tubing — Rp 150.000</option>
-            </optgroup>
-
-            <optgroup label="Multi Day Trip">
-              <option value="One Day Tour Package" data-harga="260000">One Day Tour Package — Rp 260.000</option>
-              <option value="2 Day 1 Night Package" data-harga="700000">2 Day 1 Night Package — Rp 700.000</option>
-              <option value="3 Day 2 Night Package" data-harga="700000">3 Day 2 Night Package — Rp 700.000</option>
-              <option value="Custom Trip" data-harga="">Custom Trip — Nego</option>
-            </optgroup>
-
-            <optgroup label="Sea Adventure">
-              <option value="Jetski" data-harga="350000">Jetski — Rp 350.000</option>
-              <option value="Drone Areal + Jetski" data-harga="650000">Drone Areal + Jetski — Rp 650.000</option>
-              <option value="FVP Drone + Jetski" data-harga="1200000">FPV Drone + Jetski — Rp 1.200.000</option>
-              <option value="Water Sport" data-harga="150000">Water Sport — Rp 150.000</option>
-              <option value="Stand Up Paddle" data-harga="350000">Stand Up Paddle — Rp 350.000</option>
-              <option value="Snorkeling" data-harga="150000">Snorkeling — Rp 150.000</option>
-            </optgroup>
-
-            <optgroup label="Outbound">
-              <option value="Photo Session" data-harga="200000">Photo Session — Rp 200.000</option>
-              <option value="Fun Game" data-harga="150000">Fun Game — Rp 150.000</option>
-              <option value="Team Building" data-harga="200000">Team Building — Rp 200.000</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <!-- Tanggal & Peserta -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">
-              Tanggal <span class="text-error">*</span>
-            </label>
-            <input id="tanggal" name="tanggal" type="date"
-              class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-secondary/40 transition-all text-sm [color-scheme:dark]">
-          </div>
-          <div>
-            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">
-              Jumlah Peserta <span class="text-error">*</span>
-            </label>
-            <input id="peserta" name="peserta" type="number" min="1" placeholder="1"
-              class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3.5 text-on-surface placeholder:text-outline/40 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div class="pt-2">
-          <button id="btnBook" type="submit"
-            class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold uppercase tracking-widest text-sm shadow-[0_0_25px_rgba(170,199,255,0.2)] hover:shadow-[0_0_40px_rgba(170,199,255,0.4)] hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">send</span>
-            Booking Sekarang via WhatsApp
-          </button>
-          <p class="text-center text-[11px] text-on-surface-variant/50 mt-3 uppercase tracking-widest">
-            Konfirmasi & pembayaran dibantu admin via WhatsApp
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUMMARY SIDEBAR -->
-  <aside class="lg:col-span-5">
-    <div class="sticky top-24 space-y-5">
-
-      <!-- Booking Summary Card -->
-      <div class="glass rounded-3xl p-6 border-ghost">
-        <h3 class="font-headline text-sm font-bold text-secondary uppercase tracking-widest mb-5">Ringkasan Booking</h3>
-        <div class="space-y-3.5">
-          <div class="flex justify-between items-start">
-            <span class="text-on-surface-variant text-sm">Nama</span>
-            <strong id="sumNama" class="text-on-surface text-sm text-right max-w-[55%]">—</strong>
-          </div>
-          <div class="h-px bg-white/5"></div>
-          <div class="flex justify-between items-start">
-            <span class="text-on-surface-variant text-sm">Paket</span>
-            <strong id="sumPaket" class="text-on-surface text-sm text-right max-w-[60%] leading-tight">—</strong>
-          </div>
-          <div class="h-px bg-white/5"></div>
-          <div class="flex justify-between items-center">
-            <span class="text-on-surface-variant text-sm">Harga Satuan</span>
-            <strong id="sumHarga" class="text-secondary text-sm neon">—</strong>
-          </div>
-          <div class="h-px bg-white/5"></div>
-          <div class="flex justify-between items-center">
-            <span class="text-on-surface-variant text-sm">Tanggal</span>
-            <strong id="sumTanggal" class="text-on-surface text-sm">—</strong>
-          </div>
-          <div class="h-px bg-white/5"></div>
-          <div class="flex justify-between items-center">
-            <span class="text-on-surface-variant text-sm">Peserta</span>
-            <strong id="sumPeserta" class="text-on-surface text-sm">—</strong>
-          </div>
-          <div class="h-px bg-white/5"></div>
-          <div class="flex justify-between items-center pt-1">
-            <span class="font-bold text-on-surface">Total Estimasi</span>
-            <strong id="sumTotal" class="text-xl font-headline text-secondary neon">—</strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- Info Card -->
-      <div class="glass rounded-2xl p-5 border-ghost">
-        <div class="flex items-start gap-3">
-          <span class="material-symbols-outlined text-secondary text-xl mt-0.5" style="font-variation-settings:'FILL' 1">verified</span>
-          <div>
-            <h4 class="font-headline font-bold text-sm text-on-surface mb-1">Proses Cepat & Mudah</h4>
-            <p class="text-on-surface-variant text-xs leading-relaxed">Isi form → kirim ke WhatsApp → admin konfirmasi jadwal & pembayaran. Tanpa ribet!</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contact Card -->
-      <div class="glass rounded-2xl p-5 border-ghost">
-        <h4 class="font-headline font-bold text-sm text-on-surface mb-3">Butuh Bantuan?</h4>
-        <a href="https://wa.me/6287793827592" target="_blank" class="flex items-center gap-3 hover:text-secondary transition-colors group">
-          <div class="w-9 h-9 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-all">
-            <span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings:'FILL' 1">chat</span>
-          </div>
-          <div>
-            <p class="text-on-surface text-sm font-medium">WhatsApp Admin</p>
-            <p class="text-on-surface-variant text-xs">+62 877-9382-7592</p>
-          </div>
-        </a>
-      </div>
-    </div>
-  </aside>
-
-</main>
-
-<!-- ===== FOOTER ===== -->
-<footer class="bg-[#00132F] border-t border-white/5 py-10 px-6 md:px-8 mt-8">
-  <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-    <div class="flex items-center gap-3">
-      <img src="assets/logo.png" alt="Logo" class="h-8 object-contain" onerror="this.style.display='none'">
-      <span class="font-headline font-bold text-secondary">Pangandaran.in</span>
-    </div>
-    <div class="flex flex-wrap justify-center gap-6 text-sm">
-      <a href="index.html" class="text-on-surface-variant hover:text-secondary transition-colors">Home</a>
-      <a href="index.html#paket-scroll" class="text-on-surface-variant hover:text-secondary transition-colors">Paket</a>
-      <a href="about.html" class="text-on-surface-variant hover:text-secondary transition-colors">About</a>
-      <a href="https://www.instagram.com/pangandaran.in/" class="text-on-surface-variant hover:text-secondary transition-colors">Instagram</a>
-    </div>
-    <p class="text-on-surface-variant/40 text-xs">© 2024 Pangandaran.in</p>
-  </div>
-</footer>
-
-<!-- Mobile Bottom Nav -->
-<div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10 px-4 py-3 flex justify-around items-center">
-  <a href="index.html" class="flex flex-col items-center text-on-surface-variant">
-    <span class="material-symbols-outlined text-xl">home</span>
-    <span class="text-[9px] uppercase tracking-wider mt-0.5">Home</span>
-  </a>
-  <a href="index.html#paket-scroll" class="flex flex-col items-center text-on-surface-variant">
-    <span class="material-symbols-outlined text-xl">explore</span>
-    <span class="text-[9px] uppercase tracking-wider mt-0.5">Paket</span>
-  </a>
-  <a href="booking.html" class="flex flex-col items-center -mt-6">
-    <div class="bg-secondary h-12 w-12 rounded-full shadow-[0_0_20px_rgba(162,231,255,0.4)] flex items-center justify-center">
-      <span class="material-symbols-outlined text-surface text-xl" style="font-variation-settings:'FILL' 1">send</span>
-    </div>
-    <span class="text-[9px] uppercase tracking-wider mt-1 text-secondary">Booking</span>
-  </a>
-  <a href="index.html#gallery" class="flex flex-col items-center text-on-surface-variant">
-    <span class="material-symbols-outlined text-xl">photo_library</span>
-    <span class="text-[9px] uppercase tracking-wider mt-0.5">Galeri</span>
-  </a>
-  <a href="about.html" class="flex flex-col items-center text-on-surface-variant">
-    <span class="material-symbols-outlined text-xl">info</span>
-    <span class="text-[9px] uppercase tracking-wider mt-0.5">About</span>
-  </a>
+  <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(22px,5vw,40px);font-weight:800;color:#fff;letter-spacing:-.5px">Form Pemesanan Wisata</h1>
+  <p style="color:rgba(214,227,255,.45);margin-top:10px;font-size:14px">Invoice otomatis muncul &amp; dikirim. Harga sudah tertera &mdash; tidak perlu negosiasi.</p>
 </div>
-<div class="md:hidden h-20"></div>
 
+<!-- FORM -->
+<main style="max-width:780px;margin:0 auto;padding:24px 20px 80px;display:flex;flex-direction:column;gap:18px">
+
+<!-- STEP 1 -->
+<div class="card fi">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+    <div class="snum">1</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#fff">Data Diri</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div style="grid-column:1/-1">
+      <label>Nama Lengkap <span style="color:rgba(255,120,120,.7)">*</span></label>
+      <input class="inp" id="f_nama" type="text" placeholder="Masukkan nama lengkap">
+    </div>
+    <div style="grid-column:1/-1">
+      <label>WhatsApp <span style="color:rgba(255,120,120,.7)">*</span></label>
+      <input class="inp" id="f_wa" type="tel" placeholder="+62 8xx-xxxx-xxxx" oninput="formatWA(this)" autocomplete="tel">
+      <div id="wa_hint" style="font-size:11px;margin-top:5px;color:rgba(162,231,255,.4);display:none"></div>
+    </div>
+    <div style="grid-column:1/-1">
+      <label>Media Sosial (Instagram / TikTok)</label>
+      <input class="inp" id="f_medsos" placeholder="@username_instagram" oninput="formatMedsos(this)" autocomplete="off">
+      <div id="medsos_hint" style="font-size:11px;margin-top:5px;color:rgba(162,231,255,.4)">Contoh: @pangandaran.in</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="card fi">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+    <div class="snum">2</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#fff">Detail Kegiatan</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div>
+      <label>Tanggal Kegiatan <span style="color:rgba(255,120,120,.7)">*</span></label>
+      <input class="inp" id="f_tgl" type="date" style="color-scheme:dark">
+    </div>
+    <div>
+      <label>Perkiraan Waktu</label>
+      <input class="inp" id="f_waktu" type="text" inputmode="numeric" maxlength="5"
+      placeholder="Contoh: 10.00"
+      oninput="formatWaktuBooking(this)"
+      onblur="rapikanWaktuBooking(this)">
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="card fi">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="snum">3</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#fff">Pilih Paket</div>
+    </div>
+    <button onclick="addItem()" style="display:flex;align-items:center;gap:6px;background:rgba(162,231,255,.08);border:1px solid rgba(162,231,255,.18);color:#a2e7ff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;padding:8px 16px;border-radius:20px;cursor:pointer">
+      + Tambah Paket
+    </button>
+  </div>
+  <div id="itemsWrap"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(162,231,255,.08);margin-top:4px">
+    <span style="color:rgba(214,227,255,.45);font-size:14px">Total</span>
+    <span id="grandTotal" style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#a2e7ff;text-shadow:0 0 14px rgba(162,231,255,.35)">Rp 0</span>
+  </div>
+</div>
+
+<!-- STEP 4: JENIS PEMBAYARAN -->
+<div class="card fi">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <div class="snum">4</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#fff">Jenis Pembayaran</div>
+  </div>
+  <div style="display:grid;gap:10px">
+
+    <label class="pay-opt selected" id="opt_full" onclick="selectPayment('full')">
+      <input type="radio" name="paytype" value="full" checked>
+      <div style="flex:1">
+        <div style="font-weight:600;color:#fff;font-size:14px">Full Payment</div>
+        <div style="font-size:12px;color:rgba(214,227,255,.5);margin-top:2px">Bayar penuh sekarang &mdash; invoice langsung lunas</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:#a2e7ff" id="opt_full_amt">Rp 0</div>
+        <div style="font-size:10px;color:#22c55e;margin-top:2px">Paid Off</div>
+      </div>
+    </label>
+
+    <label class="pay-opt" id="opt_dp" onclick="selectPayment('dp')">
+      <input type="radio" name="paytype" value="dp">
+      <div style="flex:1">
+        <div style="font-weight:600;color:#fff;font-size:14px">DP (Uang Muka)</div>
+        <div style="font-size:12px;color:rgba(214,227,255,.5);margin-top:2px">Bayar sebagian sekarang, sisa saat hari kegiatan</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:#f59e0b" id="opt_dp_amt">Min Rp 0</div>
+        <div style="font-size:10px;color:#f59e0b;margin-top:2px">DP</div>
+      </div>
+    </label>
+
+    <!-- DP amount input -->
+    <div id="dp_input_wrap" style="display:none;padding:14px 16px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:12px">
+      <label style="color:rgba(245,158,11,.7);margin-bottom:8px">Jumlah DP yang Dibayar (Rp) <span style="color:rgba(255,120,120,.7)">*</span></label>
+      <input class="inp" id="f_dp" type="text" inputmode="numeric"
+      placeholder="Minimal DP: Rp 0"
+      oninput="formatDPBooking(this);updatePaySummary()"
+      style="border-color:rgba(245,158,11,.3)">
+      <div id="dp_hint" style="margin-top:8px;font-size:12px;color:rgba(214,227,255,.4)">Sisa pembayaran akan tercantum di invoice</div>
+    </div>
+  
+</div>
+
+  <!-- Ringkasan Pembayaran -->
+  <div style="margin-top:16px;background:rgba(0,14,37,.6);border:1px solid rgba(162,231,255,.1);border-radius:12px;padding:14px 16px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(162,231,255,.4);margin-bottom:12px">Ringkasan Pembayaran</div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:rgba(214,227,255,.5)">Total</span><span style="color:#fff;font-weight:600" id="sum_total">Rp 0</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(162,231,255,.08)"><span style="color:rgba(214,227,255,.5)">Total Invoice</span><span style="color:#a2e7ff;font-weight:700" id="sum_invoice">Rp 0</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:rgba(214,227,255,.5)" id="lbl_paid">Dibayar (Full)</span><span style="color:#22c55e;font-weight:700" id="sum_paid">Rp 0</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span style="color:#fff">Sisa Tagihan</span><span id="sum_sisa" style="color:#f59e0b;font-family:'Space Grotesk',sans-serif">Rp 0</span></div>
+  </div>
+</div>
+<!-- SUBMIT -->
+<button id="btnSubmit" onclick="submitBooking()" style="padding:18px;border-radius:16px;background:linear-gradient(135deg,#aac7ff,#0059b3);color:#001b3e;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:15px;border:none;cursor:pointer;box-shadow:0 0 30px rgba(170,199,255,.18);display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.3px;transition:all .2s">
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+  Kirim Pemesanan &amp; Buat Invoice
+</button>
+<p style="text-align:center;font-size:12px;color:rgba(214,227,255,.28)">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai.</p>
+</main>
 <script>
-// Apply from URL params (when coming from detail page)
-(function applyFromUrl(){
-  const params = new URLSearchParams(window.location.search);
-  const paketParam = params.get('paket');
-  const hargaParam = params.get('harga');
-  if(paketParam){
-    const sel = document.getElementById('paket');
-    for(const opt of sel.options){
-      if(opt.value === paketParam){ sel.value = paketParam; break; }
+const WA_ADMIN = "6287793827592";
+
+const PAKET = [
+  {kat:"River Adventure",items:[
+    {n:"Green Canyon Body Rafting",h:250000,s:"orang"},
+    {n:"Ciwayang Body Rafting",h:150000,s:"orang"},
+    {n:"Citumang Body Rafting",h:150000,s:"orang"},
+    {n:"Santirah River Tubing",h:150000,s:"orang"},
+  ]},
+  {kat:"Sea Adventure",items:[
+    {n:"Jetski SeaDoo 15 Menit",h:350000,s:"unit"},
+    {n:"Jetski SeaDoo Exclusive 15 Menit + Dokumentasi Drone Aerial",h:700000,s:"unit"},
+    {n:"Jetski + FPV Drone Exclusive",h:1200000,s:"unit"},
+    {n:"Watersport 3 Wahana",h:100000,s:"orang"},
+    {n:"Single Board Stand Up Paddle",h:250000,s:"orang"},
+    {n:"Snorkeling",h:150000,s:"orang"},
+    {n:"Dokumentasi Drone Aerial",h:250000,s:"sesi"},
+    {n:"Dokumentasi Drone Aerial SUP",h:250000,s:"sesi"},
+    {n:"Dokumentasi Drone Aerial Watersport",h:150000,s:"sesi"},
+  ]},
+  {kat:"Multi Day Trip",items:[
+    {n:"One Day Tour Package",h:260000,s:"orang"},
+    {n:"2 Day 1 Night Package",h:700000,s:"orang"},
+    {n:"3 Day 2 Night Package",h:700000,s:"orang"},
+    {n:"Custom Trip",h:0,s:"nego"},
+  ]},
+  {kat:"Outbound",items:[
+    {n:"Photo Session",h:200000,s:"sesi"},
+    {n:"Fun Game",h:150000,s:"orang"},
+    {n:"Team Building",h:200000,s:"orang"},
+  ]},
+];
+
+let ic = 0, _inv = null, payType = "full";
+const G = id => document.getElementById(id);
+const fRp = n => (parseInt(n)||0).toLocaleString("id-ID");
+const fDate = () => new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
+
+
+function cleanAngka(v){
+  return parseInt((v||"").toString().replace(/[^0-9]/g,"")) || 0;
+}
+
+// ── Format DP input (tampilkan titik ribuan) ──
+function formatDPBooking(input){
+  const angka = cleanAngka(input.value);
+  input.value = angka ? fRp(angka) : "";
+}
+
+// ── Format WA ──
+function formatWA(input){
+  const hint = G("wa_hint");
+  let val = input.value || "";
+
+  // Tolak huruf dan karakter selain angka, +, spasi, atau strip
+  if (/[^0-9+\-\s]/.test(val)) {
+    input.value = val.replace(/[^0-9+\-\s]/g, "");
+    toast("WhatsApp hanya boleh angka.", "err", 2000);
+
+    if (hint) {
+      hint.textContent = "WhatsApp hanya boleh angka.";
+      hint.style.display = "block";
+      hint.style.color = "rgba(255,80,80,.85)";
+    }
+    return;
+  }
+
+  // Bersihkan spasi dan strip agar format nomor konsisten
+  val = input.value.replace(/\s/g, "").replace(/-/g, "");
+
+  // Tanda + hanya boleh satu dan harus di awal
+  if ((val.match(/\+/g) || []).length > 1 || (val.includes("+") && !val.startsWith("+"))) {
+    input.value = val.replace(/\+/g, "");
+    toast("Format WhatsApp tidak valid.", "err", 2000);
+
+    if (hint) {
+      hint.textContent = "Gunakan format contoh: +6281234567890";
+      hint.style.display = "block";
+      hint.style.color = "rgba(255,80,80,.85)";
+    }
+    return;
+  }
+
+  if (val.startsWith("08")) {
+    val = "+628" + val.slice(2);
+    input.value = val;
+
+    if (hint) {
+      hint.textContent = "Diformat: " + val;
+      hint.style.display = "block";
+      hint.style.color = "rgba(34,197,94,.7)";
+    }
+
+  } else if (val.startsWith("628")) {
+    input.value = "+" + val;
+
+    if (hint) {
+      hint.style.display = "none";
+    }
+
+  } else if (val.startsWith("+628")) {
+    input.value = val;
+
+    if (hint) {
+      hint.style.display = val.length > 4 && val.length < 10 ? "block" : "none";
+      hint.textContent = "Contoh: +6281234567890";
+      hint.style.color = "rgba(162,231,255,.4)";
+    }
+
+  } else if (val.startsWith("8") && val.length >= 9) {
+    val = "+62" + val;
+    input.value = val;
+
+    if (hint) {
+      hint.textContent = "Diformat: " + val;
+      hint.style.display = "block";
+      hint.style.color = "rgba(34,197,94,.7)";
+    }
+
+  } else {
+    input.value = val;
+
+    if (hint) {
+      hint.style.display = val.length > 0 ? "block" : "none";
+      hint.textContent = val.length > 0 ? "Contoh: +6281234567890" : "";
+      hint.style.color = "rgba(162,231,255,.4)";
     }
   }
-  if(hargaParam){
-    document.getElementById('paket').setAttribute('data-override-harga', hargaParam);
-  }
-})();
-
-// Format Rupiah
-function formatRupiah(num){
-  const n = Number(num);
-  if(!Number.isFinite(n) || n <= 0) return '—';
-  return 'Rp ' + n.toLocaleString('id-ID');
 }
 
-// Update Summary
-function updateSummary(){
-  const nama = (document.getElementById('nama').value||'').trim();
-  const paketEl = document.getElementById('paket');
-  const paket = paketEl.value || '';
-  const tanggal = document.getElementById('tanggal').value || '';
-  const peserta = document.getElementById('peserta').value || '';
-
-  document.getElementById('sumNama').textContent = nama || '—';
-  document.getElementById('sumPaket').textContent = paket || '—';
-  document.getElementById('sumTanggal').textContent = tanggal || '—';
-  document.getElementById('sumPeserta').textContent = peserta ? peserta+' orang' : '—';
-
-  const opt = paketEl.options[paketEl.selectedIndex];
-  const hargaOpt = opt ? (opt.getAttribute('data-harga') || '') : '';
-  const hargaNum = Number(hargaOpt);
-
-  if(hargaOpt && hargaNum > 0){
-    document.getElementById('sumHarga').textContent = formatRupiah(hargaOpt);
-    const pesertaNum = parseInt(peserta)||1;
-    document.getElementById('sumTotal').textContent = 'Rp ' + (pesertaNum * hargaNum).toLocaleString('id-ID');
-  } else if(paket) {
-    document.getElementById('sumHarga').textContent = 'Nego';
-    document.getElementById('sumTotal').textContent = 'Nego';
-  } else {
-    document.getElementById('sumHarga').textContent = '—';
-    document.getElementById('sumTotal').textContent = '—';
-  }
+// ── Format Medsos ──
+function formatMedsos(input){
+  let val = input.value.trim();
+  if(!val) return;
+  if(val.length > 1 && !val.startsWith("@") && !val.startsWith("http")) input.value = "@" + val;
+  if(val.includes(" ")) input.value = input.value.replace(/\s+/g,"");
 }
 
-document.getElementById('nama').addEventListener('input', updateSummary);
-document.getElementById('paket').addEventListener('change', updateSummary);
-document.getElementById('tanggal').addEventListener('change', updateSummary);
-document.getElementById('peserta').addEventListener('input', updateSummary);
-updateSummary();
+// ── Format Waktu ──
+function ambilAngkaWaktu(value){
+  return (value||"").toString().replace(/[^0-9]/g,"").slice(0,4);
+}
+function formatWaktuBooking(input){
+  let v = ambilAngkaWaktu(input.value);
+  input.value = (v.length === 4) ? v.slice(0,2) + "." + v.slice(2,4) : v;
+}
+function rapikanWaktuBooking(input){
+  let v = ambilAngkaWaktu(input.value);
+  if(v.length === 3) v = "0" + v;
+  input.value = (v.length === 4) ? v.slice(0,2) + "." + v.slice(2,4) : v;
+}
 
-// Booking Submit
-document.getElementById('btnBook').addEventListener('click', e => {
-  e.preventDefault();
-  const nama = (document.getElementById('nama').value||'').trim();
-  const paket = document.getElementById('paket').value;
-  const tanggal = document.getElementById('tanggal').value;
-  const peserta = document.getElementById('peserta').value;
+// ── Toast ──
+function toast(msg, type, dur){
+  const t = G("toast"); t.textContent = msg;
+  t.style.borderColor = type==="ok" ? "rgba(34,197,94,.3)" : type==="err" ? "rgba(255,80,80,.3)" : "rgba(162,231,255,.25)";
+  t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), dur||3000);
+}
+function closeOverlay(){ G("overlay").classList.remove("show"); }
+G("overlay").addEventListener("click", function(e){ if(e.target===this) closeOverlay(); });
 
-  if(!nama){ alert('Silakan isi nama.'); document.getElementById('nama').focus(); return; }
-  if(!paket){ alert('Silakan pilih paket.'); document.getElementById('paket').focus(); return; }
-  if(!tanggal){ alert('Silakan pilih tanggal.'); document.getElementById('tanggal').focus(); return; }
-  if(!peserta || parseInt(peserta) <= 0){ alert('Jumlah peserta minimal 1.'); document.getElementById('peserta').focus(); return; }
-
-  const pesan = `Halo kak, saya tertarik dengan paket trip bareng Pangandaran.in \n\nDetail Pemesanan:\nPaket   : ${paket}\nNama    : ${nama}\nTanggal : ${tanggal}\nPeserta : ${peserta} orang\n\nMohon info ketersediaan jadwal dan detail pembayaran ya kak 🙏`;
-
-  const nomor = '6287793827592';
-
-  // Save to database
-  fetch('save_booking.php', {
-    method:'POST',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:`nama=${encodeURIComponent(nama)}&paket=${encodeURIComponent(paket)}&tanggal=${encodeURIComponent(tanggal)}&peserta=${encodeURIComponent(peserta)}`
-  }).catch(()=>{}).finally(()=>{
-    window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, '_blank');
+// ── Paket dropdown ──
+function mkSel(val=""){
+  let h = '<option value="" data-h="0">Pilih paket wisata...</option>';
+  PAKET.forEach(g=>{
+    h += `<optgroup label="${g.kat}">`;
+    g.items.forEach(it=>{
+      const lbl = it.h > 0 ? `Rp ${fRp(it.h)}/${it.s}` : "Nego";
+      h += `<option value="${it.n}" data-h="${it.h}" ${it.n===val?"selected":""}>${it.n} - ${lbl}</option>`;
+    });
+    h += "</optgroup>";
   });
-});
+  return h;
+}
 
-// Mobile menu
-document.getElementById('menuBtn').addEventListener('click',()=>{
-  document.getElementById('mobileMenu').classList.toggle('hidden');
-});
+function addItem(){
+  ic++; const id = "i"+ic;
+  const div = document.createElement("div");
+  div.className = "icard"; div.id = id;
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <select onchange="onSel(this,'${id}')" style="flex:1;background:rgba(0,14,37,.88);border:1px solid rgba(162,231,255,.12);border-radius:11px;padding:11px 14px;color:#d6e3ff;font-size:13px;outline:none;cursor:pointer;font-family:Inter,sans-serif">${mkSel()}</select>
+      <button class="dbtn" onclick="rmItem('${id}')">&#215;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 110px;gap:12px;align-items:end">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(162,231,255,.35);margin-bottom:5px">Harga Satuan</div>
+        <div id="${id}_h" style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#a2e7ff">--</div>
+      </div>
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(162,231,255,.35);margin-bottom:5px">Jml / Unit</div>
+        <input type="number" id="${id}_q" value="1" min="1" oninput="recalc('${id}')"
+          style="width:100%;background:rgba(0,14,37,.88);border:1px solid rgba(162,231,255,.12);border-radius:10px;padding:10px;color:#d6e3ff;font-size:14px;text-align:center;outline:none">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding-top:10px;margin-top:8px;border-top:1px solid rgba(162,231,255,.07)">
+      <span style="font-size:12px;color:rgba(162,231,255,.3)">Subtotal</span>
+      <span id="${id}_s" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:#a2e7ff">Rp 0</span>
+    </div>`;
+  G("itemsWrap").appendChild(div);
+  updTotal();
+}
+
+function rmItem(id){
+  const el = G(id); if(!el) return;
+  el.style.cssText = "opacity:0;transform:translateY(-5px);transition:all .18s";
+  setTimeout(()=>{ el.remove(); updTotal(); }, 200);
+}
+function onSel(sel, id){
+  const h = parseInt(sel.options[sel.selectedIndex].getAttribute("data-h")||0);
+  G(id+"_h").textContent = h > 0 ? "Rp "+fRp(h) : "Nego";
+  recalc(id);
+}
+function recalc(id){
+  const sel = document.querySelector("#"+id+" select");
+  const h = parseInt(sel?.options[sel.selectedIndex]?.getAttribute("data-h")||0);
+  const q = parseInt(G(id+"_q")?.value||1);
+  const el = G(id+"_s");
+  if(el) el.textContent = h > 0 ? "Rp "+fRp(h*q) : "--";
+  updTotal();
+}
+function getItems(){
+  const list = [];
+  document.querySelectorAll("#itemsWrap .icard").forEach(card=>{
+    const sel = card.querySelector("select"); if(!sel?.value) return;
+    const h = parseInt(sel.options[sel.selectedIndex]?.getAttribute("data-h")||0);
+    const q = parseInt(card.querySelector('input[type="number"]')?.value||1);
+    list.push({produk:sel.value, harga:h, qty:q, subtotal:h*q});
+  });
+  return list;
+}
+function updTotal(){
+  const total = getItems().reduce((s,it)=>s+(parseInt(it.subtotal)||0), 0);
+  const minDP = Math.ceil(total * 0.3);
+  if(G("grandTotal")) G("grandTotal").textContent = "Rp "+fRp(total);
+  if(G("opt_full_amt")) G("opt_full_amt").textContent = "Rp "+fRp(total);
+  if(G("opt_dp_amt")) G("opt_dp_amt").textContent = "Min Rp "+fRp(minDP);
+  if(G("f_dp")) G("f_dp").placeholder = "Minimal DP: Rp "+fRp(minDP);
+  updatePaySummary();
+}
+
+// ── Pilih jenis pembayaran ──
+function selectPayment(type){
+  payType = type;
+  ["full","dp"].forEach(t=>{
+    const el = G("opt_"+t); if(!el) return;
+    el.classList.toggle("selected", t===type);
+    const inp = el.querySelector("input"); if(inp) inp.checked = (t===type);
+  });
+  const dpWrap = G("dp_input_wrap");
+  if(dpWrap) dpWrap.style.display = (type==="dp") ? "block" : "none";
+  updatePaySummary();
+}
+
+function updatePaySummary(){
+  const total = getItems().reduce((s,it)=>s+(parseInt(it.subtotal)||0), 0);
+  const tinv = total;
+  const minDP = Math.ceil(tinv * 0.3);
+  let paid = 0, sisa = tinv, status = "Pending";
+
+  if(G("opt_full_amt")) G("opt_full_amt").textContent = "Rp "+fRp(tinv);
+  if(G("opt_dp_amt")) G("opt_dp_amt").textContent = "Min Rp "+fRp(minDP);
+  if(G("f_dp") && !G("f_dp").value) G("f_dp").placeholder = "Minimal DP: Rp "+fRp(minDP);
+
+  if(payType === "full"){
+    paid = tinv; sisa = 0; status = "Paid Off";
+    if(G("lbl_paid")) G("lbl_paid").textContent = "Dibayar (Full)";
+    if(G("sum_paid")) G("sum_paid").style.color = "#22c55e";
+  } else if(payType === "dp"){
+    const dpVal = cleanAngka(G("f_dp")?.value||0);
+    paid = dpVal; sisa = Math.max(0, tinv - dpVal);
+    status = dpVal > 0 ? "DP" : "Pending";
+    if(G("lbl_paid")) G("lbl_paid").textContent = "DP Terbayar";
+    if(G("sum_paid")) G("sum_paid").style.color = dpVal > 0 ? "#f59e0b" : "rgba(214,227,255,.4)";
+    if(G("opt_dp_amt")) G("opt_dp_amt").textContent = dpVal > 0 ? "Rp "+fRp(dpVal) : "Min Rp "+fRp(minDP);
+    if(G("dp_hint")){
+      if(dpVal > 0 && dpVal < minDP){ G("dp_hint").textContent = "DP kurang! Minimal: Rp "+fRp(minDP); G("dp_hint").style.color = "#ef4444"; }
+      else if(dpVal > 0){ G("dp_hint").textContent = "Sisa saat kegiatan: Rp "+fRp(sisa); G("dp_hint").style.color = "rgba(214,227,255,.55)"; }
+      else { G("dp_hint").textContent = "Minimal DP 30%: Rp "+fRp(minDP); G("dp_hint").style.color = "rgba(214,227,255,.55)"; }
+    }
+  }
+
+  if(G("sum_total")) G("sum_total").textContent = "Rp "+fRp(total);
+  if(G("sum_invoice")) G("sum_invoice").textContent = "Rp "+fRp(tinv);
+  if(G("sum_paid")) G("sum_paid").textContent = "Rp "+fRp(paid);
+  if(G("sum_sisa")){ G("sum_sisa").textContent = sisa===0 ? "Lunas ✓" : "Rp "+fRp(sisa); G("sum_sisa").style.color = sisa===0 ? "#22c55e" : paid>0 ? "#f59e0b" : "#94a3b8"; }
+
+  return {total, tinv, minDP, paid, sisa, status};
+}
+
+function cekDPMinimal(){
+  if(payType !== "dp") return true;
+  const pay = updatePaySummary();
+  const dpAmt = cleanAngka(G("f_dp")?.value||0);
+  if(dpAmt < pay.minDP){ toast("DP minimal 30%: Rp "+fRp(pay.minDP), "err", 2500); G("f_dp").focus(); return false; }
+  if(dpAmt >= pay.tinv){ toast("DP tidak boleh sama atau lebih besar dari total.", "err", 2500); G("f_dp").focus(); return false; }
+  return true;
+}
+
+// ════════════════════════════════════════════════
+// INVOICE HTML
+// ════════════════════════════════════════════════
+function buildInvHTML(inv){
+  const d = inv;
+  const items = inv.items || [];
+  const tot  = parseInt(d.total_harga  ?? 0);
+  const disc = parseInt(d.discount     ?? 0);
+  const tinv = parseInt(d.total_invoice ?? 0) || Math.max(0, tot - disc);
+  const statusBayar = d.status_bayar || (d.metode_bayar === "full" ? "Lunas" : "DP");
+  const isPaidOff = (statusBayar === "Lunas" || statusBayar === "Paid Off");
+  const dpRaw = parseInt(d.ammount_paid ?? d.nominal_bayar ?? d.dp ?? 0) || 0;
+  const dp   = isPaidOff ? 0 : dpRaw;
+  const finalPaid = isPaidOff ? tinv : 0;
+  const sisaRaw = parseInt(d.outstanding ?? d.sisa_bayar ?? 0);
+  const sisa = isPaidOff ? 0 : (!isNaN(sisaRaw) ? sisaRaw : Math.max(0, tinv - dpRaw));
+  const tgl  = new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
+  const sc   = isPaidOff ? "#16a34a" : "#d97706";
+  const fD   = n => (parseInt(n)||0).toLocaleString("id-ID");
+
+  const rows = items.map(it=>`
+    <tr>
+      <td style="padding:14px 0;font-size:13px;color:#333;border-bottom:1px solid #e0e0e0;font-family:Georgia,serif;line-height:1.45;vertical-align:top">${it.produk}</td>
+      <td style="padding:14px 16px;font-size:13px;text-align:right;color:#333;border-bottom:1px solid #e0e0e0;font-family:Georgia,serif;white-space:nowrap;vertical-align:top">${fD(it.harga)}</td>
+      <td style="padding:14px 16px;font-size:13px;text-align:center;color:#333;border-bottom:1px solid #e0e0e0;font-family:Georgia,serif;vertical-align:top">${it.qty}</td>
+      <td style="padding:14px 0 14px 16px;font-size:13px;text-align:right;color:#333;border-bottom:1px solid #e0e0e0;font-family:Georgia,serif;white-space:nowrap;vertical-align:top">${fD(it.subtotal)}</td>
+    </tr>`).join("");
+
+  return `<div id="inv-print-area" style="padding:52px 56px 60px;font-family:Georgia,serif;background:#fff;color:#333;font-size:13px;min-width:600px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:20px">
+        <img src="assets/logo.png" width="80" height="80" style="border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">
+        <div>
+          <div style="font-family:Arial,sans-serif;font-size:26px;font-weight:900;color:#000">Pangandaran.in</div>
+          <div style="font-family:Arial,sans-serif;font-size:12px;color:#888;margin-top:4px">CV. Pangandaran in Group</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:#555;line-height:2">https://pangandaran.in<br>pangandaraningroup@gmail.com<br>@pangandaran.in</div>
+        <div style="font-family:Georgia,serif;font-size:34px;font-weight:700;color:#000;margin-top:8px">Receipt</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #ccc;margin:18px 0 28px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:32px">
+      <div>
+        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:14px">Bill to</div>
+        <table style="border-collapse:collapse">
+          <tr><td style="color:#777;padding:5px 0;width:80px;font-family:Georgia,serif;font-size:13px">Name</td><td style="color:#777;padding:5px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.nama||"—"}</td></tr>
+          <tr><td style="color:#777;padding:5px 0;font-family:Georgia,serif;font-size:13px">WhatsApp</td><td style="color:#777;padding:5px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.whatsapp||"—"}</td></tr>
+          <tr><td style="color:#777;padding:5px 0;font-family:Georgia,serif;font-size:13px">Media Sosial</td><td style="color:#777;padding:5px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.medsos||"—"}</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:14px">Payment Details</div>
+        <table style="border-collapse:collapse">
+          <tr><td style="color:#777;padding:4px 0;width:112px;font-family:Georgia,serif;font-size:13px">No. Order</td><td style="color:#777;padding:4px 8px">:</td><td style="color:#0059b3;font-family:Georgia,serif;font-size:13px;font-weight:700">${d.no_invoice||"—"}</td></tr>
+          <tr><td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Status</td><td style="color:#777;padding:4px 8px">:</td><td style="font-family:Georgia,serif;font-size:13px;font-weight:700;color:${sc}">${statusBayar||"Pending"}</td></tr>
+          <tr><td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Booking Date</td><td style="color:#777;padding:4px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${tgl}</td></tr>
+          <tr><td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Trip Date</td><td style="color:#777;padding:4px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.tanggal||"—"}</td></tr>
+          <tr><td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Trip Time</td><td style="color:#777;padding:4px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.waktu_kegiatan||d.waktu||"—"}</td></tr>
+          <tr><td style="color:#777;padding:4px 0;font-family:Georgia,serif;font-size:13px">Payment Method</td><td style="color:#777;padding:4px 8px">:</td><td style="color:#333;font-family:Georgia,serif;font-size:13px">${d.metode_bayar === "dp" ? "DP" : "Full Payment"}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#000;margin-bottom:12px">Order Details</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-top:1.5px solid #222;border-bottom:1.5px solid #222">
+        <th style="padding:12px 0;font-size:13px;font-weight:700;text-align:left;color:#000;font-family:Georgia,serif">Product</th>
+        <th style="padding:12px 16px;font-size:13px;font-weight:700;text-align:right;color:#000;font-family:Georgia,serif">Price<br>(Rp)</th>
+        <th style="padding:12px 16px;font-size:13px;font-weight:700;text-align:center;color:#000;font-family:Georgia,serif">QTY</th>
+        <th style="padding:12px 0 12px 16px;font-size:13px;font-weight:700;text-align:right;color:#000;font-family:Georgia,serif">Total<br>(Rp)</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="width:54%;padding:0"></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Total</td><td style="padding:10px 0;font-weight:700;font-size:13px;text-align:right;white-space:nowrap;color:#000;font-family:Georgia,serif">${fD(tot)}</td></tr>
+      <tr><td></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Discount (Rp.)</td><td style="padding:10px 0;font-weight:700;font-size:13px;text-align:right;color:#000;font-family:Georgia,serif">${fD(disc)}</td></tr>
+      <tr style="border-top:1.5px solid #222"><td></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Total Invoice Amount</td><td style="padding:10px 0;font-weight:700;font-size:13px;text-align:right;white-space:nowrap;color:#000;font-family:Georgia,serif">${fD(tinv)}</td></tr>
+      <tr><td></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Ammount Paid (DP)</td><td style="padding:10px 0;font-weight:700;font-size:13px;text-align:right;color:#000;font-family:Georgia,serif">${(!isPaidOff&&dp>0)?fD(dp):"—"}</td></tr>
+      <tr><td></td><td style="padding:10px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Amount Paid (Final)</td><td style="padding:10px 0;font-weight:700;font-size:13px;text-align:right;color:#000;font-family:Georgia,serif">${isPaidOff?fD(finalPaid):"—"}</td></tr>
+      <tr style="border-top:1.5px solid #222;border-bottom:1.5px solid #222"><td></td><td style="padding:11px 0;font-weight:700;font-size:13px;color:#000;font-family:Georgia,serif">Outstanding Balance</td><td style="padding:11px 0;font-weight:900;font-size:16px;text-align:right;white-space:nowrap;color:#000;font-family:Georgia,serif">${fD(sisa)}</td></tr>
+    </table>
+    <div style="height:80px"></div>
+    <div style="text-align:right">
+      <div style="font-weight:700;font-size:14px;color:#000;font-family:Georgia,serif;margin-bottom:8px">Best Regards</div>
+      <div style="font-weight:900;font-size:17px;color:#000;font-family:Arial,sans-serif">Pangandaran.in</div>
+    </div>
+  </div>`;
+}
+
+function showInvoice(inv){
+  _inv = inv;
+  G("invContent").innerHTML = buildInvHTML(inv);
+  G("overlay").classList.add("show");
+  G("overlay").scrollTop = 0;
+}
+
+// ════════════════════════════════════════════════
+// PDF
+// ════════════════════════════════════════════════
+async function genPDFBlob(inv){
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:"mm",format:"a4"});
+  const items = inv.items||[];
+  const tinv  = parseInt(inv.total_invoice)||0;
+  const total = parseInt(inv.total_harga)||tinv;
+  const disc  = parseInt(inv.discount)||0;
+  const statusBayar = inv.status_bayar || (inv.metode_bayar === "full" ? "Lunas" : "DP");
+  const isPaidOff = (statusBayar === "Lunas" || statusBayar === "Paid Off");
+  const paidRaw = parseInt(inv.ammount_paid ?? inv.nominal_bayar ?? inv.dp ?? 0) || 0;
+  const paid  = isPaidOff ? tinv : paidRaw;
+  const sisaRaw = parseInt(inv.outstanding ?? inv.sisa_bayar ?? 0);
+  const sisa  = isPaidOff ? 0 : (!isNaN(sisaRaw) ? sisaRaw : Math.max(0,tinv-paidRaw));
+  const tgl   = fDate();
+  const sc    = isPaidOff?[22,163,74]:[217,119,6];
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(17); doc.setTextColor(0);
+  doc.text("Pangandaran.in",14,18);
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(130);
+  doc.text("CV. Pangandaran in Group",14,24);
+  doc.setFontSize(8); doc.setTextColor(100);
+  doc.text("https://pangandaran.in",196,12,{align:"right"});
+  doc.text("pangandaraningroup@gmail.com",196,17,{align:"right"});
+  doc.text("@pangandaran.in",196,22,{align:"right"});
+  doc.setFont("helvetica","bold"); doc.setFontSize(22); doc.setTextColor(0);
+  doc.text("Receipt",196,35,{align:"right"});
+  doc.setDrawColor(190); doc.setLineWidth(0.4); doc.line(14,44,196,44);
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(0);
+  doc.text("Bill to",14,54);
+  doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+  [["Name",inv.nama||"—"],["WhatsApp",inv.whatsapp||"—"],["Media Sosial",inv.medsos||"—"]].forEach(([k,v],i)=>{
+    doc.setTextColor(130); doc.text(k+" :",14,63+i*8);
+    doc.setTextColor(60); doc.setFont("helvetica","bold"); doc.text(String(v),48,63+i*8);
+    doc.setFont("helvetica","normal");
+  });
+  doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(0);
+  doc.text("Payment Details",110,54);
+  doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+  [["No. Order",inv.no_invoice||"—"],["Status",statusBayar||"Pending"],["Booking Date",tgl],["Trip Date",inv.tanggal||"—"],["Trip Time",inv.waktu_kegiatan||inv.waktu||"—"],["Payment Method",inv.metode_bayar === "dp" ? "DP" : "Full Payment"]].forEach(([k,v],i)=>{
+    doc.setTextColor(130); doc.text(k,110,63+i*8);
+    if(k==="Status") doc.setTextColor(...sc); else doc.setTextColor(60);
+    doc.setFont("helvetica","bold"); doc.text(": "+String(v),150,63+i*8);
+    doc.setFont("helvetica","normal");
+  });
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(0);
+  doc.text("Order Details",14,120);
+  doc.autoTable({
+    startY:125,
+    head:[["Product","Price\n(Rp)","QTY","Total(Rp)"]],
+    body:items.map(it=>[it.produk,fRp(it.harga),String(it.qty),fRp(it.subtotal)]),
+    theme:"plain",
+    headStyles:{fillColor:[255,255,255],textColor:[0],fontSize:10,fontStyle:"bold",lineWidth:{top:0.6,bottom:0.6},lineColor:[40]},
+    columnStyles:{1:{halign:"right"},2:{halign:"center"},3:{halign:"right"}},
+    bodyStyles:{fontSize:9.5,textColor:[60],lineWidth:{bottom:0.3},lineColor:[200]},
+    margin:{left:14,right:14},
+  });
+
+  let y = doc.lastAutoTable.finalY + 8;
+  [
+    ["Total",fRp(total),false,false],
+    ["Discount (Rp.)",fRp(disc),false,false],
+    ["Total Invoice Amount",fRp(tinv),true,false],
+    ["Ammount Paid (DP)",(!isPaidOff&&paidRaw>0)?fRp(paidRaw):"—",false,false],
+    ["Amount Paid (Final)",isPaidOff?fRp(tinv):"—",false,false],
+    ["Outstanding Balance",fRp(sisa),false,true],
+  ].forEach(([k,v,topLine,bottomLine])=>{
+    if(topLine){ doc.setDrawColor(40); doc.setLineWidth(0.6); doc.line(116,y-4,196,y-4); }
+    doc.setFont("helvetica","bold"); doc.setFontSize(bottomLine?11:9.5);
+    if(bottomLine&&sisa===0) doc.setTextColor(22,163,74); else doc.setTextColor(0);
+    doc.text(k,116,y); doc.text(v,196,y,{align:"right"}); y+=9;
+    if(bottomLine){ doc.setDrawColor(40); doc.setLineWidth(0.6); doc.line(116,y-4,196,y-4); }
+  });
+  y+=18;
+  doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(0);
+  doc.text("Best Regards",196,y+12,{align:"right"});
+  doc.setFontSize(14); doc.text("Pangandaran.in",196,y+23,{align:"right"});
+  return doc.output("blob");
+}
+
+async function doPDF(){
+  if(!_inv) return;
+  const btn = G("btnPDF"); btn.innerHTML = "⏳ Membuat PDF..."; btn.disabled = true;
+  try{
+    const blob = await genPDFBlob(_inv);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "Receipt_"+_inv.no_invoice+".pdf";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast("PDF berhasil didownload!","ok");
+  }catch(e){ toast("Gagal PDF: "+e.message,"err"); }
+  finally{ btn.innerHTML = "Download PDF"; btn.disabled = false; }
+}
+
+async function doWA(){
+  if(!_inv) return;
+
+  const btn = G("btnWA");
+  const oldText = btn ? btn.innerHTML : "";
+
+  if(btn){
+    btn.innerHTML = "⏳ Membuat gambar invoice...";
+    btn.disabled = true;
+  }
+
+  try{
+    const area = document.getElementById("inv-print-area");
+
+    if(!area){
+      toast("Invoice tidak ditemukan.", "err");
+      return;
+    }
+
+    toast("Invoice sedang dibuat menjadi gambar...", "ok", 2500);
+
+    const canvas = await html2canvas(area, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    });
+
+    const link = document.createElement("a");
+    link.download = "Invoice_" + (_inv.no_invoice || "Pangandaran") + ".png";
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    const waRaw = WA_ADMIN.replace(/[^0-9]/g, "");
+    const waNum = waRaw.startsWith("0")
+      ? "62" + waRaw.slice(1)
+      : waRaw.startsWith("62")
+        ? waRaw
+        : "62" + waRaw;
+
+    const items = _inv.items || [];
+    const tinv = parseInt(_inv.total_invoice) || 0;
+    const isPaidOffWA = (_inv.status_bayar === "Lunas" || _inv.status_bayar === "Paid Off" || _inv.metode_bayar === "full");
+    const paidRawWA = parseInt(_inv.ammount_paid ?? _inv.nominal_bayar ?? _inv.dp ?? 0) || 0;
+    const paid = isPaidOffWA ? tinv : paidRawWA;
+    const sisaRawWA = parseInt(_inv.outstanding ?? _inv.sisa_bayar ?? 0);
+    const sisa = isPaidOffWA ? 0 : (!isNaN(sisaRawWA) ? sisaRawWA : Math.max(0, tinv - paidRawWA));
+
+    const li = items.map(it =>
+      "- " + it.produk + " x" + it.qty + " = Rp " + fRp(it.subtotal)
+    ).join("\n");
+
+    const msg =
+      "*INVOICE — Pangandaran.in*\n" +
+      "No. Invoice : " + (_inv.no_invoice || "-") + "\n" +
+      "Nama        : " + (_inv.nama || "-") + "\n" +
+      "WhatsApp    : " + (_inv.whatsapp || "-") + "\n" +
+      "Media Sosial: " + (_inv.medsos || "-") + "\n" +
+      "Tanggal     : " + (_inv.tanggal || "-") + "\n" +
+      "Waktu       : " + (_inv.waktu_kegiatan || _inv.waktu || "-") + "\n" +
+      "————————————————\n" +
+      li + "\n" +
+      "————————————————\n" +
+      "Status      : " + (_inv.status_bayar || "-") + "\n" +
+      "Total       : Rp " + fRp(tinv) + "\n" +
+      "Terbayar    : Rp " + fRp(paid) + "\n" +
+      "Sisa        : Rp " + fRp(sisa);
+
+    setTimeout(function(){
+      window.open(
+        "https://web.whatsapp.com/send?phone=" + waNum + "&text=" + encodeURIComponent(msg),
+        "_blank"
+      );
+    }, 700);
+
+    toast("Gambar invoice terdownload dan WhatsApp dibuka.", "ok", 3000);
+
+  }catch(e){
+    toast("Gagal membuat gambar invoice: " + e.message, "err");
+  }finally{
+    if(btn){
+      btn.innerHTML = oldText || "Kirim via WA";
+      btn.disabled = false;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+// KONFIRMASI SUDAH BAYAR → check_payment_status.php → tampilkan invoice
+// ════════════════════════════════════════════════
+async function konfirmasiSudahBayar(noInvoice){
+  const btn = G("qrisPaidBtn");
+  if(btn){ btn.disabled = true; btn.textContent = "⏳ Mengecek status..."; }
+  G("paymentStatusText").textContent = "Mengecek status pembayaran...";
+
+  try{
+    // Panggil payment_callback.php untuk update status paid
+    const cbRes = await fetch("payment_callback.php?secret=GANTI_SECRET_PANGANDARAN_2026&no_invoice="+encodeURIComponent(noInvoice)+"&payment_status=paid");
+    const cbData = await cbRes.json();
+
+    if(cbData.status !== "ok"){
+      G("paymentStatusText").textContent = "Gagal konfirmasi. Silakan coba lagi.";
+      if(btn){ btn.disabled = false; btn.textContent = "Saya Sudah Bayar"; }
+      return;
+    }
+
+    // Ambil invoice dari check_payment_status.php
+    const cekRes = await fetch("check_payment_status.php?no_invoice="+encodeURIComponent(noInvoice));
+    const cekData = await cekRes.json();
+
+    if(cekData.payment_status === "paid" && cekData.invoice){
+      G("paymentStatusText").textContent = "✓ Pembayaran berhasil!";
+      setTimeout(()=>{
+        G("qrisOverlay").style.display = "none";
+        showInvoice(cekData.invoice);
+        toast("Invoice berhasil dibuat & dikirim ke admin.", "ok", 3000);
+      }, 600);
+    } else {
+      G("paymentStatusText").textContent = "Pembayaran belum terkonfirmasi. Silakan tunggu.";
+      if(btn){ btn.disabled = false; btn.textContent = "Saya Sudah Bayar"; }
+    }
+  }catch(e){
+    G("paymentStatusText").textContent = "Gagal terhubung. Silakan coba lagi.";
+    if(btn){ btn.disabled = false; btn.textContent = "Saya Sudah Bayar"; }
+    toast("Gagal cek status: "+e.message, "err");
+  }
+}
+
+// ════════════════════════════════════════════════
+// SUBMIT BOOKING → create_payment.php → tampilkan QRIS
+// ════════════════════════════════════════════════
+async function submitBooking(){
+  // ── Ambil nilai form ──
+  const nama   = G("f_nama")?.value?.trim() || "";
+  const wa     = G("f_wa")?.value?.trim() || "";
+  const medsos = G("f_medsos")?.value?.trim() || "";
+  const tgl    = G("f_tgl")?.value?.trim() || "";
+
+  // Rapikan waktu dulu sebelum ambil nilai
+  rapikanWaktuBooking(G("f_waktu"));
+  const waktu = G("f_waktu")?.value?.trim() || "";
+
+  // ── Validasi ──
+  if(!nama){ toast("Nama lengkap wajib diisi.","err"); G("f_nama").focus(); return; }
+  if(!wa){ toast("Nomor WhatsApp wajib diisi.","err"); G("f_wa").focus(); return; }
+
+  const waClean = wa.replace(/[^0-9]/g, "");
+  if(/[^0-9+\-\s]/.test(wa)){
+    toast("WhatsApp hanya boleh angka.","err",2500);
+    G("f_wa").focus();
+    return;
+  }
+  if(waClean.length < 10 || waClean.length > 15){
+    toast("Nomor WhatsApp tidak valid. Contoh: +6281234567890","err",2500);
+    G("f_wa").focus();
+    return;
+  }
+  if(!wa.startsWith("+62") && !wa.startsWith("62") && !wa.startsWith("08")){
+    toast("Gunakan format WhatsApp Indonesia, contoh: +6281234567890","err",2500);
+    G("f_wa").focus();
+    return;
+  }
+
+  if(!tgl){ toast("Tanggal wajib diisi.","err"); G("f_tgl").focus(); return; }
+  if(!waktu){ toast("Perkiraan waktu wajib diisi.","err"); G("f_waktu").focus(); return; }
+  if(!/^([01][0-9]|2[0-3])\.[0-5][0-9]$/.test(waktu)){ toast("Format waktu salah. Contoh: 09.00","err"); G("f_waktu").focus(); return; }
+
+  const items = getItems();
+  if(!items.length){ toast("Pilih minimal 1 paket.","err"); return; }
+  const emptyItems = [...document.querySelectorAll("#itemsWrap .icard select")].filter(s=>!s.value);
+  if(emptyItems.length){ toast("Ada paket belum dipilih.","err"); emptyItems[0].focus(); return; }
+  if(!cekDPMinimal()) return;
+
+  // ── Hitung nilai ──
+  const {total, tinv, paid, sisa, status} = updatePaySummary();
+  const nominalBayar   = payType === "full" ? tinv : paid;
+  const dpUntukDB      = payType === "full" ? tinv : paid;
+  const sisaBayar      = payType === "full" ? 0 : sisa;
+  const namaPaketGabung = items.map(it=>it.produk).join(" | ");
+  const pesertaTotal   = items.reduce((sum,it)=>sum+(parseInt(it.qty)||0), 0);
+  const hargaSatuanAwal = items[0] ? parseInt(items[0].harga)||0 : 0;
+  const email = "noemail@pangandaran.in";
+
+  // ── Nonaktifkan tombol ──
+  const btn = G("btnSubmit");
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Membuat QRIS...";
+  toast("Membuat pembayaran QRIS...");
+
+  try{
+    const bodyParams = [
+      "nama="+encodeURIComponent(nama),
+      "email="+encodeURIComponent(email),
+      "whatsapp="+encodeURIComponent(wa),
+      "medsos="+encodeURIComponent(medsos),
+      "paket="+encodeURIComponent(namaPaketGabung),
+      "tanggal="+encodeURIComponent(tgl),
+      "waktu="+encodeURIComponent(waktu),
+      "waktu_kegiatan="+encodeURIComponent(waktu),
+      "peserta="+encodeURIComponent(pesertaTotal||1),
+      "sumber=booking",
+      "harga_satuan="+encodeURIComponent(hargaSatuanAwal),
+      "metode_bayar="+encodeURIComponent(payType),
+      "total_harga="+encodeURIComponent(total),
+      "discount=0",
+      "total_invoice="+encodeURIComponent(tinv),
+      "dp="+encodeURIComponent(dpUntukDB),
+      "sisa_bayar="+encodeURIComponent(sisaBayar),
+      "nominal_bayar="+encodeURIComponent(nominalBayar),
+      "payment_status=pending",
+      "status_bayar="+encodeURIComponent(payType==="full"?"Lunas":"DP"),
+      "items="+encodeURIComponent(JSON.stringify(items)),
+    ].join("&");
+
+    const res = await fetch("create_payment.php",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: bodyParams
+    });
+
+    let data;
+    try{ data = await res.json(); }
+    catch(e){
+      toast("Server error. Periksa create_payment.php","err");
+      return;
+    }
+
+    if(data.status === "ok" || data.ok === true){
+      const noInvoice = data.no_invoice || data.invoice || data.order_id;
+
+      // Tampilkan QRIS modal
+      G("qrisAmount").textContent = "Rp "+fRp(data.nominal_bayar || nominalBayar);
+      G("paymentStatusText").textContent = "Menunggu pembayaran...";
+      G("qrisOverlay").style.display = "flex";
+
+      // Ganti QR image jika server return URL
+      const qrisImg = document.querySelector("#qrisOverlay img");
+      if(qrisImg && (data.qris_url||data.qr_url||data.qris_image)){
+        qrisImg.src = data.qris_url || data.qr_url || data.qris_image;
+      }
+
+      // Wire tombol "Saya Sudah Bayar"
+      const paidBtn = G("qrisPaidBtn");
+      if(paidBtn) paidBtn.onclick = ()=> konfirmasiSudahBayar(noInvoice);
+
+      toast("QRIS berhasil dibuat!","ok",2000);
+    } else {
+      toast(data.message || data.msg || "Gagal membuat QRIS. Periksa server.","err");
+    }
+
+  }catch(e){
+    toast("Gagal terhubung ke server.","err");
+    console.error("submitBooking error:", e);
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg> Kirim Pemesanan &amp; Buat Invoice`;
+  }
+}
+
+// ── Init ──
+G("btnPDF").addEventListener("click", doPDF);
+G("btnWA").addEventListener("click", doWA);
+addItem();
 </script>
 </body>
 </html>
