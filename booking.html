@@ -205,14 +205,41 @@ label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5
     </button>
   </div>
   <div id="itemsWrap"></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(162,231,255,.08);margin-top:4px">
+
+  <!-- KHUSUS CUSTOM TRIP: muncul otomatis saat paket Custom Trip dipilih -->
+  <div id="customTripFields" style="display:none;margin-top:16px;background:rgba(0,14,37,.55);border:1px solid rgba(162,231,255,.12);border-radius:14px;padding:16px">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+      <span style="width:8px;height:8px;border-radius:50%;background:#a2e7ff;display:inline-block"></span>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;color:#a2e7ff;letter-spacing:.4px">Pengajuan Custom Trip</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:14px">
+      <div>
+        <label>Kebutuhan Perjalanan <span style="color:rgba(255,120,120,.7)">*</span></label>
+        <textarea class="inp" id="f_custom_kebutuhan" rows="4"
+          placeholder="Contoh: Custom trip untuk 2 hari 1 malam, 30 peserta, butuh hotel, transportasi, dokumentasi, dan itinerary wisata."
+          style="resize:none;min-height:96px"></textarea>
+      </div>
+
+      <div>
+        <label>Perkiraan Budget <span style="color:rgba(255,120,120,.7)">*</span></label>
+        <input class="inp" id="f_custom_budget" type="text" inputmode="numeric"
+          placeholder="Contoh: 5.000.000"
+          oninput="formatBudgetBooking(this)">
+        <div style="font-size:11px;margin-top:6px;color:rgba(162,231,255,.38)">
+          Budget ini hanya perkiraan. Harga final akan dikonfirmasi admin.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="grandTotalWrap" style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(162,231,255,.08);margin-top:4px">
     <span style="color:rgba(214,227,255,.45);font-size:14px">Total</span>
     <span id="grandTotal" style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#a2e7ff;text-shadow:0 0 14px rgba(162,231,255,.35)">Rp 0</span>
   </div>
 </div>
 
 <!-- STEP 4: JENIS PEMBAYARAN -->
-<div class="card fi">
+<div id="paymentSection" class="card fi">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
     <div class="snum">4</div>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#fff">Jenis Pembayaran</div>
@@ -269,7 +296,7 @@ label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5
   <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
   Kirim Pemesanan &amp; Buat Invoice
 </button>
-<p style="text-align:center;font-size:12px;color:rgba(214,227,255,.28)">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai.</p>
+<p id="bookingHintText" style="text-align:center;font-size:12px;color:rgba(214,227,255,.28)">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai.</p>
 </main>
 <script>
 const WA_ADMIN = "6287793827592";
@@ -313,6 +340,144 @@ const fDate = () => new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"
 
 function cleanAngka(v){
   return parseInt((v||"").toString().replace(/[^0-9]/g,"")) || 0;
+}
+
+function formatBudgetBooking(input){
+  const angka = cleanAngka(input.value);
+  input.value = angka ? fRp(angka) : "";
+}
+
+function isCustomTripSelected(){
+  return getItems().some(it => (it.produk || "").toLowerCase().includes("custom trip"));
+}
+
+function applyBookingMode(){
+  const isCustom = isCustomTripSelected();
+  const customFields = G("customTripFields");
+  const paymentSection = G("paymentSection");
+  const grandTotalWrap = G("grandTotalWrap");
+  const btn = G("btnSubmit");
+  const hint = G("bookingHintText");
+
+  if(customFields) customFields.style.display = isCustom ? "block" : "none";
+  if(paymentSection) paymentSection.style.display = isCustom ? "none" : "block";
+  if(grandTotalWrap) grandTotalWrap.style.display = isCustom ? "none" : "flex";
+
+  if(btn){
+    if(isCustom){
+      btn.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg> Ajukan ke Admin`;
+    }else{
+      btn.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg> Kirim Pemesanan &amp; Buat Invoice`;
+    }
+  }
+
+  if(hint){
+    hint.textContent = isCustom
+      ? "Custom Trip tidak memakai QRIS otomatis. Pengajuan akan masuk ke admin untuk dikonfirmasi."
+      : "Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai.";
+  }
+}
+
+async function submitCustomTripBooking(nama, wa, medsos, tgl, waktu, items){
+  const kebutuhan = G("f_custom_kebutuhan")?.value?.trim() || "";
+  const budgetText = G("f_custom_budget")?.value?.trim() || "";
+  const budget = cleanAngka(budgetText);
+  const pesertaTotal = items.reduce((sum,it)=>sum+(parseInt(it.qty)||0), 0) || 1;
+
+  if(!kebutuhan){
+    toast("Kebutuhan perjalanan wajib diisi.","err");
+    G("f_custom_kebutuhan").focus();
+    return;
+  }
+
+  if(!budget){
+    toast("Perkiraan budget wajib diisi.","err");
+    G("f_custom_budget").focus();
+    return;
+  }
+
+  const btn = G("btnSubmit");
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Mengirim pengajuan...";
+  toast("Mengirim pengajuan Custom Trip ke admin...");
+
+  const itemCustom = {
+    produk: "Custom Trip - Kebutuhan: " + kebutuhan + " | Budget: Rp " + fRp(budget),
+    harga: budget,
+    qty: 1,
+    subtotal: budget
+  };
+
+  const pesanWA =
+`Halo Admin Pangandaran.in, saya ingin mengajukan Custom Trip.
+
+Nama: ${nama}
+WhatsApp: ${wa}
+Media Sosial: ${medsos || "-"}
+Tanggal Trip: ${tgl}
+Perkiraan Waktu: ${waktu}
+Jumlah Peserta: ${pesertaTotal} orang
+
+Kebutuhan Perjalanan:
+${kebutuhan}
+
+Perkiraan Budget:
+Rp ${fRp(budget)}
+
+Mohon dibantu konfirmasi harga final dan itinerary.`;
+
+  try{
+    const bodyParams = [
+      "nama="+encodeURIComponent(nama),
+      "email="+encodeURIComponent("noemail@pangandaran.in"),
+      "whatsapp="+encodeURIComponent(wa),
+      "medsos="+encodeURIComponent(medsos),
+      "paket="+encodeURIComponent(itemCustom.produk),
+      "tanggal="+encodeURIComponent(tgl),
+      "waktu="+encodeURIComponent(waktu),
+      "waktu_kegiatan="+encodeURIComponent(waktu),
+      "peserta="+encodeURIComponent(pesertaTotal),
+      "sumber=booking",
+      "harga_satuan="+encodeURIComponent(budget),
+      "metode_bayar="+encodeURIComponent("full"),
+      "total_harga="+encodeURIComponent(budget),
+      "discount=0",
+      "total_invoice="+encodeURIComponent(budget),
+      "dp=0",
+      "sisa_bayar="+encodeURIComponent(budget),
+      "nominal_bayar=0",
+      "payment_status=pending",
+      "status_bayar="+encodeURIComponent("Menunggu Konfirmasi"),
+      "items="+encodeURIComponent(JSON.stringify([itemCustom])),
+    ].join("&");
+
+    const res = await fetch("create_payment.php",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: bodyParams
+    });
+
+    let data;
+    try{ data = await res.json(); }
+    catch(e){
+      toast("Server error. Periksa create_payment.php","err");
+      return;
+    }
+
+    if(data.status === "ok" || data.ok === true){
+      toast("Pengajuan Custom Trip berhasil masuk ke admin.","ok",3000);
+      const waNum = WA_ADMIN.replace(/[^0-9]/g, "");
+      window.open("https://wa.me/" + waNum + "?text=" + encodeURIComponent(pesanWA), "_blank");
+    }else{
+      toast(data.message || data.msg || "Gagal mengirim Custom Trip ke admin.","err");
+    }
+  }catch(e){
+    toast("Gagal terhubung ke server.","err");
+    console.error("submitCustomTripBooking error:", e);
+  }finally{
+    btn.disabled = false;
+    applyBookingMode();
+  }
 }
 
 // ── Format DP input (tampilkan titik ribuan) ──
@@ -478,12 +643,13 @@ function addItem(){
 function rmItem(id){
   const el = G(id); if(!el) return;
   el.style.cssText = "opacity:0;transform:translateY(-5px);transition:all .18s";
-  setTimeout(()=>{ el.remove(); updTotal(); }, 200);
+  setTimeout(()=>{ el.remove(); updTotal(); applyBookingMode(); }, 200);
 }
 function onSel(sel, id){
   const h = parseInt(sel.options[sel.selectedIndex].getAttribute("data-h")||0);
   G(id+"_h").textContent = h > 0 ? "Rp "+fRp(h) : "Nego";
   recalc(id);
+  applyBookingMode();
 }
 function recalc(id){
   const sel = document.querySelector("#"+id+" select");
@@ -511,6 +677,7 @@ function updTotal(){
   if(G("opt_dp_amt")) G("opt_dp_amt").textContent = "Min Rp "+fRp(minDP);
   if(G("f_dp")) G("f_dp").placeholder = "Minimal DP: Rp "+fRp(minDP);
   updatePaySummary();
+  applyBookingMode();
 }
 
 // ── Pilih jenis pembayaran ──
@@ -938,6 +1105,14 @@ async function submitBooking(){
   if(!items.length){ toast("Pilih minimal 1 paket.","err"); return; }
   const emptyItems = [...document.querySelectorAll("#itemsWrap .icard select")].filter(s=>!s.value);
   if(emptyItems.length){ toast("Ada paket belum dipilih.","err"); emptyItems[0].focus(); return; }
+
+  // Jika customer memilih Custom Trip, gunakan alur pengajuan ke admin.
+  // Tidak menampilkan QRIS, tidak membuat invoice otomatis di sisi customer.
+  if(isCustomTripSelected()){
+    await submitCustomTripBooking(nama, wa, medsos, tgl, waktu, items);
+    return;
+  }
+
   if(!cekDPMinimal()) return;
 
   // ── Hitung nilai ──
@@ -1030,6 +1205,7 @@ async function submitBooking(){
 G("btnPDF").addEventListener("click", doPDF);
 G("btnWA").addEventListener("click", doWA);
 addItem();
+applyBookingMode();
 </script>
 </body>
 </html>

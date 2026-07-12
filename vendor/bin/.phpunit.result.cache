@@ -1,0 +1,1 @@
+{"version":1,"defects":[],"times":{"PaymentTest::testFullPayment":0.009,"PaymentTest::testDownPayment":0,"PaymentTest::testStatusFullPayment":0,"PaymentTest::testStatusDownPayment":0}}

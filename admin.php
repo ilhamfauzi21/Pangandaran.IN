@@ -84,6 +84,169 @@ if($cnt == 0){
 }
 
 // ============================================================
+// AUTO SYNC PAKET WEBSITE KE ITEM BOOKING
+// ============================================================
+// Tujuan:
+// Paket yang dibuat di admin_paket.php tersimpan di tabel `paket`.
+// Kelola Item Booking membaca tabel `paket_item`.
+// Bagian ini menyamakan isi `paket` ke `paket_item` setiap admin.php dibuka,
+// tanpa mengubah struktur tampilan admin.
+
+$cekPaketIdCol = $db->query("SHOW COLUMNS FROM paket_item LIKE 'paket_id'");
+if($cekPaketIdCol && $cekPaketIdCol->num_rows == 0){
+    $db->query("ALTER TABLE paket_item ADD COLUMN paket_id VARCHAR(50) NULL AFTER id");
+}
+
+$cekPaketTable = $db->query("SHOW TABLES LIKE 'paket'");
+if($cekPaketTable && $cekPaketTable->num_rows > 0){
+
+    // Pastikan kolom yang dibutuhkan dari tabel paket tersedia.
+    $cekUnitPaket = $db->query("SHOW COLUMNS FROM paket LIKE 'unit'");
+    if($cekUnitPaket && $cekUnitPaket->num_rows == 0){
+        $db->query("ALTER TABLE paket ADD COLUMN unit VARCHAR(30) DEFAULT '/ orang'");
+    }
+
+    $cekHargaPaket = $db->query("SHOW COLUMNS FROM paket LIKE 'harga'");
+    if($cekHargaPaket && $cekHargaPaket->num_rows == 0){
+        $db->query("ALTER TABLE paket ADD COLUMN harga INT DEFAULT 0");
+    }
+
+    $cekKategoriPaket = $db->query("SHOW COLUMNS FROM paket LIKE 'kategori'");
+    if($cekKategoriPaket && $cekKategoriPaket->num_rows == 0){
+        $db->query("ALTER TABLE paket ADD COLUMN kategori VARCHAR(50) DEFAULT 'sea'");
+    }
+
+    // Bersihkan beberapa item default lama yang tidak lagi mengikuti nama paket website.
+    // Ini hanya menghapus item lama yang belum terhubung ke paket_id.
+    $db->query("
+        DELETE FROM paket_item
+        WHERE paket_id IS NULL
+        AND LOWER(TRIM(nama)) IN (
+            'jetski seadoo 15 menit',
+            'jetski + drone aerial premium',
+            'jetski + fpv drone exclusive',
+            'water sport 3 wahana',
+            'dokumentasi drone aerial',
+            'dokumentasi fpv drone',
+            'ilham fauzi',
+            'qwww'
+        )
+    ");
+
+    $paketRows = $db->query("
+        SELECT id, nama, harga, unit, kategori
+        FROM paket
+        WHERE nama IS NOT NULL
+        AND TRIM(nama) <> ''
+    ");
+
+    if($paketRows){
+        while($p = $paketRows->fetch_assoc()){
+            $paket_id = trim($p['id'] ?? '');
+            $nama     = trim($p['nama'] ?? '');
+            $harga    = intval($p['harga'] ?? 0);
+            $satuan   = trim(str_replace('/', '', $p['unit'] ?? 'orang'));
+            $kategori = trim($p['kategori'] ?? 'sea');
+
+            if($paket_id === '' || $nama === '') continue;
+            if($satuan === '') $satuan = 'orang';
+            if($kategori === '') $kategori = 'sea';
+
+            // 1. Kalau item sudah terhubung dengan paket_id, update saja.
+            $cek = $db->prepare("SELECT id FROM paket_item WHERE paket_id = ? LIMIT 1");
+            $cek->bind_param("s", $paket_id);
+            $cek->execute();
+            $ada = $cek->get_result();
+
+            if($ada && $ada->num_rows > 0){
+                $row = $ada->fetch_assoc();
+                $item_id = intval($row['id']);
+
+                $up = $db->prepare("
+                    UPDATE paket_item
+                    SET nama = ?, harga = ?, satuan = ?, kategori = ?, aktif = 1, updated_at = NOW()
+                    WHERE id = ?
+                ");
+                $up->bind_param("sissi", $nama, $harga, $satuan, $kategori, $item_id);
+                $up->execute();
+                continue;
+            }
+
+            // 2. Kalau data lama sudah ada dengan nama yang sama, hubungkan ke paket_id.
+            $cekNama = $db->prepare("
+                SELECT id FROM paket_item
+                WHERE LOWER(TRIM(nama)) = LOWER(TRIM(?))
+                LIMIT 1
+            ");
+            $cekNama->bind_param("s", $nama);
+            $cekNama->execute();
+            $adaNama = $cekNama->get_result();
+
+            if($adaNama && $adaNama->num_rows > 0){
+                $rowNama = $adaNama->fetch_assoc();
+                $item_id = intval($rowNama['id']);
+
+                $up = $db->prepare("
+                    UPDATE paket_item
+                    SET paket_id = ?, nama = ?, harga = ?, satuan = ?, kategori = ?, aktif = 1, updated_at = NOW()
+                    WHERE id = ?
+                ");
+                $up->bind_param("ssissi", $paket_id, $nama, $harga, $satuan, $kategori, $item_id);
+                $up->execute();
+                continue;
+            }
+
+            // 3. Kalau belum ada, buat item baru.
+            $in = $db->prepare("
+                INSERT INTO paket_item (paket_id, nama, harga, satuan, kategori, aktif)
+                VALUES (?, ?, ?, ?, ?, 1)
+            ");
+            $in->bind_param("ssiss", $paket_id, $nama, $harga, $satuan, $kategori);
+            $in->execute();
+        }
+    }
+
+    // Hapus item yang dulu tersambung ke paket website, tetapi paketnya sudah dihapus.
+    $db->query("
+        DELETE pi FROM paket_item pi
+        LEFT JOIN paket p ON p.id = pi.paket_id
+        WHERE pi.paket_id IS NOT NULL
+        AND p.id IS NULL
+    ");
+}
+
+
+// ============================================================
+// ITEM BOOKING MAINTENANCE
+// ============================================================
+// Perbaikan ini tidak mengubah struktur tampilan. Fungsinya hanya:
+// 1) membersihkan item dobel,
+// 2) menghapus data dummy yang tidak valid,
+// 3) mencegah item yang sama masuk dua kali lagi.
+
+// Hapus data dummy / salah input jika pernah masuk ke item booking.
+$db->query("DELETE FROM paket_item WHERE LOWER(TRIM(nama)) = 'ilham fauzi'");
+
+// Hapus duplikat item booking yang memiliki nama, harga, satuan, dan kategori yang sama.
+// Data yang dipertahankan adalah baris dengan id paling kecil.
+$db->query("
+    DELETE p1 FROM paket_item p1
+    INNER JOIN paket_item p2
+        ON LOWER(TRIM(p1.nama)) = LOWER(TRIM(p2.nama))
+        AND p1.harga = p2.harga
+        AND LOWER(TRIM(p1.satuan)) = LOWER(TRIM(p2.satuan))
+        AND LOWER(TRIM(p1.kategori)) = LOWER(TRIM(p2.kategori))
+        AND p1.id > p2.id
+");
+
+// Tambahkan unique index agar item yang sama tidak bisa tersimpan dobel lagi.
+// Jika index sudah ada, bagian ini akan dilewati.
+$cekIndexPaketItem = $db->query("SHOW INDEX FROM paket_item WHERE Key_name = 'uniq_paket_item_clean'");
+if($cekIndexPaketItem && $cekIndexPaketItem->num_rows == 0){
+    $db->query("ALTER TABLE paket_item ADD UNIQUE KEY uniq_paket_item_clean (nama(191), harga, satuan, kategori)");
+}
+
+// ============================================================
 // AJAX
 // ============================================================
 $act = $_POST['act'] ?? $_GET['act'] ?? '';
@@ -91,18 +254,76 @@ $act = $_POST['act'] ?? $_GET['act'] ?? '';
 if($act === 'get_items_json'){
     header('Content-Type: application/json');
     $rows=[];
-    $r=$db->query("SELECT * FROM paket_item WHERE aktif=1 ORDER BY kategori,nama");
+    $r=$db->query("
+        SELECT p.*
+        FROM paket_item p
+        INNER JOIN (
+            SELECT MIN(id) AS id
+            FROM paket_item
+            WHERE aktif = 1
+            GROUP BY LOWER(TRIM(nama)), harga, LOWER(TRIM(satuan)), LOWER(TRIM(kategori))
+        ) x ON x.id = p.id
+        ORDER BY p.kategori, p.nama
+    ");
     while($row=$r->fetch_assoc()) $rows[]=$row;
     echo json_encode($rows); exit;
 }
 
 if($act === 'save_item'){
     header('Content-Type: application/json');
-    $id=intval($_POST['id']??0);$nama=trim($_POST['nama']??'');$harga=intval($_POST['harga']??0);
-    $satuan=trim($_POST['satuan']??'orang');$kat=trim($_POST['kategori']??'sea');
-    if($id){$s=$db->prepare("UPDATE paket_item SET nama=?,harga=?,satuan=?,kategori=? WHERE id=?");$s->bind_param("sissi",$nama,$harga,$satuan,$kat,$id);}
-    else{$s=$db->prepare("INSERT INTO paket_item (nama,harga,satuan,kategori) VALUES (?,?,?,?)");$s->bind_param("siss",$nama,$harga,$satuan,$kat);}
-    $s->execute(); echo json_encode(['ok'=>true,'id'=>$id?:$db->insert_id]); exit;
+
+    $id = intval($_POST['id'] ?? 0);
+    $nama = trim($_POST['nama'] ?? '');
+    $harga = intval($_POST['harga'] ?? 0);
+    $satuan = trim($_POST['satuan'] ?? 'orang');
+    $kat = trim($_POST['kategori'] ?? 'sea');
+
+    if($nama === ''){
+        echo json_encode(['ok'=>false,'msg'=>'Nama item wajib diisi.']);
+        exit;
+    }
+
+    if($id){
+        $s = $db->prepare("UPDATE paket_item SET nama=?, harga=?, satuan=?, kategori=? WHERE id=?");
+        $s->bind_param("sissi", $nama, $harga, $satuan, $kat, $id);
+        $s->execute();
+
+        echo json_encode(['ok'=>true,'id'=>$id]);
+        exit;
+    }
+
+    // Cek item yang sama sebelum insert agar tidak dobel.
+    $cek = $db->prepare("
+        SELECT id FROM paket_item
+        WHERE LOWER(TRIM(nama)) = LOWER(TRIM(?))
+        AND harga = ?
+        AND LOWER(TRIM(satuan)) = LOWER(TRIM(?))
+        AND LOWER(TRIM(kategori)) = LOWER(TRIM(?))
+        LIMIT 1
+    ");
+    $cek->bind_param("siss", $nama, $harga, $satuan, $kat);
+    $cek->execute();
+    $hasil = $cek->get_result();
+
+    if($hasil && $hasil->num_rows > 0){
+        $row = $hasil->fetch_assoc();
+        $existingId = intval($row['id']);
+
+        // Kalau item sudah ada, aktifkan kembali saja. Jangan insert baris baru.
+        $up = $db->prepare("UPDATE paket_item SET aktif=1 WHERE id=?");
+        $up->bind_param("i", $existingId);
+        $up->execute();
+
+        echo json_encode(['ok'=>true,'id'=>$existingId,'duplicate'=>true]);
+        exit;
+    }
+
+    $s = $db->prepare("INSERT INTO paket_item (nama,harga,satuan,kategori) VALUES (?,?,?,?)");
+    $s->bind_param("siss", $nama, $harga, $satuan, $kat);
+    $s->execute();
+
+    echo json_encode(['ok'=>true,'id'=>$db->insert_id]);
+    exit;
 }
 
 if($act === 'toggle_item'){
@@ -116,6 +337,45 @@ if($act === 'delete_item'){
     header('Content-Type: application/json');
     $id=intval($_POST['id']??0);$db->query("DELETE FROM paket_item WHERE id=$id");
     echo json_encode(['ok'=>true]); exit;
+}
+
+if($act === 'delete_booking'){
+    header('Content-Type: application/json');
+
+    $id = intval($_POST['id'] ?? 0);
+    if($id <= 0){
+        echo json_encode(['ok'=>false,'msg'=>'ID booking tidak valid.']);
+        exit;
+    }
+
+    $cek = $db->prepare("SELECT id FROM booking WHERE id=? LIMIT 1");
+    $cek->bind_param("i", $id);
+    $cek->execute();
+    $ada = $cek->get_result();
+
+    if(!$ada || $ada->num_rows == 0){
+        echo json_encode(['ok'=>false,'msg'=>'Data booking tidak ditemukan.']);
+        exit;
+    }
+
+    $db->begin_transaction();
+
+    $s1 = $db->prepare("DELETE FROM booking_items WHERE booking_id=?");
+    $s1->bind_param("i", $id);
+    $ok1 = $s1->execute();
+
+    $s2 = $db->prepare("DELETE FROM booking WHERE id=?");
+    $s2->bind_param("i", $id);
+    $ok2 = $s2->execute();
+
+    if($ok1 && $ok2 && $s2->affected_rows > 0){
+        $db->commit();
+        echo json_encode(['ok'=>true]);
+    } else {
+        $db->rollback();
+        echo json_encode(['ok'=>false,'msg'=>'Gagal menghapus data booking.']);
+    }
+    exit;
 }
 
 if($act === 'save_booking'){
@@ -278,13 +538,20 @@ if($act === 'get_booking'){
 
 if($act === 'export_excel'){
     while(ob_get_level()) ob_end_clean();
-    $fs=$_GET['fs']??'';$from=$_GET['from']??'';$to=$_GET['to']??'';
+    $fs=$_GET['fs']??'';$from=$_GET['from']??'';$to=$_GET['to']??'';$q=$_GET['q']??'';
 
     // filter: $wA pakai alias b. (untuk query join), $wN tanpa alias
+    // Export Excel selalu membaca database TERBARU, jadi setelah data booking dihapus
+    // jumlah transaksi dan omzet di Excel akan mengikuti halaman Laporan.
     $wA='WHERE 1=1'; $wN='WHERE 1=1';
-    if($fs){   $wA.=" AND b.status_bayar='".addslashes($fs)."'"; $wN.=" AND status_bayar='".addslashes($fs)."'"; }
-    if($from){ $wA.=" AND b.tanggal>='".addslashes($from)."'";   $wN.=" AND tanggal>='".addslashes($from)."'"; }
-    if($to){   $wA.=" AND b.tanggal<='".addslashes($to)."'";     $wN.=" AND tanggal<='".addslashes($to)."'"; }
+    if($fs){   $fsSafe=$db->real_escape_string($fs); $wA.=" AND b.status_bayar='$fsSafe'"; $wN.=" AND status_bayar='$fsSafe'"; }
+    if($from){ $fromSafe=$db->real_escape_string($from); $wA.=" AND b.tanggal>='$fromSafe'";   $wN.=" AND tanggal>='$fromSafe'"; }
+    if($to){   $toSafe=$db->real_escape_string($to); $wA.=" AND b.tanggal<='$toSafe'";     $wN.=" AND tanggal<='$toSafe'"; }
+    if($q){
+        $qSafe=$db->real_escape_string($q);
+        $wA.=" AND (b.nama LIKE '%$qSafe%' OR b.no_invoice LIKE '%$qSafe%' OR b.whatsapp LIKE '%$qSafe%' OR b.medsos LIKE '%$qSafe%')";
+        $wN.=" AND (nama LIKE '%$qSafe%' OR no_invoice LIKE '%$qSafe%' OR whatsapp LIKE '%$qSafe%' OR medsos LIKE '%$qSafe%')";
+    }
 
     // ===== REKAP (sama dengan halaman Laporan Omzet) =====
     $sum   = $db->query("SELECT SUM(total_invoice) t,SUM(dp) d,SUM(sisa_bayar) s,COUNT(*) c FROM booking $wN");
@@ -298,7 +565,9 @@ if($act === 'export_excel'){
 
     header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
     header('Content-Disposition: attachment; filename="Laporan_Omzet_Pangandaran_'.date('Ymd_His').'.xls"');
-    header('Cache-Control: max-age=0');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
     echo "\xEF\xBB\xBF";
     ?>
     <html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>
@@ -394,6 +663,7 @@ if($r6) while($r=$r6->fetch_assoc()) $omzet6[]=$r;
 
 $view=$_GET['v']??'dashboard';
 $fs=$_GET['fs']??'';$fq=$_GET['q']??'';
+$fromFilter=$_GET['from']??'';$toFilter=$_GET['to']??'';
 $page=max(1,intval($_GET['page']??1));$pp=15;$offset=($page-1)*$pp;
 $where="WHERE 1=1";
 if($fs) $where.=" AND status_bayar='".addslashes($fs)."'";
@@ -422,7 +692,16 @@ if(in_array($view,['booking','invoice','dashboard'])){
     if($res) while($r=$res->fetch_assoc()) $bookings[]=$r;
 }
 if(in_array($view,['items','booking'])){
-    $rpi=$db->query("SELECT * FROM paket_item ORDER BY aktif DESC,kategori,nama");
+    $rpi=$db->query("
+        SELECT p.*
+        FROM paket_item p
+        INNER JOIN (
+            SELECT MIN(id) AS id
+            FROM paket_item
+            GROUP BY LOWER(TRIM(nama)), harga, LOWER(TRIM(satuan)), LOWER(TRIM(kategori))
+        ) x ON x.id = p.id
+        ORDER BY p.aktif DESC, p.kategori, p.nama
+    ");
     if($rpi) while($r=$rpi->fetch_assoc()) $paket_items[]=$r;
 }
 
@@ -568,11 +847,11 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
     <div class="sb-section">Transaksi</div>
     <a href="admin.php?v=booking" class="sb-link <?= $view==='booking'?'on':'' ?>"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg> Data Booking</a>
     <div class="sb-section">Master Data</div>
-    <a href="admin.php?v=items" class="sb-link <?= $view==='items'?'on':'' ?>"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Kelola Item</a>
+    <a href="admin.php?v=items" class="sb-link <?= $view==='items'?'on':'' ?>"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Kelola Item Booking</a>
     <div class="sb-section">Laporan</div>
-    <a href="admin.php?v=laporan" class="sb-link <?= $view==='laporan'?'on':'' ?>"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Laporan Omzet</a>
+    <a href="admin.php?v=laporan" class="sb-link <?= $view==='laporan'?'on':'' ?>"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Laporan Transaksi</a>
     <div class="sb-section">Website</div>
-    <a href="admin_paket.php" class="sb-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Foto &amp; Harga</a>
+    <a href="admin_paket.php" class="sb-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Kelola Paket Website</a>
     <a href="index.html" target="_blank" class="sb-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Lihat Website</a>
     <a href="booking.html" target="_blank" class="sb-link"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg> Form Booking</a>
   </div>
@@ -582,10 +861,10 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
 <!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-t"><?= ['dashboard'=>'Dashboard','booking'=>'Data Booking','invoice'=>'Invoice','items'=>'Kelola Item Wisata','laporan'=>'Laporan Transaksi'][$view]??'Admin' ?></div>
+  <div class="topbar-t"><?= ['dashboard'=>'Dashboard','booking'=>'Data Booking','invoice'=>'Invoice','items'=>'Kelola Item Booking','laporan'=>'Laporan Transaksi'][$view]??'Admin' ?></div>
   <div style="display:flex;gap:8px;align-items:center">
     <?php if(in_array($view,['booking','invoice','laporan'])): ?>
-    <a href="?act=export_excel&fs=<?=urlencode($fs)?>&q=<?=urlencode($fq)?>" class="btn-s">Export Excel</a>
+    <a href="?act=export_excel&fs=<?=urlencode($fs)?>&q=<?=urlencode($fq)?>&from=<?=urlencode($fromFilter)?>&to=<?=urlencode($toFilter)?>&_t=<?=time()?>" class="btn-s">Export Excel</a>
     <?php endif; ?>
     <?php if($view==='booking'): ?>
     <button class="btn-p" onclick="openNewBooking()">+ Buat Booking</button>
@@ -716,7 +995,7 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
       <td style="padding:12px 14px;font-size:12px;color:var(--text)"><div><?= htmlspecialchars($r['tanggal'] ?? '—') ?></div><div style="font-size:10px;color:var(--muted);margin-top:2px"><?= !empty($r['waktu_kegiatan']) ? htmlspecialchars($r['waktu_kegiatan']) : '—' ?></div></td>
       <td style="padding:12px 14px;text-align:right;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--cyan)">Rp <?= rp($r['total_invoice']) ?></td>
       <td style="padding:12px 14px"><?= badge($r['status_bayar']) ?></td>
-      <td style="padding:12px 14px"><div style="display:flex;gap:4px"><button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openDetail(<?= $r['id'] ?>)">Detail</button><button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openInvoice(<?= $r['id'] ?>)">Invoice</button></div></td>
+      <td style="padding:12px 14px"><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openDetail(<?= $r['id'] ?>)">Detail</button><button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openInvoice(<?= $r['id'] ?>)">Invoice</button><button class="btn-d" style="padding:5px 9px;font-size:11px" onclick="deleteBooking(<?= $r['id'] ?>)">Hapus</button></div></td>
     </tr>
     <?php endwhile;
     else: ?>
@@ -772,9 +1051,10 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
       <?= !empty($b['tanggal_pelunasan']) ? date('Y-m-d', strtotime($b['tanggal_pelunasan'])) : '—' ?>
       </td>
 
-      <td><div style="display:flex;gap:4px">
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openDetail(<?= $b['id'] ?>)">Detail</button>
         <button class="btn-s" style="padding:5px 9px;font-size:11px" onclick="openInvoice(<?= $b['id'] ?>)">Invoice</button>
+        <button class="btn-d" style="padding:5px 9px;font-size:11px" onclick="deleteBooking(<?= $b['id'] ?>)">Hapus</button>
       </div></td>
     </tr>
     <?php endforeach; endif; ?>
@@ -794,7 +1074,7 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
 
 <?php elseif($view==='items'): ?>
 <!-- ===== KELOLA ITEM ===== -->
-<div class="ph"><div class="pt">Master Data</div><div class="ptitle">Paket & Item Wisata</div></div>
+<div class="ph"><div class="pt">Master Data</div><div class="ptitle">Kelola Item Booking</div></div>
 <div class="tw">
   <table>
     <thead><tr><th>Nama Item</th><th>Harga</th><th>Satuan</th><th>Kategori</th><th style="text-align:center">Status</th><th>Aksi</th></tr></thead>
@@ -828,7 +1108,7 @@ td{padding:10px 14px;font-size:12.5px;vertical-align:middle}
     <div class="fg"><label>Sampai Tanggal</label><input type="date" name="to" value="<?= $_GET['to']??'' ?>" style="min-width:140px"></div>
     <div class="fg"><label>Status</label><select class="sf" name="fs"><option value="">Semua</option><?php foreach(['Lunas','DP','Pending','Batal','Refund'] as $st): ?><option value="<?=$st?>" <?=$fs===$st?'selected':''?>><?=$st?></option><?php endforeach; ?></select></div>
     <button type="submit" class="btn-p">Tampilkan</button>
-    <a href="?act=export_excel&fs=<?=urlencode($fs)?>&from=<?=urlencode($_GET['from']??'')?>&to=<?=urlencode($_GET['to']??'')?>" class="btn-s" style="padding:8px 14px">Export Excel</a>
+    <a href="?act=export_excel&fs=<?=urlencode($fs)?>&q=<?=urlencode($fq)?>&from=<?=urlencode($_GET['from']??'')?>&to=<?=urlencode($_GET['to']??'')?>&_t=<?=time()?>" class="btn-s" style="padding:8px 14px">Export Excel</a>
   </form>
 </div>
 <?php
@@ -1195,6 +1475,7 @@ async function openDetail(id){
     <button class="btn-s" onclick="closeM('moDet')">Tutup</button>
     <button class="btn-s" onclick="closeM('moDet');openSts(${d.id}, ${parseInt(d.dp || 0)}, '${d.status_bayar || 'Pending'}')">Update Status</button>
     <button class="btn-s" onclick="closeM('moDet');openEditBk(${d.id})">Edit</button>
+    <button class="btn-d" onclick="closeM('moDet');deleteBooking(${d.id})">Hapus</button>
     <button class="btn-p" onclick="closeM('moDet');openInvoice(${d.id})">Invoice</button>`;
   openM('moDet');
 }
@@ -1398,6 +1679,23 @@ async function toggleItem(id,btn){
   btn.textContent=on?'Nonaktif':'Aktif';btn.style.color=on?'rgba(148,163,184,1)':'#22c55e';
   btn.closest('tr').style.opacity=on?'0.35':'1';toast('Status diperbarui','ok',2000);
 }
+async function deleteBooking(id){
+  if(!id) return;
+  if(!confirm('Hapus data booking ini? Data invoice dan item yang dipesan akan ikut terhapus.')) return;
+
+  const r=await(await fetch('admin.php',{
+    method:'POST',
+    body:new URLSearchParams({act:'delete_booking',id})
+  })).json();
+
+  if(r.ok){
+    toast('Data booking dihapus','ok',2000);
+    setTimeout(()=>location.reload(),900);
+  } else {
+    toast(r.msg || 'Gagal menghapus data booking.','err');
+  }
+}
+
 async function deleteItem(id){
   if(!confirm('Hapus item ini?')) return;
   const r=await(await fetch('admin.php',{method:'POST',body:new URLSearchParams({act:'delete_item',id})})).json();

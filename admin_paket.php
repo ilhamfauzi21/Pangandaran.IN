@@ -56,7 +56,7 @@ if (!isset($_SESSION['admin'])) { ?>
         <div class="logo-desc">Admin Panel</div>
     </div>
     <h1>Masuk</h1>
-    <p class="subtitle">Kelola paket wisata, harga, dan foto website.</p>
+    <p class="subtitle">Kelola paket website, harga, deskripsi, dan foto website.</p>
     <?php if (isset($loginError)): ?>
     <div class="error">Username atau password salah.</div>
     <?php endif; ?>
@@ -81,27 +81,173 @@ $conn = new mysqli("localhost", "root", "", "pangandaran_db");
 if($conn->connect_error){ die("Koneksi DB gagal: ".$conn->connect_error); }
 $conn->set_charset("utf8mb4");
 
-// Auto-create tabel paket jika belum ada
+// Auto-create / repair tabel sesuai kebutuhan prototype
 $conn->query("CREATE TABLE IF NOT EXISTS `paket` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `nama` VARCHAR(255) NOT NULL,
+    `id` VARCHAR(50) PRIMARY KEY,
+    `nama` VARCHAR(150) NOT NULL,
+    `subtitle` VARCHAR(150) DEFAULT NULL,
     `deskripsi` TEXT,
     `harga` INT DEFAULT 0,
+    `unit` VARCHAR(30) DEFAULT '/ orang',
     `kategori` VARCHAR(50) DEFAULT 'other',
-    `gambar` VARCHAR(255),
+    `durasi` VARCHAR(50) DEFAULT NULL,
+    `foto1` VARCHAR(200) DEFAULT NULL,
+    `foto2` VARCHAR(200) DEFAULT NULL,
+    `foto3` VARCHAR(200) DEFAULT NULL,
+    `wa` VARCHAR(20) DEFAULT NULL,
+    `highlights` TEXT,
+    `inclusions` TEXT,
     `aktif` TINYINT(1) DEFAULT 1,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+$conn->query("CREATE TABLE IF NOT EXISTS `paket_item` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `paket_id` VARCHAR(50) DEFAULT NULL,
+    `nama` VARCHAR(150),
+    `harga` INT DEFAULT 0,
+    `satuan` VARCHAR(30) DEFAULT '/ orang',
+    `kategori` VARCHAR(50) DEFAULT 'other',
+    `aktif` TINYINT(1) DEFAULT 1,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+function ensureColumn($conn, $table, $column, $definition){
+    $tableSafe = $conn->real_escape_string($table);
+    $columnSafe = $conn->real_escape_string($column);
+    $cek = $conn->query("SHOW COLUMNS FROM `$tableSafe` LIKE '$columnSafe'");
+    if ($cek && $cek->num_rows == 0) {
+        $conn->query("ALTER TABLE `$tableSafe` ADD COLUMN `$columnSafe` $definition");
+    }
+}
+
+function intRupiah($value){
+    $digits = preg_replace('/\D+/', '', (string)$value);
+    return $digits === '' ? 0 : intval($digits);
+}
+
+function normalizeItemSatuan($satuan){
+    $s = strtolower(trim((string)$satuan));
+    $s = str_replace('/', '', $s);
+    $s = trim($s);
+    return $s !== '' ? $s : 'orang';
+}
+
+function normalizeItemKategori($kategori){
+    $k = strtolower(trim((string)$kategori));
+    $allowed = ['river','sea','multi','outbound','other'];
+    return in_array($k, $allowed, true) ? $k : 'other';
+}
+
+function repairPaketItemTable($conn){
+    // Normalisasi satuan dari format '/ orang' menjadi 'orang' agar tidak muncul '// orang'.
+    $conn->query("UPDATE paket_item SET satuan = TRIM(REPLACE(satuan, '/', '')) WHERE satuan LIKE '/%' OR satuan LIKE '%/%'");
+
+    // Bersihkan data item dobel tanpa mengubah struktur tabel atau tampilan.
+    $conn->query("
+        DELETE p1 FROM paket_item p1
+        INNER JOIN paket_item p2
+            ON LOWER(TRIM(p1.nama)) = LOWER(TRIM(p2.nama))
+            AND p1.harga = p2.harga
+            AND LOWER(TRIM(p1.satuan)) = LOWER(TRIM(p2.satuan))
+            AND LOWER(TRIM(p1.kategori)) = LOWER(TRIM(p2.kategori))
+            AND p1.id > p2.id
+    ");
+}
+
+// Kolom pendukung agar aman jika struktur lama belum lengkap.
+ensureColumn($conn, 'paket', 'subtitle', "VARCHAR(150) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'unit', "VARCHAR(30) DEFAULT '/ orang'");
+ensureColumn($conn, 'paket', 'durasi', "VARCHAR(50) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'foto1', "VARCHAR(200) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'foto2', "VARCHAR(200) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'foto3', "VARCHAR(200) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'wa', "VARCHAR(20) DEFAULT NULL");
+ensureColumn($conn, 'paket', 'highlights', "TEXT");
+ensureColumn($conn, 'paket', 'inclusions', "TEXT");
+ensureColumn($conn, 'paket', 'updated_at', "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+ensureColumn($conn, 'paket_item', 'paket_id', "VARCHAR(50) DEFAULT NULL AFTER `id`");
+ensureColumn($conn, 'paket_item', 'updated_at', "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+
+// Sinkronisasi ringan: paket website menjadi sumber utama item booking.
+// Tidak mengubah tampilan; hanya memastikan data Paket Website masuk ke Kelola Item Booking.
+repairPaketItemTable($conn);
+syncAllPaketWebsiteToItemBooking($conn);
+repairPaketItemTable($conn);
+
+function syncPaketItem($conn, $paketId, $nama, $harga, $satuan, $kategori){
+    $aktif = 1;
+    $paketId = trim((string)$paketId);
+    $nama = trim((string)$nama);
+    $harga = intval($harga);
+    $satuan = normalizeItemSatuan($satuan);
+    $kategori = normalizeItemKategori($kategori);
+
+    if ($paketId === '' || $nama === '') return;
+
+    $cek = $conn->prepare("SELECT id FROM paket_item WHERE paket_id=? LIMIT 1");
+    $cek->bind_param("s", $paketId);
+    $cek->execute();
+    $row = $cek->get_result()->fetch_assoc();
+
+    if ($row) {
+        $stmt = $conn->prepare("UPDATE paket_item SET nama=?, harga=?, satuan=?, kategori=?, aktif=?, updated_at=NOW() WHERE paket_id=?");
+        $stmt->bind_param("sissis", $nama, $harga, $satuan, $kategori, $aktif, $paketId);
+        $stmt->execute();
+        return;
+    }
+
+    // Jika data lama sudah ada dengan nama yang sama, hubungkan dengan paket_id agar tidak dobel.
+    $cekNama = $conn->prepare("SELECT id FROM paket_item WHERE LOWER(TRIM(nama)) = LOWER(TRIM(?)) LIMIT 1");
+    $cekNama->bind_param("s", $nama);
+    $cekNama->execute();
+    $rowNama = $cekNama->get_result()->fetch_assoc();
+
+    if ($rowNama) {
+        $idItem = intval($rowNama['id']);
+        $stmt = $conn->prepare("UPDATE paket_item SET paket_id=?, harga=?, satuan=?, kategori=?, aktif=?, updated_at=NOW() WHERE id=?");
+        $stmt->bind_param("sissii", $paketId, $harga, $satuan, $kategori, $aktif, $idItem);
+        $stmt->execute();
+    } else {
+        $stmt = $conn->prepare("INSERT INTO paket_item (paket_id,nama,harga,satuan,kategori,aktif) VALUES (?,?,?,?,?,?)");
+        $stmt->bind_param("ssissi", $paketId, $nama, $harga, $satuan, $kategori, $aktif);
+        $stmt->execute();
+    }
+}
+
+function syncAllPaketWebsiteToItemBooking($conn){
+    $res = $conn->query("SELECT id,nama,harga,unit,kategori FROM paket");
+    if(!$res) return;
+    while($p = $res->fetch_assoc()){
+        syncPaketItem($conn, $p['id'], $p['nama'], $p['harga'], $p['unit'], $p['kategori']);
+    }
+}
 
 $message = '';
 $messageType = '';
 
 if (isset($_GET['hapus'])) {
     $hapusId = $_GET['hapus'];
+
+    $oldNama = '';
+    $q = $conn->prepare("SELECT nama FROM paket WHERE id=? LIMIT 1");
+    $q->bind_param("s", $hapusId);
+    $q->execute();
+    $old = $q->get_result()->fetch_assoc();
+    if ($old) $oldNama = $old['nama'];
+
+    // Hapus juga data item yang terhubung agar Kelola Item Booking tetap sinkron.
+    $stmtItem = $conn->prepare("DELETE FROM paket_item WHERE paket_id=? OR nama=?");
+    $stmtItem->bind_param("ss", $hapusId, $oldNama);
+    $stmtItem->execute();
+
     $stmt = $conn->prepare("DELETE FROM paket WHERE id=?");
     $stmt->bind_param("s", $hapusId);
     $stmt->execute();
-    header("Location: admin_paket.php?msg=".urlencode("Paket berhasil dihapus.")."&mt=success");
+
+    header("Location: admin_paket.php?msg=".urlencode("Paket berhasil dihapus dari daftar paket dan item.")."&mt=success");
     exit;
 }
 
@@ -116,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_paket'])) {
     $kategori = $_POST['kategori'];
     $subtitle = trim($_POST['subtitle']);
     $deskripsi= trim($_POST['deskripsi']);
-    $harga    = intval($_POST['harga']);
+    $harga    = intRupiah($_POST['harga'] ?? 0);
     $unit     = $_POST['unit'];
     $durasi   = trim($_POST['durasi']);
     $wa       = '6287793827592';
@@ -140,7 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_paket'])) {
         $stmt = $conn->prepare("INSERT INTO paket (id,nama,kategori,subtitle,deskripsi,harga,unit,durasi,foto1,foto2,foto3,wa) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
         $stmt->bind_param("sssssissssss", $id,$nama,$kategori,$subtitle,$deskripsi,$harga,$unit,$durasi,$foto[1],$foto[2],$foto[3],$wa);
         if ($stmt->execute()) {
-            header("Location: admin_paket.php?edit=$id&msg=".urlencode("Paket '$nama' berhasil ditambahkan.")."&mt=success");
+            syncPaketItem($conn, $id, $nama, $harga, $unit, $kategori);
+            header("Location: admin_paket.php?edit=$id&msg=".urlencode("Paket '$nama' berhasil ditambahkan dan masuk ke Kelola Item Booking.")."&mt=success");
             exit;
         } else {
             $message = "Gagal menyimpan: ".$stmt->error;
@@ -154,9 +301,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_paket'])) {
     $nama     = trim($_POST['nama']);
     $subtitle = trim($_POST['subtitle']);
     $deskripsi= trim($_POST['deskripsi']);
-    $harga    = intval($_POST['harga']);
+    $harga    = intRupiah($_POST['harga'] ?? 0);
     $unit     = $_POST['unit'];
     $durasi   = trim($_POST['durasi']);
+
+    $kategori = 'other';
+    $qKat = $conn->prepare("SELECT kategori FROM paket WHERE id=? LIMIT 1");
+    $qKat->bind_param("s", $id);
+    $qKat->execute();
+    $rowKat = $qKat->get_result()->fetch_assoc();
+    if ($rowKat && !empty($rowKat['kategori'])) $kategori = $rowKat['kategori'];
+
     $foto = [];
     for ($i = 1; $i <= 3; $i++) {
         if (!empty($_FILES["foto$i"]['name'])) {
@@ -172,7 +327,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_paket'])) {
     $stmt = $conn->prepare("UPDATE paket SET nama=?,subtitle=?,deskripsi=?,harga=?,unit=?,durasi=?,foto1=?,foto2=?,foto3=? WHERE id=?");
     $stmt->bind_param("sssissssss", $nama,$subtitle,$deskripsi,$harga,$unit,$durasi,$foto[1],$foto[2],$foto[3],$id);
     if ($stmt->execute()) {
-        header("Location: admin_paket.php?edit=$id&msg=".urlencode("Perubahan pada '$nama' berhasil disimpan.")."&mt=success");
+        syncPaketItem($conn, $id, $nama, $harga, $unit, $kategori);
+        header("Location: admin_paket.php?edit=$id&msg=".urlencode("Perubahan pada '$nama' berhasil disimpan dan Kelola Item Booking ikut diperbarui.")."&mt=success");
         exit;
     } else {
         $message = "Gagal: ".$stmt->error;
@@ -228,6 +384,8 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
         .nav{height:56px;background:rgba(0,14,37,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;position:relative;z-index:50}
         .nav-left{display:flex;align-items:center;gap:20px}
         .nav-brand{display:flex;align-items:center;gap:8px}
+        .nav-brand-logo{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(162,231,255,0.18)}
+        .nav-brand-fallback{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0059b3,#a2e7ff);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:12px;flex-shrink:0}
         .nav-brand-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan)}
         .nav-brand-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px}
         .nav-brand-name span{color:var(--cyan)}
@@ -261,8 +419,9 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
         .pkg-info{min-width:0;flex:1}
         .pkg-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
         .pkg-price{font-size:11px;color:var(--cyan);margin-top:1px}
-        .pkg-del{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,100,100,0.2);text-decoration:none;font-size:11px;font-weight:700;transition:all 0.15s;flex-shrink:0}
-        .pkg-del:hover{background:rgba(255,100,100,0.08);color:#ff8080}
+        .pkg-del{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:rgba(255,128,128,0.45);text-decoration:none;transition:all 0.15s;flex-shrink:0}
+        .pkg-del svg{width:13px;height:13px;stroke:currentColor}
+        .pkg-del:hover{background:rgba(255,100,100,0.10);color:#ff8080;border:1px solid rgba(255,100,100,0.14)}
 
         /* MAIN */
         .main{flex:1;overflow-y:auto;padding:28px 32px;background:var(--surface)}
@@ -324,6 +483,9 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
         .btn-save:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,89,179,0.35)}
         .btn-cancel{padding:11px 20px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:400;text-decoration:none;transition:all 0.15s;font-family:'Inter',sans-serif}
         .btn-cancel:hover{background:rgba(162,231,255,0.04);color:var(--text);border-color:rgba(162,231,255,0.2)}
+        .btn-delete{padding:11px 20px;border-radius:10px;background:rgba(255,80,80,0.07);border:1px solid rgba(255,80,80,0.18);color:#ff8080;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.15s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:8px}
+        .btn-delete svg{width:14px;height:14px;stroke:currentColor;flex-shrink:0}
+        .btn-delete:hover{background:rgba(255,80,80,0.14);border-color:rgba(255,80,80,0.28);color:#ff9a9a}
 
         @media(max-width:768px){
             .body{flex-direction:column}
@@ -338,14 +500,16 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
 <nav class="nav">
     <div class="nav-left">
         <div class="nav-brand">
-            <div class="nav-brand-dot"></div>
+            <img src="assets/logo.png" class="nav-brand-logo" alt="Logo Pangandaran.in" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="nav-brand-fallback" style="display:none">P</div>
             <div class="nav-brand-name">Pangandaran<span>.in</span></div>
         </div>
         <div class="nav-divider"></div>
         <span class="nav-label">Admin</span>
     </div>
     <div class="nav-right">
-        <a href="?mode=tambah" class="nav-btn">+ Tambah Paket</a>
+        <a href="?mode=tambah" class="nav-btn">+ Tambah Paket Website</a>
+        <a href="admin.php?v=items" class="nav-link">Kelola Item Booking</a>
         <a href="admin_booking.php" class="nav-link">Data Booking</a>
         <a href="index.html" target="_blank" class="nav-link">Website</a>
         <a href="?logout=1" class="nav-logout">Keluar</a>
@@ -356,7 +520,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <span class="sidebar-title">Paket Wisata</span>
+            <span class="sidebar-title">Paket Website</span>
             <span class="sidebar-count"><?= count($pakets) ?></span>
         </div>
         <div class="sidebar-body">
@@ -385,7 +549,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
                     <div class="pkg-name"><?= htmlspecialchars($p['nama']) ?></div>
                     <div class="pkg-price"><?= $hText ?></div>
                 </div>
-                <a href="?hapus=<?= $p['id'] ?>" class="pkg-del" onclick="return confirm('Hapus paket ini?')">x</a>
+                <a href="?hapus=<?= $p['id'] ?>" class="pkg-del" title="Hapus Paket Website" onclick="return confirm('Hapus paket website ini? Data item terkait di Kelola Item Booking juga akan dihapus.')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg></a>
             </a>
             <?php endforeach; ?>
         </div>
@@ -414,7 +578,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
 
         <div class="page-header">
             <div class="page-tag">Paket Baru</div>
-            <div class="page-title">Tambah Paket Wisata</div>
+            <div class="page-title">Tambah Paket Website</div>
         </div>
 
         <form method="POST" enctype="multipart/form-data">
@@ -470,7 +634,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
                     <div class="form-grid">
                         <div class="fg">
                             <label>Harga (Rp)</label>
-                            <input type="number" name="harga" id="hNew" placeholder="0" min="0" oninput="prevNew()">
+                            <input type="text" name="harga" id="hNew" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatHargaInput(this);prevNew()">
                             <div class="harga-display" id="hpNew">Nego</div>
                         </div>
                         <div class="fg">
@@ -513,7 +677,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save">Tambah Paket</button>
+                <button type="submit" class="btn-save">Tambah Paket Website</button>
                 <a href="admin_paket.php" class="btn-cancel">Batal</a>
             </div>
         </form>
@@ -566,7 +730,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
                     <div class="form-grid">
                         <div class="fg">
                             <label>Harga (Rp)</label>
-                            <input type="number" name="harga" id="hEdit" value="<?= $editPaket['harga'] ?>" min="0" oninput="prevEdit()">
+                            <input type="text" name="harga" id="hEdit" value="<?= $editPaket['harga'] > 0 ? number_format($editPaket['harga'],0,',','.') : '' ?>" inputmode="numeric" autocomplete="off" oninput="formatHargaInput(this);prevEdit()">
                             <div class="harga-display" id="hpEdit"><?= $editPaket['harga'] > 0 ? 'Rp '.number_format($editPaket['harga'],0,',','.') : 'Nego' ?></div>
                         </div>
                         <div class="fg">
@@ -617,6 +781,7 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
             <div class="form-actions">
                 <button type="submit" class="btn-save">Simpan Perubahan</button>
                 <a href="admin_paket.php" class="btn-cancel">Batal</a>
+                <a href="admin_paket.php?hapus=<?= urlencode($editPaket['id']) ?>" class="btn-delete" onclick="return confirm('Hapus paket website ini? Data item terkait di Kelola Item Booking juga akan dihapus.')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg><span>Hapus Paket Website</span></a>
             </div>
         </form>
 
@@ -625,12 +790,20 @@ foreach($pakets as $p) $katCount[$p['kategori']] = ($katCount[$p['kategori']] ??
 </div>
 
 <script>
+function cleanRupiahValue(value) {
+    const digits = String(value || '').replace(/\D/g, '');
+    return digits ? parseInt(digits, 10) : 0;
+}
+function formatHargaInput(input) {
+    const v = cleanRupiahValue(input.value);
+    input.value = v > 0 ? v.toLocaleString('id-ID') : '';
+}
 function prevNew() {
-    const v = parseInt(document.getElementById('hNew').value) || 0;
+    const v = cleanRupiahValue(document.getElementById('hNew').value);
     document.getElementById('hpNew').textContent = v > 0 ? 'Rp ' + v.toLocaleString('id-ID') : 'Nego';
 }
 function prevEdit() {
-    const v = parseInt(document.getElementById('hEdit').value) || 0;
+    const v = cleanRupiahValue(document.getElementById('hEdit').value);
     document.getElementById('hpEdit').textContent = v > 0 ? 'Rp ' + v.toLocaleString('id-ID') : 'Nego';
 }
 function previewFoto(input, num) {

@@ -343,9 +343,24 @@
               </div>
             </div>
 
+            <!-- KHUSUS CUSTOM TRIP: hanya muncul saat detail.html?paket=custom -->
+            <div id="customTripFields" class="hidden space-y-3">
+              <div>
+                <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Kebutuhan Perjalanan *</label>
+                <textarea id="customKebutuhan" rows="4" placeholder="Contoh: Trip 2 hari 1 malam, butuh hotel, transportasi, dokumentasi, dan wisata pantai."
+                  class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm resize-none"></textarea>
+              </div>
+
+              <div>
+                <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-1.5">Perkiraan Budget</label>
+                <input id="customBudget" type="text" inputmode="numeric" placeholder="Contoh: 3.000.000"
+                  class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-3 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
+              </div>
+            </div>
+
            
                         <!-- Jenis Pembayaran -->
-            <div>
+            <div id="paymentSection">
               <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1 block mb-2">Jenis Pembayaran</label>
               <div class="space-y-2">
                 <label id="payFull" class="pay-opt active flex items-center justify-between p-3 rounded-xl border cursor-pointer">
@@ -378,7 +393,7 @@
               </div>
 
               <div id="dpBox" class="hidden mt-2">
-                <input id="dpNominal" type="number" min="0" placeholder="Masukkan nominal DP minimal 30%"
+                <input id="dpNominal" type="text" inputmode="numeric" placeholder="Masukkan nominal DP minimal 30%"
                   class="w-full bg-surface-container-highest/60 border-0 rounded-xl px-4 py-2.5 text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-secondary/40 transition-all text-sm">
                 <p id="dpHint" class="text-[10px] text-amber-400/70 mt-1 px-1">Minimal DP 30% dari total invoice</p>
               </div>
@@ -387,7 +402,7 @@
 
           <!-- Ringkasan + Tombol -->
           <div class="mt-5 pt-4 border-t border-white/10">
-            <div class="space-y-1.5 mb-4 text-sm">
+            <div id="priceSummaryBox" class="space-y-1.5 mb-4 text-sm">
               <div class="flex justify-between text-on-surface-variant text-xs">
                 <span>Total Harga</span>
                 <span>Rp <span id="totalHarga">0</span></span>
@@ -405,7 +420,7 @@
               <span class="material-symbols-outlined text-base">payment</span>
               Lanjut ke Pembayaran
             </button>
-            <p class="text-center text-[10px] text-on-surface-variant/50 uppercase tracking-widest leading-relaxed mt-2">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai</p>
+            <p id="bookingHelperText" class="text-center text-[10px] text-on-surface-variant/50 uppercase tracking-widest leading-relaxed mt-2">Scan QRIS terlebih dahulu, lalu invoice akan muncul setelah pembayaran selesai</p>
           </div>
         </div>
         <a href="index.html#paket-scroll" class="mt-4 flex items-center justify-center gap-2 text-on-surface-variant hover:text-secondary transition-colors text-sm">
@@ -453,6 +468,7 @@ let _curInvoice = null;
 let _curWA      = '6287793827592';
 let _curTitle   = '';
 let _curPrice   = 0;
+let _isCustomTrip = false;
 
 // ===== TOAST =====
 function showToast(msg, duration) {
@@ -466,6 +482,11 @@ function showToast(msg, duration) {
 function fmtRp(n) { return (parseInt(n)||0).toLocaleString('id-ID'); }
 function fmtDate() { return new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); }
 function formatJamOtomatis(el) {
+  // Input waktu dibuat aman:
+  // 1000  -> 10.00
+  // 10000 -> 10.00
+  // 100.00 -> 10.00
+  // 930   -> dirapikan jadi 09.30 saat keluar dari field
   let v = el.value.replace(/[^0-9]/g, '');
 
   if (v.length > 4) {
@@ -482,17 +503,52 @@ function formatJamOtomatis(el) {
 function rapikanJam(el) {
   let v = el.value.replace(/[^0-9]/g, '');
 
+  if (!v) {
+    el.value = '';
+    return;
+  }
+
   if (v.length > 4) {
     v = v.slice(0, 4);
   }
 
-  if (v.length === 3) {
-    v = '0' + v;
+  let jam = '';
+  let menit = '';
+
+  if (v.length === 1) {
+    jam = '0' + v;
+    menit = '00';
+  } else if (v.length === 2) {
+    jam = v;
+    menit = '00';
+  } else if (v.length === 3) {
+    const duaDigitAwal = parseInt(v.slice(0, 2), 10);
+
+    if (duaDigitAwal <= 23) {
+      // contoh: 100 -> 10.00, 123 -> 12.30
+      jam = v.slice(0, 2);
+      menit = v.slice(2, 3) + '0';
+    } else {
+      // contoh: 930 -> 09.30, 830 -> 08.30
+      jam = '0' + v.slice(0, 1);
+      menit = v.slice(1, 3);
+    }
+  } else {
+    jam = v.slice(0, 2);
+    menit = v.slice(2, 4);
   }
 
-  if (v.length === 4) {
-    el.value = v.slice(0, 2) + '.' + v.slice(2, 4);
+  const jamAngka = parseInt(jam, 10);
+  const menitAngka = parseInt(menit, 10);
+
+  if (jamAngka > 23 || menitAngka > 59) {
+    showToast('Jam tidak valid. Gunakan format 10.00 atau 09.30');
+    el.value = '';
+    el.focus();
+    return;
   }
+
+  el.value = jam.padStart(2, '0') + '.' + menit.padEnd(2, '0');
 }
 // ===== GALLERY =====
 function renderGallery(fotos) {
@@ -921,6 +977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else { return; }
 
   _curWA=wa; _curTitle=title; _curPrice=price;
+  _isCustomTrip = key === 'custom' || title.toLowerCase().includes('custom');
   const priceDisp = price>0 ? 'Rp '+price.toLocaleString('id-ID') : 'Hubungi Kami';
 
   document.title=title+' | Pangandaran.in';
@@ -967,6 +1024,14 @@ document.getElementById('medsos').addEventListener('input', function(){
   }
 });
 
+// ─── Budget Custom Trip auto titik ───
+const customBudgetEl = document.getElementById('customBudget');
+if (customBudgetEl) {
+  customBudgetEl.addEventListener('input', function(){
+    formatBudgetRupiah(this);
+  });
+}
+
   // ─── Peserta ───
   const pesertaEl=document.getElementById('peserta');
   document.getElementById('plusPax').addEventListener('click',()=>{pesertaEl.value=parseInt(pesertaEl.value)+1;updateTotal();});
@@ -998,7 +1063,10 @@ document.querySelectorAll('input[name="payType"]').forEach(function(r){
   });
 });
 
-document.getElementById('dpNominal').addEventListener('input', updateTotal);
+document.getElementById('dpNominal').addEventListener('input', function(){
+  formatDpRupiah(this);
+  updateTotal();
+});
 
 function updateTotal() {
   const n = Math.max(1, parseInt(pesertaEl.value) || 1);
@@ -1009,7 +1077,8 @@ function updateTotal() {
   const minDP = Math.ceil(total * 0.3);
 
   const dpInput = document.getElementById('dpNominal');
-  const dp = payType === 'dp' ? Math.max(0, parseInt(dpInput.value) || 0) : 0;
+  const dpRaw = (dpInput.value || '').replace(/\D/g, '');
+  const dp = payType === 'dp' ? Math.max(0, parseInt(dpRaw) || 0) : 0;
   const sisa = payType === 'dp' ? Math.max(0, total - dp) : 0;
 
   document.getElementById('totalHarga').textContent = fmtRp(total);
@@ -1035,6 +1104,32 @@ function updateTotal() {
   }
 }
 updateTotal();
+applyCustomTripMode();
+
+
+function formatBudgetRupiah(el) {
+  let angka = (el.value || '').replace(/[^0-9]/g, '');
+
+  if (!angka) {
+    el.value = '';
+    return;
+  }
+
+  // 100000 -> 100.000, 5000000 -> 5.000.000
+  el.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function formatDpRupiah(el) {
+  let angka = (el.value || '').replace(/[^0-9]/g, '');
+
+  if (!angka) {
+    el.value = '';
+    return;
+  }
+
+  // 200000 -> 200.000, 210000 -> 210.000
+  el.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
 
 function formatWaktuInput(value) {
   let v = (value || '').replace(/[^0-9]/g, '');
@@ -1057,8 +1152,179 @@ function formatWaktuInput(value) {
   return v;
 }
 
+    // ─── Custom Trip Mode ───
+  function applyCustomTripMode() {
+    if (!_isCustomTrip) return;
+
+    const customTripFields = document.getElementById('customTripFields');
+    const paymentSection = document.getElementById('paymentSection');
+    const priceSummaryBox = document.getElementById('priceSummaryBox');
+    const bookBtn = document.getElementById('bookWA');
+    const helperText = document.getElementById('bookingHelperText');
+    const mobileBtn = document.getElementById('mobileBookBtn');
+
+    const hargaPaket = document.getElementById('hargaPaket');
+    const unitPaket = document.getElementById('unitPaket');
+    const mobilePriceDisplay = document.getElementById('mobilePriceDisplay');
+
+    if (hargaPaket) hargaPaket.textContent = 'Hubungi Kami';
+    if (unitPaket) unitPaket.textContent = '/ nego';
+    if (mobilePriceDisplay) mobilePriceDisplay.textContent = 'Hubungi Kami';
+
+    if (customTripFields) customTripFields.classList.remove('hidden');
+    if (paymentSection) paymentSection.classList.add('hidden');
+    if (priceSummaryBox) priceSummaryBox.classList.add('hidden');
+    if (helperText) helperText.classList.add('hidden');
+
+    if (bookBtn) {
+      bookBtn.innerHTML = `
+        <span class="material-symbols-outlined text-base">forum</span>
+        Ajukan ke Admin
+      `;
+    }
+
+    if (mobileBtn) {
+      mobileBtn.textContent = 'Ajukan ke Admin';
+    }
+  }
+
+  async function submitCustomTrip() {
+    const nama = document.getElementById('nama').value.trim();
+    const wa2 = document.getElementById('whatsapp').value.trim();
+    const medsos = document.getElementById('medsos').value.trim();
+    const tanggal = document.getElementById('tanggal').value;
+
+    rapikanJam(document.getElementById('waktu'));
+    const waktu = document.getElementById('waktu').value.trim();
+
+    const peserta = parseInt(document.getElementById('peserta').value) || 1;
+    const kebutuhan = document.getElementById('customKebutuhan').value.trim();
+    const budget = document.getElementById('customBudget').value.trim();
+
+    if(!nama) {
+      showToast('Nama lengkap wajib diisi.');
+      document.getElementById('nama').focus();
+      return;
+    }
+
+    if(!wa2) {
+      showToast('WhatsApp wajib diisi.');
+      document.getElementById('whatsapp').focus();
+      return;
+    }
+
+    if(!tanggal) {
+      showToast('Silakan pilih tanggal.');
+      document.getElementById('tanggal').focus();
+      return;
+    }
+
+    if(!waktu) {
+      showToast('Perkiraan waktu wajib diisi. Contoh: 10.00');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    if(!/^\d{2}\.\d{2}$/.test(waktu)) {
+      showToast('Format waktu salah. Gunakan format 10.00 atau 09.30');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    const jamParts = waktu.split('.');
+    const jam = parseInt(jamParts[0], 10);
+    const menit = parseInt(jamParts[1], 10);
+
+    if(jam < 0 || jam > 23 || menit < 0 || menit > 59) {
+      showToast('Jam tidak valid. Gunakan jam antara 00.00 sampai 23.59');
+      document.getElementById('waktu').focus();
+      return;
+    }
+
+    if(!kebutuhan) {
+      showToast('Kebutuhan perjalanan wajib diisi.');
+      document.getElementById('customKebutuhan').focus();
+      return;
+    }
+
+    const budgetAngka = parseInt((budget || '').replace(/\D/g, '')) || 0;
+    const hargaSatuanCustom = (budgetAngka > 0 && peserta > 0) ? Math.ceil(budgetAngka / peserta) : 0;
+
+    const itemCustomAdmin =
+      'Custom Trip - Kebutuhan: ' + kebutuhan + (budget ? ' | Budget: Rp ' + budget : '');
+
+    const pesan =
+`Halo Admin Pangandaran.in, saya ingin mengajukan Custom Trip.
+
+Nama: ${nama}
+WhatsApp: ${wa2}
+Media Sosial: ${medsos || '-'}
+Tanggal Trip: ${tanggal}
+Perkiraan Waktu: ${waktu}
+Jumlah Peserta: ${peserta} orang
+
+Kebutuhan Perjalanan:
+${kebutuhan}
+
+Perkiraan Budget:
+${budget || '-'}
+
+Mohon dibantu konfirmasi harga dan itinerary.`;
+
+    const body = 'nama=' + encodeURIComponent(nama)
+      + '&whatsapp=' + encodeURIComponent(wa2)
+      + '&medsos=' + encodeURIComponent(medsos)
+      + '&paket=' + encodeURIComponent(itemCustomAdmin)
+      + '&tanggal=' + encodeURIComponent(tanggal)
+      + '&waktu=' + encodeURIComponent(waktu)
+      + '&waktu_kegiatan=' + encodeURIComponent(waktu)
+      + '&peserta=' + encodeURIComponent(peserta)
+      + '&sumber=custom_trip'
+      + '&harga_satuan=' + encodeURIComponent(hargaSatuanCustom)
+      + '&total_harga=' + encodeURIComponent(budgetAngka)
+      + '&total_invoice=' + encodeURIComponent(budgetAngka)
+      + '&metode_bayar=' + encodeURIComponent('full')
+      + '&dp=' + encodeURIComponent(budgetAngka)
+      + '&sisa_bayar=0'
+      + '&nominal_bayar=' + encodeURIComponent(budgetAngka)
+      + '&kebutuhan=' + encodeURIComponent(kebutuhan)
+      + '&budget=' + encodeURIComponent(budget)
+      + '&catatan=' + encodeURIComponent('Custom Trip - pengajuan admin, tanpa QRIS otomatis');
+
+    showToast('Menyimpan Custom Trip ke admin...');
+
+    try {
+      const res = await fetch('create_payment.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: body
+      });
+
+      let data = {};
+      try { data = await res.json(); } catch(e) {}
+
+      if(!res.ok || (data.status && data.status !== 'ok')) {
+        showToast(data.message || 'Custom Trip gagal disimpan ke admin.');
+        return;
+      }
+
+      showToast('Custom Trip tersimpan di Data Booking admin.');
+
+      const adminWA = _curWA || '6287793827592';
+      const url = 'https://wa.me/' + adminWA + '?text=' + encodeURIComponent(pesan);
+      setTimeout(function(){ window.open(url, '_blank'); }, 500);
+    } catch(e) {
+      showToast('Gagal terhubung ke server. Custom Trip belum tersimpan ke admin.');
+    }
+  }
+
     // ─── doBooking ───
   async function doBooking() {
+    if (_isCustomTrip) {
+      await submitCustomTrip();
+      return;
+    }
+
     const nama    = document.getElementById('nama').value.trim();
     const wa2     = document.getElementById('whatsapp').value.trim();
     const medsos  = document.getElementById('medsos').value.trim();
@@ -1069,7 +1335,8 @@ function formatWaktuInput(value) {
 
     const peserta = parseInt(pesertaEl.value) || 1;
     const payType = document.querySelector('input[name="payType"]:checked')?.value || 'full';
-    const dpAmt   = payType === 'dp' ? Math.max(0, parseInt(document.getElementById('dpNominal').value) || 0) : 0;
+    const dpRawBooking = (document.getElementById('dpNominal').value || '').replace(/\D/g, '');
+    const dpAmt   = payType === 'dp' ? Math.max(0, parseInt(dpRawBooking) || 0) : 0;
     const totalHarga = peserta * price;
     const minDP = Math.ceil(totalHarga * 0.3);
 

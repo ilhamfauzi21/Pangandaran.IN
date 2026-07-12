@@ -652,11 +652,6 @@ td{padding:11px 14px;font-size:12.5px;vertical-align:middle;white-space:nowrap}
     <div class="fgrid">
       <div class="fg full"><label>Nama Lengkap *</label><input id="bkNama" placeholder="Nama client"></div>
       <div class="fg">
-        <label>Email (Opsional)</label>
-        <input id="bkEmail" type="email" placeholder="boleh dikosongkan" oninput="valEmail(this)" autocomplete="off">
-        <div id="ehint" style="font-size:11px;margin-top:4px;display:none"></div>
-      </div>
-      <div class="fg">
         <label>WhatsApp</label>
         <input id="bkWA" type="tel" placeholder="+62 8xx-xxxx-xxxx" oninput="fmtWA(this)">
       </div>
@@ -665,9 +660,9 @@ td{padding:11px 14px;font-size:12.5px;vertical-align:middle;white-space:nowrap}
         <input id="bkMedsos" type="text" placeholder="@username" oninput="fmtMedsos(this)" autocomplete="off">
       </div>
       <div class="fg"><label>Tanggal Kegiatan</label><input id="bkTgl" type="date" style="color-scheme:dark"></div>
-      <div class="fg"><label>Waktu Kegiatan</label><input id="bkWaktu" placeholder="09.00 - 11.00 WIB"></div>
-      <div class="fg"><label>Diskon (Rp)</label><input id="bkDisc" type="number" min="0" value="0" oninput="recalcBk()"></div>
-      <div class="fg"><label>DP / Terbayar (Rp)</label><input id="bkDP" type="number" min="0" value="0" oninput="recalcBk()"></div>
+      <div class="fg"><label>Waktu Kegiatan</label><input id="bkWaktu" placeholder="Contoh: 1000 → 10.00" inputmode="numeric" maxlength="5" oninput="fmtWaktuLive(this)" onblur="fmtWaktu(this)"></div>
+      <div class="fg"><label>Diskon (Rp)</label><input id="bkDisc" type="text" inputmode="numeric" value="0" oninput="fmtRpInput(this)" placeholder="0"></div>
+      <div class="fg"><label>DP / Terbayar (Rp)</label><input id="bkDP" type="text" inputmode="numeric" value="0" oninput="fmtRpInput(this)" placeholder="0"></div>
       <div class="fg"><label>Status Pembayaran</label>
         <select id="bkSts">
           <option value="Pending">Pending</option><option value="DP">DP</option>
@@ -701,7 +696,7 @@ td{padding:11px 14px;font-size:12.5px;vertical-align:middle;white-space:nowrap}
         <option value="Lunas">Lunas</option><option value="Paid Off">Paid Off</option>
         <option value="Batal">Batal</option><option value="Refund">Refund</option>
       </select></div>
-    <div class="fg"><label>Jumlah DP / Terbayar (Rp)</label><input id="stsDP" type="number" min="0" placeholder="0"></div>
+    <div class="fg"><label>Jumlah DP / Terbayar (Rp)</label><input id="stsDP" type="text" inputmode="numeric" placeholder="0" oninput="fmtRpInputOnly(this)"></div>
   </div>
   <div class="mf"><button class="btn-s" onclick="closeM('moSts')">Batal</button><button class="btn-p" onclick="saveSts()">Update</button></div>
 </div></div>
@@ -946,6 +941,15 @@ function openM(id){document.getElementById(id).classList.add('show');}
 function closeM(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
 const fRp=n=>(parseInt(n)||0).toLocaleString('id-ID');
+function onlyNum(v){return parseInt(String(v||'').replace(/\D/g,''),10)||0;}
+function fmtRpInputOnly(input){
+  const n=String(input.value||'').replace(/\D/g,'');
+  input.value=n ? Number(n).toLocaleString('id-ID') : '';
+}
+function fmtRpInput(input){
+  fmtRpInputOnly(input);
+  recalcBk();
+}
 
 function valEmail(input){
   const v=input.value.trim(),h=document.getElementById('ehint');if(!h)return;
@@ -973,6 +977,45 @@ function fmtMedsos(input){
   if(input.value.includes(' ')) input.value=input.value.replace(/\s+/g,'');
 }
 
+function fmtWaktuLive(input){
+  // Format otomatis saat admin mengetik.
+  // Contoh: 1000 -> 10.00, 0800 -> 08.00, 8 -> 8 lalu saat keluar menjadi 08.00.
+  let digits = input.value.replace(/\D/g,'').slice(0,4);
+
+  if(digits.length <= 2){
+    input.value = digits;
+    return;
+  }
+
+  input.value = digits.slice(0,2) + '.' + digits.slice(2);
+}
+
+function fmtWaktu(input){
+  // Normalisasi final saat admin keluar dari kolom waktu.
+  let digits = input.value.replace(/\D/g,'').slice(0,4);
+  if(!digits){
+    input.value = '';
+    return;
+  }
+
+  if(digits.length === 1){
+    input.value = '0' + digits + '.00';
+    return;
+  }
+
+  if(digits.length === 2){
+    input.value = digits + '.00';
+    return;
+  }
+
+  if(digits.length === 3){
+    input.value = '0' + digits.charAt(0) + '.' + digits.slice(1);
+    return;
+  }
+
+  input.value = digits.slice(0,2) + '.' + digits.slice(2,4);
+}
+
 let piList=[];
 async function loadPI(){try{const r=await fetch('admin_booking.php?act=get_items_json');piList=await r.json();}catch(e){piList=[];}}
 loadPI();
@@ -990,14 +1033,13 @@ let bc=0;
 function openNewBk(){
   document.getElementById('bkId').value='';
   document.getElementById('moBkT').textContent='Buat Booking Baru';
-  ['bkNama','bkEmail','bkWA','bkMedsos','bkCat','bkWaktu'].forEach(function(i){var el=document.getElementById(i);if(el){el.value='';el.style.borderColor='';}});
+  ['bkNama','bkWA','bkMedsos','bkCat','bkWaktu'].forEach(function(i){var el=document.getElementById(i);if(el){el.value='';el.style.borderColor='';}});
   document.getElementById('bkTgl').value='';
   document.getElementById('bkDisc').value=0;
   document.getElementById('bkDP').value=0;
   document.getElementById('bkSts').value='Pending';
   document.getElementById('bkItems').innerHTML='';
   bc=0;
-  var h=document.getElementById('ehint');if(h)h.style.display='none';
   addBkRow();
   recalcBk();
   openM('moBk');
@@ -1006,9 +1048,9 @@ function openNewBk(){
 async function openEditBk(id){
   const r=await(await fetch('admin_booking.php?act=get_booking&id='+id)).json();if(!r.ok)return;const d=r.data;
   document.getElementById('bkId').value=d.id;document.getElementById('moBkT').textContent='Edit — '+d.no_invoice;
-  document.getElementById('bkNama').value=d.nama;document.getElementById('bkEmail').value=(d.email==='noemail@pangandaran.in'?'':d.email);document.getElementById('bkWA').value=d.whatsapp;document.getElementById('bkMedsos').value=d.medsos||'';
+  document.getElementById('bkNama').value=d.nama;document.getElementById('bkWA').value=d.whatsapp;document.getElementById('bkMedsos').value=d.medsos||'';
   document.getElementById('bkTgl').value=d.tanggal;document.getElementById('bkWaktu').value=d.waktu_kegiatan||'';document.getElementById('bkCat').value=d.catatan||'';
-  document.getElementById('bkDisc').value=d.discount||0;document.getElementById('bkDP').value=d.dp||0;document.getElementById('bkSts').value=d.status_bayar;
+  document.getElementById('bkDisc').value=fRp(d.discount||0);document.getElementById('bkDP').value=fRp(d.dp||0);document.getElementById('bkSts').value=d.status_bayar;
   document.getElementById('bkItems').innerHTML='';bc=0;(d.items||[]).forEach(function(it){addBkRow(it);});if(!(d.items||[]).length)addBkRow();recalcBk();openM('moBk');
 }
 
@@ -1020,7 +1062,7 @@ function addBkRow(data){
   div.innerHTML='<div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">Produk</label>'
     +'<select onchange="onSel(this,\''+id+'\')" style="width:100%;background:rgba(0,14,37,.8);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--text);font-size:12px;outline:none">'+mkSel(data?data.produk:'')+'</select></div>'
     +'<div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">Harga</label>'
-    +'<input type="number" id="'+id+'h" value="'+(data?data.harga:0)+'" min="0" oninput="recalcBk()" style="background:rgba(0,14,37,.8);border:1px solid var(--border);border-radius:9px;padding:9px 10px;color:var(--cyan);font-size:11px;font-weight:700;outline:none"></div>'
+    +'<input type="text" inputmode="numeric" id="'+id+'h" value="'+fRp(data?data.harga:0)+'" oninput="fmtRpInput(this)" style="background:rgba(0,14,37,.8);border:1px solid var(--border);border-radius:9px;padding:9px 10px;color:var(--cyan);font-size:11px;font-weight:700;outline:none"></div>'
     +'<div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">Qty</label>'
     +'<input type="number" id="'+id+'q" value="'+(data?data.qty:1)+'" min="1" oninput="recalcBk()" style="background:rgba(0,14,37,.8);border:1px solid var(--border);border-radius:9px;padding:9px 8px;color:var(--text);font-size:12px;text-align:center;outline:none"></div>'
     +'<div style="padding-bottom:1px"><button onclick="document.getElementById(\''+id+'\').remove();recalcBk()" style="width:28px;height:34px;border-radius:7px;background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.18);color:#ff8080;cursor:pointer;font-size:16px;font-weight:700">&#215;</button></div>';
@@ -1028,17 +1070,17 @@ function addBkRow(data){
   recalcBk();
 }
 
-function onSel(sel,id){var h=parseInt(sel.options[sel.selectedIndex].getAttribute('data-h')||0);document.getElementById(id+'h').value=h;recalcBk();}
+function onSel(sel,id){var h=onlyNum(sel.options[sel.selectedIndex].getAttribute('data-h')||0);document.getElementById(id+'h').value=fRp(h);recalcBk();}
 
 function recalcBk(){
   var tot=0;
   document.querySelectorAll('#bkItems .irow').forEach(function(row){
-    var h=parseInt(row.querySelector('input[id$="h"]')?row.querySelector('input[id$="h"]').value:0);
-    var q=parseInt(row.querySelector('input[id$="q"]')?row.querySelector('input[id$="q"]').value:1);
+    var h=onlyNum(row.querySelector('input[id$="h"]')?row.querySelector('input[id$="h"]').value:0);
+    var q=onlyNum(row.querySelector('input[id$="q"]')?row.querySelector('input[id$="q"]').value:1);
     tot+=h*q;
   });
-  var disc=parseInt(document.getElementById('bkDisc').value||0);
-  var dp=parseInt(document.getElementById('bkDP').value||0);
+  var disc=onlyNum(document.getElementById('bkDisc').value||0);
+  var dp=onlyNum(document.getElementById('bkDP').value||0);
   var tinv=Math.max(0,tot-disc);var sisa=Math.max(0,tinv-dp);
   document.getElementById('bkSub').textContent='Rp '+fRp(tot);
   document.getElementById('bkDiscD').textContent='Rp '+fRp(disc);
@@ -1049,20 +1091,18 @@ function recalcBk(){
 
 async function saveBk(){
   var nama=document.getElementById('bkNama').value.trim();
-  var email=document.getElementById('bkEmail').value.trim();
+  var email='noemail@pangandaran.in';
   var medsos=document.getElementById('bkMedsos').value.trim();
   if(!nama){toast('Nama wajib diisi.','err');document.getElementById('bkNama').focus();return;}
-  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('Format email tidak valid.','err');document.getElementById('bkEmail').focus();return;}
-  if(!email) email='noemail@pangandaran.in';
   var items=[];
   document.querySelectorAll('#bkItems .irow').forEach(function(row){
     var p=row.querySelector('select')?row.querySelector('select').value:'';if(!p)return;
-    var h=parseInt(row.querySelector('input[id$="h"]')?row.querySelector('input[id$="h"]').value:0);
-    var q=parseInt(row.querySelector('input[id$="q"]')?row.querySelector('input[id$="q"]').value:1);
+    var h=onlyNum(row.querySelector('input[id$="h"]')?row.querySelector('input[id$="h"]').value:0);
+    var q=onlyNum(row.querySelector('input[id$="q"]')?row.querySelector('input[id$="q"]').value:1);
     items.push({produk:p,harga:h,qty:q,subtotal:h*q});
   });
   if(!items.length){toast('Minimal 1 item.','err');return;}
-  var body=new URLSearchParams({act:'save_booking',bid:document.getElementById('bkId').value||0,nama:nama,email:email,medsos:medsos,whatsapp:document.getElementById('bkWA').value,tanggal:document.getElementById('bkTgl').value,waktu:document.getElementById('bkWaktu').value,catatan:document.getElementById('bkCat').value,discount:document.getElementById('bkDisc').value||0,dp:document.getElementById('bkDP').value||0,status:document.getElementById('bkSts').value,items:JSON.stringify(items)});
+  var body=new URLSearchParams({act:'save_booking',bid:document.getElementById('bkId').value||0,nama:nama,email:email,medsos:medsos,whatsapp:document.getElementById('bkWA').value,tanggal:document.getElementById('bkTgl').value,waktu:document.getElementById('bkWaktu').value,catatan:document.getElementById('bkCat').value,discount:onlyNum(document.getElementById('bkDisc').value),dp:onlyNum(document.getElementById('bkDP').value),status:document.getElementById('bkSts').value,items:JSON.stringify(items)});
   var r=await(await fetch('admin_booking.php',{method:'POST',body:body})).json();
   if(r.ok){toast('Tersimpan!','ok');closeM('moBk');setTimeout(function(){location.reload();},1100);}else toast(r.msg||'Gagal.','err');
 }
@@ -1102,10 +1142,10 @@ async function openDetail(id){
   openM('moDet');
 }
 
-function openSts(id,dp,status){document.getElementById('stsId').value=id;document.getElementById('stsDP').value=dp||0;document.getElementById('stsVal').value=status||'Pending';openM('moSts');}
+function openSts(id,dp,status){document.getElementById('stsId').value=id;document.getElementById('stsDP').value=fRp(dp||0);document.getElementById('stsVal').value=status||'Pending';openM('moSts');}
 async function saveSts(){
   var id=document.getElementById('stsId').value;
-  var body=new URLSearchParams({act:'update_status',id:id,status:document.getElementById('stsVal').value,dp:document.getElementById('stsDP').value||0});
+  var body=new URLSearchParams({act:'update_status',id:id,status:document.getElementById('stsVal').value,dp:onlyNum(document.getElementById('stsDP').value)});
   var r=await(await fetch('admin_booking.php',{method:'POST',body:body})).json();
   if(r.ok){toast('Status diperbarui!','ok');closeM('moSts');setTimeout(function(){location.reload();},1100);}
 }
